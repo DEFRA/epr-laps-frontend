@@ -1,14 +1,14 @@
 export function buildNavigation(request) {
   return [
     {
-      text: 'Home',
+      text: 'Your Defra account',
       href: '/',
       current: request?.path === '/'
     },
     {
-      text: 'About',
-      href: '/about',
-      current: request?.path === '/about'
+      text: 'Sign out',
+      href: '/sign-out',
+      current: request?.path === '/sign-out'
     }
   ]
 }

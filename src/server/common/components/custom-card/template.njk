@@ -1,0 +1,27 @@
+<div class="govuk-grid-column-one-half custom-container-card" data-testid="app-custom-card">
+  <div class="custom-card">
+
+    {% if params.title %}
+      <h2 class="govuk-heading-m">
+        {% if params.link %}
+          <a class="govuk-link" href="{{ params.link }}">{{ params.title }}</a>
+        {% else %}
+          {{ params.title }}
+        {% endif %}
+      </h2>
+    {% endif %}
+
+    {% if params.body %}
+      <p class="govuk-body">{{ params.body }}</p>
+    {% endif %}
+
+    {% if params.list %}
+      <ul class="govuk-list govuk-list--bullet">
+        {% for item in params.list %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+  </div>
+</div>
