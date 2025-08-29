@@ -13,7 +13,7 @@ export const signOutController = {
   handler: (request, h) => {
     return h.view('sign-out/index.njk', {
       pageTitle: 'Get Help',
-      heading: 'Glamshire County Council',
+      heading: 'Glamshire County Council'
     })
   }
-};
+}

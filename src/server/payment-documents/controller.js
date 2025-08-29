@@ -27,6 +27,6 @@ export const paymentDocumentsController = {
           text: 'Payment documents'
         }
       ]
-    });
+    })
   }
-};
+}

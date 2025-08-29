@@ -4,8 +4,8 @@
  */
 export const homeController = {
   handler: (_request, h) => {
-    const translations = _request.app.translations || {};
-    const currentLang = _request.app.currentLang || 'en';
+    const translations = _request.app.translations || {}
+    const currentLang = _request.app.currentLang || 'en'
 
     return h.view('home/index', {
       pageTitle: 'Home',
@@ -17,8 +17,6 @@ export const homeController = {
           href: '/'
         }
       ]
-    });
+    })
   }
-};
-
-
+}
