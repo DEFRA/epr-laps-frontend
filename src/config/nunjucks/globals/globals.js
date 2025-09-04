@@ -1,3 +1,3 @@
-const govukRebrand = true
+const govukRebrand = false
 
 export { govukRebrand }

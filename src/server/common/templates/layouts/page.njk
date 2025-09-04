@@ -27,11 +27,6 @@
     useTudorCrown: true
   }) }}
 
-  {{ govukServiceNavigation({
-    serviceName: "Local Authority Payments account for EPR",
-    navigation: navigation
-  }) }}
-
  
 {% endblock %}
 
@@ -40,9 +35,14 @@
 {% endblock %}
 
 {% block beforeContent %}
+ {{ govukServiceNavigation({
+    serviceName: "Local Authority Payments account for EPR",
+    serviceUrl: "#",
+    navigation: navigation
+  }) }}
  {{ govukPhaseBanner({
     tag: {
-      text: "Beta"
+      text: "BETA"
     },
     html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help improve it.'
   }) }}

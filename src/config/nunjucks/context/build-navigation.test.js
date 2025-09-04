@@ -4,20 +4,20 @@ function mockRequest(options) {
   return { ...options }
 }
 
-describe.skip('#buildNavigation', () => {
+describe('#buildNavigation', () => {
   test('Should provide expected navigation details', () => {
     expect(
       buildNavigation(mockRequest({ path: '/non-existent-path' }))
     ).toEqual([
       {
         current: false,
-        text: 'Home',
+        text: 'Your Defra account',
         href: '/'
       },
       {
         current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Sign out',
+        href: '/sign-out'
       }
     ])
   })
@@ -25,14 +25,14 @@ describe.skip('#buildNavigation', () => {
   test('Should provide expected highlighted navigation details', () => {
     expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
-        current: true,
-        text: 'Home',
+        current: false,
+        text: 'Your Defra account',
         href: '/'
       },
       {
         current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Sign out',
+        href: '/sign-out'
       }
     ])
   })

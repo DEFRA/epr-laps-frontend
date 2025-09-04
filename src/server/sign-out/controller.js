@@ -12,7 +12,7 @@
 export const signOutController = {
   handler: (request, h) => {
     return h.view('sign-out/index.njk', {
-      pageTitle: 'Get Help',
+      pageTitle: 'Sign out',
       heading: 'Glamshire County Council'
     })
   }

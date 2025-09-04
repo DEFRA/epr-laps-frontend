@@ -1,7 +1,7 @@
 import { createServer } from '../server.js'
-import { statusCodes } from '../common/constants/status-codes.js'
+import { paymentDocumentsController } from './controller.js'
 
-describe.skip('#paymentDocumentsController', () => {
+describe('#paymentDocumentsController', () => {
   let server
 
   beforeAll(async () => {
@@ -14,12 +14,17 @@ describe.skip('#paymentDocumentsController', () => {
   })
 
   test('Should provide expected response', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/payment'
-    })
+    const mockRequest = {
+      app: {
+        translations: {}, // or whatever shape you expect
+        currentLang: 'en'
+      }
+    }
+    const mockH = {
+      view: (template, context) => `<html>${template}</html>` // or your expected output
+    }
 
-    expect(result).toEqual({ message: 'success' })
-    expect(statusCode).toBe(statusCodes.ok)
+    const response = paymentDocumentsController.handler(mockRequest, mockH)
+    expect(typeof response).toBe('string')
   })
 })

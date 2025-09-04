@@ -3,9 +3,15 @@
 {% block content %}
 
 <div class="govuk-body">
-  <h2 class="govuk-heading-m">
+  <h2 class="govuk-heading-xl">
     You are now signed out of Local Authority Payments
   </h2>
+  {% from "govuk/components/button/macro.njk" import govukButton %}
+
+{{ govukButton({
+  text: "Sign in",
+  href: "/"
+}) }}
 </div>
 
 {% endblock %}

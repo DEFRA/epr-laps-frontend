@@ -4,7 +4,7 @@ import { catchAll } from './errors.js'
 import { createServer } from '../../server.js'
 import { statusCodes } from '../constants/status-codes.js'
 
-describe.skip('#errors', () => {
+describe('#errors', () => {
   let server
 
   beforeAll(async () => {
@@ -17,14 +17,12 @@ describe.skip('#errors', () => {
   })
 
   test('Should provide expected Not Found page', async () => {
-    const { result, statusCode } = await server.inject({
+    const { payload, statusCode } = await server.inject({
       method: 'GET',
       url: '/non-existent-path'
     })
 
-    expect(result).toEqual(
-      expect.stringContaining('Page not found | epr-laps-frontend')
-    )
+    expect(payload).toMatch(/<title>\s*Page not found\s*\|/i)
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })

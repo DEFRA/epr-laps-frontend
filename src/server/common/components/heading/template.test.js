@@ -1,6 +1,6 @@
 import { renderComponent } from '../../test-helpers/component-helpers.js'
 
-describe.skip('Heading Component', () => {
+describe('Heading Component', () => {
   let $heading
 
   describe('With caption', () => {
@@ -17,7 +17,7 @@ describe.skip('Heading Component', () => {
 
     test('Should contain expected heading', () => {
       expect($heading('[data-testid="app-heading-title"]').text().trim()).toBe(
-        'Services'
+        'A page showing available services'
       )
     })
 

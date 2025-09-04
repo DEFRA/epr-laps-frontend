@@ -1,13 +1,13 @@
-import { getHelpController } from './controller.js'
+import { signOutController } from './controller.js'
 
-export const getHelp = {
+export const signOut = {
   plugin: {
-    name: 'getHelp',
+    name: 'signOut',
     register(server) {
       server.route({
         method: 'GET',
-        path: '/get-help',
-        ...getHelpController
+        path: '/sign-out',
+        ...signOutController
       })
     }
   }

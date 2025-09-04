@@ -1,3 +1,4 @@
 {% macro appCustomCard(params) %}
-    {%- include "./template.njk" -%}
+  {% set params = params %}  {# ensures template can see params #}
+  {%- include "./template.njk" -%}
 {% endmacro %}

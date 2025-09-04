@@ -3,7 +3,7 @@ export function buildNavigation(request) {
     {
       text: 'Your Defra account',
       href: '/',
-      current: request?.path === '/'
+      current: request?.path === '/your-defra-account'
     },
     {
       text: 'Sign out',

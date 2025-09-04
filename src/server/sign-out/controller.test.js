@@ -1,7 +1,7 @@
 import { createServer } from '../server.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
-describe.skip('#signOutController', () => {
+describe('#signOutController', () => {
   let server
 
   beforeAll(async () => {

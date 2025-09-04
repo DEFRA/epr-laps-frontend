@@ -15,7 +15,7 @@ vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
-describe.skip('context and cache', () => {
+describe('context and cache', () => {
   beforeEach(() => {
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()
@@ -50,7 +50,7 @@ describe.skip('context and cache', () => {
           getAssetPath: expect.any(Function),
           navigation: [
             {
-              current: true,
+              current: false,
               text: 'Your Defra account',
               href: '/'
             },
@@ -60,7 +60,7 @@ describe.skip('context and cache', () => {
               href: '/sign-out'
             }
           ],
-          serviceName: 'epr-laps-frontend',
+          serviceName: '',
           serviceUrl: '/'
         })
       })
@@ -139,17 +139,17 @@ describe.skip('context and cache', () => {
           getAssetPath: expect.any(Function),
           navigation: [
             {
-              current: true,
-              text: 'Home',
+              current: false,
+              text: 'Your Defra account',
               href: '/'
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Sign out',
+              href: '/sign-out'
             }
           ],
-          serviceName: 'epr-laps-frontend',
+          serviceName: '',
           serviceUrl: '/'
         })
       })

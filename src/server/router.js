@@ -7,6 +7,7 @@ import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 import { paymentDocuments } from './payment-documents/index.js'
 import { bankDetails } from './bank-details/index.js'
 import { getHelp } from './get-help/index.js'
+import { signOut } from './sign-out/index.js'
 
 export const router = {
   plugin: {
@@ -23,7 +24,8 @@ export const router = {
         about,
         paymentDocuments,
         bankDetails,
-        getHelp
+        getHelp,
+        signOut
       ])
 
       // Static assets

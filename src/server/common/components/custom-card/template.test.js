@@ -6,13 +6,13 @@ describe.skip('Custom Card Component', () => {
   describe('With caption', () => {
     beforeEach(() => {
       $customCard = renderComponent('customCard', {
-        text: 'Services',
+        title: 'Services',
         caption: 'A page showing available services'
       })
     })
 
     test('Should render app customCard component', () => {
-      expect($customCard('[data-testid="app-customCard"]')).toHaveLength(1)
+      expect($customCard('[data-testid="app-custom-card"]')).toHaveLength(1)
     })
 
     test('Should contain expected customCard', () => {
@@ -24,7 +24,7 @@ describe.skip('Custom Card Component', () => {
     test('Should have expected customCard caption', () => {
       expect(
         $customCard('[data-testid="app-customCard-caption"]').text().trim()
-      ).toBe('Services')
+      ).toBe('A page showing available services')
     })
   })
 })
