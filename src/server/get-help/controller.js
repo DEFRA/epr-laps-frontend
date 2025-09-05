@@ -3,7 +3,7 @@
  */
 
 export const getHelpController = {
-  handler: (request, h) => {
+  handler: (_request, h) => {
     return h.view('get-help/index.njk', {
       pageTitle: 'Get Help',
       heading: 'Glamshire County Council',

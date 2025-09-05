@@ -20,8 +20,7 @@ describe('#bankDetailsController', () => {
     })
 
     expect(statusCode).toBe(statusCodes.ok)
-
-    // Since result is HTML, assert that it contains the breadcrumb text
+    
     expect(result).toContain('Local Authority Payments (LAPs) home')
     expect(result).toContain('Bank details')
   })

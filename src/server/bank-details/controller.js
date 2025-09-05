@@ -3,7 +3,7 @@
  */
 
 export const bankDetailsController = {
-  handler: (request, h) => {
+  handler: (_request, h) => {
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       heading: 'Glamshire County Council',
