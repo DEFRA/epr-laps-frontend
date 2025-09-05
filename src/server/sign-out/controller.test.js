@@ -13,13 +13,13 @@ describe('#signOutController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should provide expected response', async () => {
+  test('GET /sign-out should render the sign out page', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/health'
+      url: '/sign-out'
     })
 
-    expect(result).toEqual({ message: 'success' })
     expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toContain('<title>  Sign out |')
   })
 })
