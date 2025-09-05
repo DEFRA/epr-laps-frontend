@@ -2,7 +2,7 @@ export function buildNavigation(request) {
   return [
     {
       text: 'Your Defra account',
-      href: '/',
+      href: '/defra-account',
       current: request?.path === '/your-defra-account'
     },
     {

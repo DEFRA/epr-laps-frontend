@@ -12,7 +12,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Your Defra account',
-        href: '/'
+        href: '/defra-account'
       },
       {
         current: false,
@@ -27,7 +27,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Your Defra account',
-        href: '/'
+        href: '/defra-account'
       },
       {
         current: false,

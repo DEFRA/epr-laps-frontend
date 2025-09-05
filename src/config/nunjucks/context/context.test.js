@@ -52,7 +52,7 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'Your Defra account',
-              href: '/'
+              href: '/defra-account'
             },
             {
               current: false,
@@ -141,7 +141,7 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'Your Defra account',
-              href: '/'
+              href: '/defra-account'
             },
             {
               current: false,
