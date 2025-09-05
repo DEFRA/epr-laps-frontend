@@ -2,7 +2,7 @@
   <div class="custom-card">
 
     {% if params.title %}
-      <h2 class="govuk-heading-m">
+      <h2 class="govuk-heading-m" data-testid="app-customCard-title">
         {% if params.link %}
           <a class="govuk-link" href="{{ params.link }}">{{ params.title }}</a>
         {% else %}
