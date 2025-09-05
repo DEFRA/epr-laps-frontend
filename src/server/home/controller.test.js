@@ -6,6 +6,12 @@ describe('#homeController', () => {
 
   beforeAll(async () => {
     server = await createServer()
+
+    server.ext('onRequest', (request, h) => {
+      request.app.translations = { 'local-authority': 'Mocked Local Authority' }
+      return h.continue
+    })
+
     await server.initialize()
   })
 

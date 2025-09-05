@@ -13,13 +13,15 @@ describe('#bankDetailsController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should provide expected response', async () => {
+  test('Should render breadcrumbs in the bank details page', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/health'
+      url: '/bank-details'
     })
 
-    expect(result).toEqual({ message: 'success' })
     expect(statusCode).toBe(statusCodes.ok)
+
+    expect(result).toContain('Local Authority Payments (LAPs) home')
+    expect(result).toContain('Bank details')
   })
 })
