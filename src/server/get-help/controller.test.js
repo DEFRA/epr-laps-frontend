@@ -18,9 +18,9 @@ describe('#getHelpController', () => {
       method: 'GET',
       url: '/get-help'
     })
-  
+
     expect(statusCode).toBe(statusCodes.ok)
-  
+
     // Since result is HTML, assert that it contains the breadcrumb text
     expect(result).toContain('Local Authority Payments (LAPs) home')
     expect(result).toContain('Get help')
