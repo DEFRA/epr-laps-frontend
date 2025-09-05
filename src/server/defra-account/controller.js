@@ -1,6 +1,5 @@
-
 export const defraAccountController = {
-  handler: (request, h) => {
+  handler: (_request, h) => {
     return h.view('defra-account/index.njk', {
       pageTitle: 'Your DEFRA Account',
       heading: 'Glamshire County Council',

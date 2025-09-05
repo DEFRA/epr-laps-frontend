@@ -13,13 +13,13 @@ describe('#defraAccountController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should provide expected response', async () => {
+  test('Should render defra-account page', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
       url: '/defra-account'
     })
 
-    expect(result).toEqual({ message: 'success' })
     expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toContain('<!DOCTYPE html>')
   })
 })
