@@ -8,11 +8,12 @@ export const homeController = {
 
     return h.view('home/index', {
       pageTitle: 'Home',
-      heading: translations['local-authority'] || 'local-authority',
+      // heading: translations['local-authority'] || 'local-authority',
       currentLang,
+      translations,
       breadcrumbs: [
         {
-          text: 'Local Authority Payments (LAPs) home',
+          text:  translations['local-authority'] || 'Local Authority Payments (LAPs) home',
           href: '/'
         }
       ]

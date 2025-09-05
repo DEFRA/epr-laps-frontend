@@ -36,15 +36,15 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: "Local Authority Payments account for EPR",
+    serviceName: translations['local-authority'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
  {{ govukPhaseBanner({
     tag: {
-      text: "BETA"
+      text: translations['beta']
     },
-    html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help improve it.'
+    html: translations['this-is-a-new-s'] | safe
   }) }}
   
     <div class="govuk-width-container">

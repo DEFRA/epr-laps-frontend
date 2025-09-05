@@ -1,7 +1,10 @@
 import { buildNavigation } from './build-navigation.js'
 
 function mockRequest(options) {
-  return { ...options }
+return {
+    ...options,
+    app: { translations: {} }
+}
 }
 
 describe('#buildNavigation', () => {
@@ -12,7 +15,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Your Defra account',
-        href: '/'
+        href: '/defra-account'
       },
       {
         current: false,
@@ -27,7 +30,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Your Defra account',
-        href: '/'
+        href: '/defra-account'
       },
       {
         current: false,
