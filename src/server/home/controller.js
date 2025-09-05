@@ -4,12 +4,12 @@
 export const homeController = {
   handler: (_request, h) => {
     const translations = _request.app.translations || {}
-    // const currentLang = _request.app.currentLang || 'en'
+    const currentLang = _request.app.currentLang || 'en'
 
     return h.view('home/index', {
       pageTitle: 'Home',
       heading: translations['local-authority'] || 'local-authority',
-      // currentLang,
+      currentLang,
       breadcrumbs: [
         {
           text: 'Local Authority Payments (LAPs) home',
