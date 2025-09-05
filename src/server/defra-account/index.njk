@@ -1,0 +1,64 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+<div class="govuk-grid-row">
+<div class="govuk-grid-column-two-thirds">
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{{ appHeading({
+    caption: "Your Defra account"
+
+  }) }}
+
+    <p>
+      From here you can update your personal details, manage your accounts, and access your available services.
+    </p>
+
+   <p>
+  <span class="govuk-!-font-weight-bold">Full Name</span>
+  <span class="govuk-!-margin-left-1">John Smith</span>
+</p>
+<p>
+<span class="govuk-!-font-weight-bold">Email</span>
+<span class="govuk-!-margin-left-1">joe.bloggs@glamshirecountycouncil.gov.uk</span>
+</p>
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+ <h1 class="govuk-heading-m">
+      Your accounts
+    </h1>
+
+{{ govukTable({
+  firstCellIsHeader: false,
+  head: [
+    { text: "Account" },
+    { text: "Account Role" },
+    { text: "Service" },
+    { text: "Service Role" }
+  ],
+  rows: [
+    [
+      { text: "Glamshire County Council" },
+      { text: "Owner" },
+      { text: "Local Authority Payments(LAPs)" },
+      { text: "CEO" }
+    ],
+    [
+      { text: "Unglamshire County Council" },
+      { text: "Owner" },
+      { text: "Local Authority Payments(LAPs)" },
+      { text: "CEO" }
+    ]
+  ]
+}) }}
+
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{{ govukDetails({
+  summaryText: "Help with nationality",
+  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
+}) }}
+</div>
+  
+{% endblock %}

@@ -8,7 +8,7 @@ import { paymentDocuments } from './payment-documents/index.js'
 import { bankDetails } from './bank-details/index.js'
 import { getHelp } from './get-help/index.js'
 import { signOut } from './sign-out/index.js'
-
+import { defraAccount } from './defra-account/index.js'
 export const router = {
   plugin: {
     name: 'router',
@@ -25,7 +25,8 @@ export const router = {
         paymentDocuments,
         bankDetails,
         getHelp,
-        signOut
+        signOut,
+        defraAccount
       ])
 
       // Static assets
