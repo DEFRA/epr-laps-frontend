@@ -20,7 +20,7 @@ describe('#bankDetailsController', () => {
     })
 
     expect(statusCode).toBe(statusCodes.ok)
-    
+
     expect(result).toContain('Local Authority Payments (LAPs) home')
     expect(result).toContain('Bank details')
   })
