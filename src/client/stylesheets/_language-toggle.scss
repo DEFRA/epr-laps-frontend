@@ -1,4 +1,5 @@
 @use "govuk-frontend" as *;
+
 .dwp-language-toggle {
     @include govuk-font($size: 16);
     @include govuk-clearfix;
