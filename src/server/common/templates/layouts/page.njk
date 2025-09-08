@@ -54,17 +54,15 @@
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
         
       </div>
-      <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
-         {{
-          dwpLanguageToggle({
-            selectedLang: currentLang,
-            href: {
-              en: "?lang=en",
-              cy: "?lang=cy"
-            }
-          })
-        }}
-      </div>
+    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+  <nav aria-label="Language switcher" class="app-language-toggle">
+    {% if currentLang == 'en' %}
+      <span class="govuk-!-font-weight">English</span> | <a href="?lang=cy" class="govuk-link">Cymraeg</a>
+    {% else %}
+      <a href="?lang=en" class="govuk-link">English</a> | <span class="govuk-!-font-weight">Cymraeg</span>
+    {% endif %}
+  </nav>
+</div>
     </div>
   </div>
 {% endblock %}

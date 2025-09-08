@@ -13,7 +13,9 @@ export const homeController = {
       translations,
       breadcrumbs: [
         {
-          text:  translations['local-authority'] || 'Local Authority Payments (LAPs) home',
+          text:
+            translations['local-authority'] ||
+            'Local Authority Payments (LAPs) home',
           href: '/'
         }
       ]
