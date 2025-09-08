@@ -44,7 +44,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: ''
+    default: 'EPR-LAPs'
   },
   root: {
     doc: 'Project root',

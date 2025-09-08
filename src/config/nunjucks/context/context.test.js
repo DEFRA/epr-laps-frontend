@@ -60,7 +60,7 @@ describe('context and cache', () => {
               href: '/sign-out'
             }
           ],
-          serviceName: '',
+          serviceName: 'EPR-LAPs',
           serviceUrl: '/'
         })
       })
@@ -149,7 +149,7 @@ describe('context and cache', () => {
               href: '/sign-out'
             }
           ],
-          serviceName: '',
+          serviceName: 'EPR-LAPs',
           serviceUrl: '/'
         })
       })
