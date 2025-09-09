@@ -4,7 +4,7 @@ export function buildNavigation(request) {
     {
       text: translations['your-defra-acco'] || 'Your Defra account',
       href: '/defra-account',
-      current: request?.path === '/your-defra-account'
+      current: request?.path === '/defra-account'
     },
     {
       text: translations['sign-out'] || 'Sign out',

@@ -88,13 +88,6 @@ export async function createServer() {
     return h.continue
   })
 
-  // Attach i18n translator to each request
-  // server.ext('onRequest', (request, h) => {
-  //   const lang = request.query.lang || request.headers['accept-language']?.split(',')[0] || 'en'
-  //   request.i18n = i18n.cloneInstance({ lng: lang })
-  //   request.language = lang // useful in templates
-  //   return h.continue
-  // })
   await server.register([
     requestLogger,
     requestTracing,
