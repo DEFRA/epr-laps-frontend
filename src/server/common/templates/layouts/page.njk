@@ -55,22 +55,16 @@
         
       </div>
    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
-  <nav aria-label="Language switcher" class="app-language-toggle">
-    {% if currentLang == 'cy' %}
-      <a href="?lang=en" class="govuk-link app-lang-link">English</a> | <span class="govuk-!-font-weight">Cymraeg</span>
-    {% else %}
-      <span class="govuk-!-font-weight">English</span> | <a href="?lang=cy" class="govuk-link app-lang-link">Cymraeg</a>
-    {% endif %}
-  </nav>
-</div>
-
-<style>
-  /* Ensure language links stay GOV.UK blue even after visiting */
-  .app-lang-link:link,
-  .app-lang-link:visited {
-    color: #1d70b8; /* GOV.UK blue */
-  }
-</style>
+         {{
+          dwpLanguageToggle({
+            selectedLang: currentLang,
+            href: {
+              en: "?lang=en",
+              cy: "?lang=cy"
+            }
+          })
+        }}
+      </div>
     </div>
   </div>
 {% endblock %}
