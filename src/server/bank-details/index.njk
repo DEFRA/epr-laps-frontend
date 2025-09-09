@@ -7,7 +7,7 @@
 
   {% set html %}
     <p class="govuk-notification-banner__heading">
-      You have 7 days left to send your application.
+      {{ notificationHeading }}
     </p>
   {% endset %}
 
@@ -18,15 +18,31 @@
   {% from "govuk/components/table/macro.njk" import govukTable %}
   {% from "govuk/components/tag/macro.njk" import govukTag %}
 
+{{ appHeading({
+    text: heading,
+    caption: translations['bank-details'] 
+  }) }}
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
-  <h2 class="govuk-heading-m">
-    Your local authority's bank details
+  <h2 class="govuk-heading-s">
+    {{yourlocal}}
   </h2>
   {{ govukTag({
-    text: "UNCONFIRMED",
-    classes: "govuk-tag--red"
+    text: translations['unconfirmed'] or "UNCONFIRMED",
+    classes:  "govuk-tag--red govuk-!-font-weight-bold app-tag-custom"
   }) }}
 </div>
+
+{% block styles %}
+<style>
+  .app-tag-custom {
+    letter-spacing: 1px;   
+    font-size: 14px;       
+    line-height: 1.2;   
+    position: relative;     
+    top: -9px;     
+  }
+</style>
+{% endblock %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
@@ -35,26 +51,26 @@
   rows: [
     [
       {
-        text: "First 6 weeks"
+        text: translations['account-name'] 
       },
       {
-        text: "£109.80 per week"
+        text: translations['glamshire-count']  
       }
     ],
     [
       {
-        text: "Next 33 weeks"
+        text: translations['sort-code'] 
       },
       {
-        text: "£109.80 per week"
+        text: "12 34 56"
       }
     ],
     [
       {
-        text: "Total estimated pay"
+        text: translations['account-number']
       },
       {
-        text: "£4,282.20"
+        text: "78910112"
       }
     ]
   ]
@@ -62,10 +78,23 @@
 
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
+{% set detailsHtml %}
+  <p>{{ translations['to-update-your-'] }}</p>
+  <p>{{ translations["we'll-let-you-k"] }}, {{ translations['we-aim-to-respo'] }}</p>
+
+  <p><strong>{{ translations['email'] }}</strong><br>
+    <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
+    {{ translations['we-aim-to-respo'] }}
+  </p>
+
+  <p><strong>{{ translations['telephone'] }}</strong><br>
+    {{ translations['0300-060-0002'] }}<br>
+    {{ translations['monday-to-frida'] }}
+  </p>
+{% endset %}
+
 {{ govukDetails({
-  summaryText: "Help with nationality",
-  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
+  summaryText: translations['these-details-a'],
+  html: detailsHtml
 }) }}
-</div>
-  
 {% endblock %}

@@ -36,15 +36,15 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: "Local Authority Payments account for EPR",
+    serviceName: translations['local-authority'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
  {{ govukPhaseBanner({
     tag: {
-      text: "BETA"
+      text: translations['beta']
     },
-    html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help improve it.'
+    html: translations['this-is-a-new-s'] | safe
   }) }}
   
     <div class="govuk-width-container">
@@ -54,17 +54,23 @@
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
         
       </div>
-      <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
-         {{
-          dwpLanguageToggle({
-            selectedLang: currentLang,
-            href: {
-              en: "?lang=en",
-              cy: "?lang=cy"
-            }
-          })
-        }}
-      </div>
+   <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+  <nav aria-label="Language switcher" class="app-language-toggle">
+    {% if currentLang == 'cy' %}
+      <a href="?lang=en" class="govuk-link app-lang-link">English</a> | <span class="govuk-!-font-weight">Cymraeg</span>
+    {% else %}
+      <span class="govuk-!-font-weight">English</span> | <a href="?lang=cy" class="govuk-link app-lang-link">Cymraeg</a>
+    {% endif %}
+  </nav>
+</div>
+
+<style>
+  /* Ensure language links stay GOV.UK blue even after visiting */
+  .app-lang-link:link,
+  .app-lang-link:visited {
+    color: #1d70b8; /* GOV.UK blue */
+  }
+</style>
     </div>
   </div>
 {% endblock %}
