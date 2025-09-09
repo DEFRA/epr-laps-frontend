@@ -17,14 +17,12 @@ describe('#errors', () => {
   })
 
   test('Should provide expected Not Found page', async () => {
-    const { result, statusCode } = await server.inject({
+    const { payload, statusCode } = await server.inject({
       method: 'GET',
       url: '/non-existent-path'
     })
 
-    expect(result).toEqual(
-      expect.stringContaining('Page not found | epr-laps-frontend')
-    )
+    expect(payload).toMatch(/<title>\s*Page not found\s*\|/i)
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })

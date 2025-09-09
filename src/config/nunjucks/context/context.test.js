@@ -50,17 +50,17 @@ describe('context and cache', () => {
           getAssetPath: expect.any(Function),
           navigation: [
             {
-              current: true,
-              text: 'Home',
-              href: '/'
+              current: false,
+              text: 'Your Defra account',
+              href: '/defra-account'
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Sign out',
+              href: '/sign-out'
             }
           ],
-          serviceName: 'epr-laps-frontend',
+          serviceName: 'EPR-LAPs',
           serviceUrl: '/'
         })
       })
@@ -139,17 +139,17 @@ describe('context and cache', () => {
           getAssetPath: expect.any(Function),
           navigation: [
             {
-              current: true,
-              text: 'Home',
-              href: '/'
+              current: false,
+              text: 'Your Defra account',
+              href: '/defra-account'
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Sign out',
+              href: '/sign-out'
             }
           ],
-          serviceName: 'epr-laps-frontend',
+          serviceName: 'EPR-LAPs',
           serviceUrl: '/'
         })
       })

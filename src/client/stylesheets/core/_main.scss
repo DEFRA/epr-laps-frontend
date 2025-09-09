@@ -1,9 +1,18 @@
 @use "govuk-frontend" as *;
-
+@use "../language-toggle";
 // Example namespaced custom element style CSS classes
 
 .app-main-wrapper {
   display: block;
   padding-top: govuk-spacing(4);
   padding-bottom: govuk-spacing(3);
+}
+
+.govuk-service-navigation .govuk-service-navigation__list {
+  justify-content: flex-end;
+}
+
+.govuk-service-navigation {
+  padding-left: 1em;
+  padding-right: 1em;
 }

@@ -11,13 +11,13 @@ describe('#buildNavigation', () => {
     ).toEqual([
       {
         current: false,
-        text: 'Home',
-        href: '/'
+        text: 'Your Defra account',
+        href: '/defra-account'
       },
       {
         current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Sign out',
+        href: '/sign-out'
       }
     ])
   })
@@ -25,14 +25,14 @@ describe('#buildNavigation', () => {
   test('Should provide expected highlighted navigation details', () => {
     expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
-        current: true,
-        text: 'Home',
-        href: '/'
+        current: false,
+        text: 'Your Defra account',
+        href: '/defra-account'
       },
       {
         current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Sign out',
+        href: '/sign-out'
       }
     ])
   })
