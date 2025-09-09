@@ -21,7 +21,7 @@ describe('context and cache', () => {
   let contextImport
 
   beforeEach(async () => {
-    vi.resetModules() 
+    vi.resetModules()
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()
 
@@ -31,7 +31,7 @@ describe('context and cache', () => {
       "stylesheets/application.scss": "stylesheets/application.css"
     }`)
 
-    contextImport = await import('./context.js') 
+    contextImport = await import('./context.js')
   })
 
   const mockRequest = {
@@ -77,10 +77,10 @@ describe('context and cache', () => {
     })
 
     test('Should use cache on second call', () => {
-      contextImport.context(mockRequest) 
-      mockReadFileSync.mockClear()       
+      contextImport.context(mockRequest)
+      mockReadFileSync.mockClear()
 
-      contextImport.context(mockRequest) 
+      contextImport.context(mockRequest)
 
       expect(mockReadFileSync).not.toHaveBeenCalled()
     })
@@ -100,7 +100,9 @@ describe('context and cache', () => {
       const context = (await import('./context.js')).context
       context(mockRequest)
 
-      expect(mockLoggerError).toHaveBeenCalledWith('Webpack assets-manifest.json not found')
+      expect(mockLoggerError).toHaveBeenCalledWith(
+        'Webpack assets-manifest.json not found'
+      )
     })
   })
 })

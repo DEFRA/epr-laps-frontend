@@ -1,5 +1,5 @@
 export function buildNavigation(request) {
-    const translations = request?.app?.translations || {}
+  const translations = request?.app?.translations || {}
   return [
     {
       text: translations['your-defra-acco'] || 'Your Defra account',

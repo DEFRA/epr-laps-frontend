@@ -11,8 +11,11 @@ export const bankDetailsController = {
       pageTitle: 'Bank Details',
       heading: translations['glamshire-count'] || 'Glamshire County Counci',
       bankdetails: translations['bank-details'] || 'Bank details',
-      notificationHeading: translations['the-nominated-h'] || 'The nominated Head of Finance will need to confirm your local authority\'s bank details',
-      yourlocal: translations['your-local'] || 'Your local authority bank details',
+      notificationHeading:
+        translations['the-nominated-h'] ||
+        "The nominated Head of Finance will need to confirm your local authority's bank details",
+      yourlocal:
+        translations['your-local'] || 'Your local authority bank details',
       currentLang,
       translations,
       breadcrumbs: [
