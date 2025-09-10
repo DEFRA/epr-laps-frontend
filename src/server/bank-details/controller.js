@@ -20,7 +20,7 @@ export const bankDetailsController = {
       translations,
       breadcrumbs: [
         {
-          text: translations['local-authority'] || 'LAPs home',
+          text: translations['laps-home'] || 'LAPs home',
           href: '/'
         },
         {
