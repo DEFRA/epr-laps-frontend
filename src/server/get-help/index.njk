@@ -5,67 +5,53 @@
 <div class="govuk-grid-column-two-thirds">
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
-  {% set html %}
-    <p class="govuk-notification-banner__heading">
-      You have 7 days left to send your application.
-    </p>
-  {% endset %}
+{{ appHeading({
+  text: heading,
+    caption: "Get help"
 
-  {{ govukNotificationBanner({
-    html: html
   }) }}
 
-  {% from "govuk/components/table/macro.njk" import govukTable %}
-  {% from "govuk/components/tag/macro.njk" import govukTag %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
-  <h2 class="govuk-heading-m">
-    Your local authority's bank details
-  </h2>
-  {{ govukTag({
-    text: "UNCONFIRMED",
-    classes: "govuk-tag--red"
-  }) }}
-</div>
+      <h3 class="govuk-heading-s">Guidance</h3>
+      <p class="govuk-body">
+        <a href="#" class="govuk-link" rel="noreferrer noopener" target="_blank">
+          Understanding LAPs (opens in new tab)
+        </a><br>
+        Access guidance on LAPs, including how it works and how payments are made
+      </p>
 
-{% from "govuk/components/table/macro.njk" import govukTable %}
+      <h3 class="govuk-heading-s">support</h3>
+      <p class="govuk-body">
+        <a href="#" class="govuk-link" rel="noreferrer noopener" target="_blank">
+          Request support (opens in new tab)
+        </a><br>
+        Raise a help request or view open requests
+      </p>
 
-{{ govukTable({
-  firstCellIsHeader: true,
-  rows: [
-    [
-      {
-        text: "First 6 weeks"
-      },
-      {
-        text: "£109.80 per week"
-      }
-    ],
-    [
-      {
-        text: "Next 33 weeks"
-      },
-      {
-        text: "£109.80 per week"
-      }
-    ],
-    [
-      {
-        text: "Total estimated pay"
-      },
-      {
-        text: "£4,282.20"
-      }
-    ]
-  ]
-}) }}
+      <h3 class="govuk-heading-s">Contact us</h3>
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
+      <p class="govuk-body">
+        Raise a quesry, make a complaint, or request communication in alternative formats
+      </p>
 
-{{ govukDetails({
-  summaryText: "Help with nationality",
-  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
-}) }}
-</div>
+      <h4 class="govuk-heading-s">Email</h4>
+      <p class="govuk-body">
+        <a href="mailto:EPRCustomerService@defra.gov.uk" class="govuk-link">
+          EPRCustomerService@defra.gov.uk
+        </a><br>
+        We aim to respond within 20 working days
+      </p>
+
+      <h4 class="govuk-heading-s">Telephone</h4>
+      <p class="govuk-body">
+        0300 060 0002<br>
+        Monday to Friday 8am to 6pm (closed on weekends and bank holidays)
+      </p>
+
+    </div>
+  </div>
+   
   
 {% endblock %}

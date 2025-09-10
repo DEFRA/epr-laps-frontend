@@ -9,11 +9,12 @@ export const getHelpController = {
       heading: 'Glamshire County Council',
       breadcrumbs: [
         {
-          text: 'Local Authority Payments (LAPs) home',
+          text: 'LAPs home',
           href: '/'
         },
         {
-          text: 'Get help'
+          text: 'Get help',
+          href: '/'
         }
       ]
     })
