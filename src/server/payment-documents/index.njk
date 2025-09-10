@@ -1,62 +1,128 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block content %}
-  {{ appHeading({
-    text: heading,
-    caption: caption
-  }) }}
+<span class="govuk-caption-xl">Glamshire County Council</span>
+<h1 class="govuk-heading-xl">Payment documents</h1>
+
 <div class="govuk-grid-row">
-<div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-two-thirds">
 
-  {% from "govuk/components/table/macro.njk" import govukTable %}
-  {% from "govuk/components/tag/macro.njk" import govukTag %}
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-visually-hidden">Warning</span>
+        For the 2025 to 2026 financial year, there will be a single payment covering quarters 1 and 2.
+      </strong>
+    </div>
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
-  <h2 class="govuk-heading-m">
-    Your local authority's bank details
-  </h2>
-  {{ govukTag({
-    text: "UNCONFIRMED",
-    classes: "govuk-tag--red"
-  }) }}
+  </div>
 </div>
+  
+{{ govukSelect({
+  id: "sort",
+  name: "sort",
+  label: {
+    text: "Financial year"
+  },
+  items: [
+    {
+      value: "published",
+      text: "2025 to 2026",
+      selected: true
+    },
+    {
+      value: "updated",
+      text: "2024 to 2025"
+    }
+  ]
+}) }}
 
 {{ govukTable({
-  firstCellIsHeader: true,
+  caption: "Financial documents",
+  captionClasses: "govuk-visually-hidden",
+  firstCellIsHeader: false,
+  head: [
+    {
+      text: "Date"
+    },
+    {
+      text: "Document name"
+    },
+    {
+      html: "<span class='govuk-visually-hidden'>Download document</span>"
+    },
+    {
+      html: "<span class='govuk-visually-hidden'>View document</span>"
+    }
+  ],
   rows: [
     [
       {
-        text: "First 6 weeks"
+        text: "9 Dec 2025"
       },
       {
-        text: "£109.80 per week"
+        text: "Grant determination letter Q4"
+      },
+      {
+        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>",
+        classes: "govuk-table__cell--numeric"
+      },
+      {
+        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>",
+        classes: "govuk-table__cell--numeric"
       }
     ],
     [
       {
-        text: "Next 33 weeks"
+        text: "7 Dec 2025"
       },
       {
-        text: "£109.80 per week"
+        text: "Remittance Advice Q4"
+      },
+      {
+        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>",
+        classes: "govuk-table__cell--numeric"
+      },
+      {
+        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>",
+        classes: "govuk-table__cell--numeric"
       }
     ],
     [
       {
-        text: "Total estimated pay"
+        text: "19 Sep 2025"
       },
       {
-        text: "£4,282.20"
+        text: "Grant determination letter Q3"
+      },
+      {
+        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>9 Sep 2025 Grant determination letter Q3</span></a>",
+        classes: "govuk-table__cell--numeric"
+      },
+      {
+        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>19 Sep 2025 Grant determination letter Q3</span></a>",
+        classes: "govuk-table__cell--numeric"
+      }
+    ],
+    [
+      {
+        text: "18 Sep 2025"
+      },
+      {
+        text: "Remittance Advice Q3"
+      },
+      {
+        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>",
+        classes: "govuk-table__cell--numeric"
+      },
+      {
+        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>",
+        classes: "govuk-table__cell--numeric"
       }
     ]
   ]
 }) }}
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-
-{{ govukDetails({
-  summaryText: "Help with nationality",
-  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
-}) }}
-</div>
-  
 {% endblock %}
