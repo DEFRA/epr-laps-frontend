@@ -1,6 +1,6 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
-import HapiI18n from 'hapi-i18n'
+import { HapiI18nPlugin } from './common/helpers/hapi-i18n.js'
 import { router } from './router.js'
 import { config } from '../config/config.js'
 import { pulse } from './common/helpers/pulse.js'
@@ -61,16 +61,6 @@ export async function createServer() {
     }
   })
 
-  await server.register({
-    plugin: HapiI18n,
-    options: {
-      locales: ['en', 'cy'], // English and Welsh
-      directory: path.join(__dirname, '../client/common/locales'),
-      defaultLocale: 'en',
-      cookieName: 'locale'
-    }
-  })
-
   server.ext('onRequest', (request, h) => {
     const lang = request.query.lang || 'en'
     const filePath = path.join(
@@ -95,6 +85,7 @@ export async function createServer() {
     pulse,
     sessionCache,
     nunjucksConfig,
+    HapiI18nPlugin,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
