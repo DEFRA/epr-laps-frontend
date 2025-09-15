@@ -1,7 +1,6 @@
 /**
  * A GDS styled example home page controller.
  */
-
 export const homeController = {
   handler: (_request, h) => {
     const translations = _request.app.translations || {}
