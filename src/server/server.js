@@ -14,6 +14,10 @@ import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
+import bell from '@hapi/bell'
+import cookie from '@hapi/cookie'
+import { defraId } from './common/helpers/auth/defra-id.js'
+import { getUserSession } from './common/helpers/auth/utils.js'
 
 // Current file path
 const __filename = fileURLToPath(import.meta.url)
@@ -88,12 +92,23 @@ export async function createServer() {
     return h.continue
   })
 
+  server.app.cache = server.cache({
+    cache: 'session',
+    expiresIn: config.get('redis.ttl'),
+    segment: 'session'
+  })
+
+  server.decorate('request', 'getUserSession', getUserSession)
+
   await server.register([
     requestLogger,
     requestTracing,
     secureContext,
     pulse,
     sessionCache,
+    bell,
+    cookie,
+    defraId,
     nunjucksConfig,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
