@@ -39,12 +39,14 @@
     serviceUrl: "#",
     navigation: navigation
   }) }}
- {{ govukPhaseBanner({
+{% if showBetaBanner %}
+  {{ govukPhaseBanner({
     tag: {
       text: "Beta"
     },
-    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback(opens in new tab)</a>'
+    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback (opens in new tab)</a>'
   }) }}
+{% endif %}
   
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">

@@ -98,6 +98,18 @@ export async function createServer() {
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
+  // Inject showBetaBanner into all views globally
+  server.ext('onPreResponse', (request, h) => {
+    const response = request.response
+    if (response.variety === 'view') {
+      response.source.context = {
+        ...response.source.context,
+        showBetaBanner: config.get('showBetaBanner')
+      }
+    }
+    return h.continue
+  })
+
   server.ext('onPreResponse', catchAll)
 
   return server

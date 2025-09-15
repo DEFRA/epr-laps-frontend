@@ -1,6 +1,9 @@
 /**
  * A GDS styled example home page controller.
  */
+
+import { config } from '../../config/config.js'
+
 export const homeController = {
   handler: (_request, h) => {
     const translations = _request.app.translations || {}
