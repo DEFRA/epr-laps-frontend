@@ -1,6 +1,5 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
-import HapiI18n from 'hapi-i18n'
 import { router } from './router.js'
 import { config } from '../config/config.js'
 import { pulse } from './common/helpers/pulse.js'
@@ -18,6 +17,7 @@ import bell from '@hapi/bell'
 import cookie from '@hapi/cookie'
 import { defraId } from './common/helpers/auth/defra-id.js'
 import { getUserSession } from './common/helpers/auth/utils.js'
+import { hapiI18n } from './common/helpers/hapi-i18n.js'
 
 // Current file path
 const __filename = fileURLToPath(import.meta.url)
@@ -65,32 +65,7 @@ export async function createServer() {
     }
   })
 
-  await server.register({
-    plugin: HapiI18n,
-    options: {
-      locales: ['en', 'cy'], // English and Welsh
-      directory: path.join(__dirname, '../client/common/locales'),
-      defaultLocale: 'en',
-      cookieName: 'locale'
-    }
-  })
-
-  server.ext('onRequest', (request, h) => {
-    const lang = request.query.lang || 'en'
-    const filePath = path.join(
-      __dirname,
-      '../client/common/locales',
-      lang,
-      'translation.json'
-    )
-    try {
-      request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-    } catch {
-      request.app.translations = {}
-    }
-    request.app.currentLang = lang
-    return h.continue
-  })
+  server.ext('onRequest', handleTranslations)
 
   server.app.cache = server.cache({
     cache: 'session',
@@ -110,10 +85,28 @@ export async function createServer() {
     cookie,
     defraId,
     nunjucksConfig,
-    router // Register all the controllers/routes defined in src/server/router.js
+    router,
+    hapiI18n
   ])
 
   server.ext('onPreResponse', catchAll)
 
   return server
+}
+
+function handleTranslations(request, h) {
+  const lang = request.query.lang || 'en'
+  const filePath = path.join(
+    __dirname,
+    '../client/common/locales',
+    lang,
+    'translation.json'
+  )
+  try {
+    request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  } catch {
+    request.app.translations = {}
+  }
+  request.app.currentLang = lang
+  return h.continue
 }
