@@ -12,7 +12,6 @@ import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
-import { fileURLToPath } from 'url'
 import { registerLanguageExtension } from './common/helpers/request-language.js'
 
 export async function createServer() {
