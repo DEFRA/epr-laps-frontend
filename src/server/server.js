@@ -1,6 +1,6 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
-import { HapiI18nPlugin } from './common/helpers/hapi-i18n.js'
+import { hapiI18nPlugin } from './common/helpers/hapi-i18n.js'
 import { router } from './router.js'
 import { config } from '../config/config.js'
 import { pulse } from './common/helpers/pulse.js'
@@ -13,7 +13,7 @@ import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { fileURLToPath } from 'url'
-import fs from 'fs'
+import { registerLanguageExtension } from './common/helpers/request-language.js'
 
 // Current file path
 const __filename = fileURLToPath(import.meta.url)
@@ -61,22 +61,7 @@ export async function createServer() {
     }
   })
 
-  server.ext('onRequest', (request, h) => {
-    const lang = request.query.lang || 'en'
-    const filePath = path.join(
-      __dirname,
-      '../client/common/locales',
-      lang,
-      'translation.json'
-    )
-    try {
-      request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-    } catch {
-      request.app.translations = {}
-    }
-    request.app.currentLang = lang
-    return h.continue
-  })
+  registerLanguageExtension(server)
 
   await server.register([
     requestLogger,
@@ -85,7 +70,7 @@ export async function createServer() {
     pulse,
     sessionCache,
     nunjucksConfig,
-    HapiI18nPlugin,
+    hapiI18nPlugin,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 

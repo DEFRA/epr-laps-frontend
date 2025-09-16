@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Export the plugin as default or named
-export const HapiI18nPlugin = {
+export const hapiI18nPlugin = {
   plugin: HapiI18n,
   options: {
     locales: ['en', 'cy'], // English and Welsh
