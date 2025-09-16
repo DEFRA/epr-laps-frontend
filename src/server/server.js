@@ -15,12 +15,6 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { fileURLToPath } from 'url'
 import { registerLanguageExtension } from './common/helpers/request-language.js'
 
-// Current file path
-const __filename = fileURLToPath(import.meta.url)
-
-// Current directory path (equivalent to __dirname)
-const __dirname = path.dirname(__filename)
-
 export async function createServer() {
   setupProxy()
   // const i18n = await initI18n()
