@@ -52,7 +52,6 @@ describe('context and cache', () => {
       })
 
       test('Should provide expected context', () => {
-        const contextResult = contextImport.context(mockRequest)
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           breadcrumbs: [],
@@ -140,7 +139,8 @@ describe('context and cache', () => {
       }`)
 
         // First call: should read from file
-        contextImport.context(mockRequest)
+        // contextImport.context(mockRequest)
+        contextResult = contextImport.context(mockRequest)
       })
 
       test('Should read file', () => {
@@ -157,8 +157,6 @@ describe('context and cache', () => {
       })
 
       test('Should provide expected context', () => {
-        const contextResult = contextImport.context(mockRequest)
-
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           breadcrumbs: [],
