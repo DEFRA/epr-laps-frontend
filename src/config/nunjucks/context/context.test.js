@@ -122,10 +122,10 @@ describe('context and cache', () => {
         }
       }
     }
-    let contextResult
 
     describe('Webpack manifest file cache', () => {
       let contextImport
+      let contextResult
 
       beforeAll(async () => {
         contextImport = await import('./context.js')
@@ -155,10 +155,6 @@ describe('context and cache', () => {
 
         expect(mockReadFileSync).not.toHaveBeenCalled()
       })
-
-      // test('Should use cache', () => {
-      //   expect(mockReadFileSync).not.toHaveBeenCalled()
-      // })
 
       test('Should provide expected context', () => {
         const contextResult = contextImport.context(mockRequest)
