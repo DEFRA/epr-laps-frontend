@@ -6,7 +6,7 @@ export const signOut = {
     register(server) {
       server.route({
         method: 'GET',
-        path: '/log-out',
+        path: '/logout',
         ...signOutController
       })
     }
