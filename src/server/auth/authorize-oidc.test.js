@@ -1,6 +1,5 @@
-import { createServer } from '../server.js'
-import { setUserSession } from './utils.js'
 import { authorizeOidcController } from './authorize-oidc.js'
+import { setUserSession } from './utils.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 
 vi.mock('../common/helpers/auth/get-oidc-config.js')
@@ -9,22 +8,16 @@ vi.mock('./utils.js', () => ({
 }))
 
 describe('#authorizeOidcController', () => {
-  let server
-
-  beforeAll(async () => {
+  beforeEach(() => {
     vi.mocked(getOidcConfig).mockResolvedValue({
       authorization_endpoint: 'https://test-idm-endpoint/authorize',
       token_endpoint: 'https://test-idm-endpoint/token',
       end_session_endpoint: 'https://test-idm-endpoint/logout'
     })
-
-    server = await createServer()
-    await server.initialize()
   })
 
-  afterAll(async () => {
-    getOidcConfig.mockReset()
-    await server.stop({ timeout: 0 })
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   test('should redirect users to auth page when user is not authenticated', async () => {

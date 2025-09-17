@@ -3,7 +3,7 @@
 {% set language = currentLang %}
 {% block content %}
   {{ appHeading({
-    text: heading,
+   text: translations['local-authority'],
     caption: "Glamshire County Council"
 
   }) }}
@@ -19,31 +19,31 @@
 
       <div class="govuk-grid-row">
         {{ appCustomCard({
-          title: "Payment documents",
-          link: "/payment-documents",
-          body: "You can view and download your:",
-          list: [
-            "estimated grant payment amounts for Extended Producer Responsibility (EPR) packaging",
-            "remittance advice with payment details"
+          title: translations['payment-documen'],
+         link: "/payment-documents",
+         body: translations['you-can-view-an'],
+         list: [
+           translations['estimated-grant'],
+           translations['remittance-advi']
           ]
         }) }}
         {{ appCustomCard({
-          title: "Bank details",
+          title: translations['bank-details'],
           link: "/bank-details",
-          body: "You can:",
+          body: translations['you-can:'],
           list: [
-            "view bank details"
+            translations['view-bank-detai']
           ]
         }) }}
         </div>
         <div class="govuk-grid-row">
         {{ appCustomCard({
-          title: "Get help",
+          title: translations['get-help'],
           link: "/get-help",
-          body: "You can view and download your:",
+          body: translations['you-can-view-ou'],
           list: [
-            "read Local Authority Payments (LAPs) guidance",
-            "raise a support request"
+            translations['read-local-auth'],
+            translations['raise-a-support']
           ]
         }) }}
       </div>

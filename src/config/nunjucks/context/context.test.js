@@ -69,7 +69,8 @@ describe('context and cache', () => {
             }
           ],
           serviceName: 'EPR-LAPs',
-          serviceUrl: '/'
+          serviceUrl: '/',
+          showBetaBanner: true
         })
       })
 
@@ -165,7 +166,8 @@ describe('context and cache', () => {
             }
           ],
           serviceName: 'EPR-LAPs',
-          serviceUrl: '/'
+          serviceUrl: '/',
+          showBetaBanner: true
         })
       })
     })

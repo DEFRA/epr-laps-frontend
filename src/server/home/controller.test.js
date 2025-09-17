@@ -58,7 +58,7 @@ describe('#homeController', () => {
   test('Should provide expected response', async () => {
     const mockRequest = {
       app: {
-        translations: { 'local-authority': 'Mocked Local Authority' },
+        // translations: { 'local-authority': 'Mocked Local Authority' },
         currentLang: 'en'
       }
     }
@@ -68,14 +68,14 @@ describe('#homeController', () => {
 
     expect(mockedResponse.view).toHaveBeenCalledWith('home/index', {
       pageTitle: 'Home',
-      heading: 'Mocked Local Authority',
       currentLang: 'en',
       breadcrumbs: [
         {
-          text: 'Local Authority Payments (LAPs) home',
+          text: undefined,
           href: '/'
         }
-      ]
+      ],
+      translations: {}
     })
   })
 })

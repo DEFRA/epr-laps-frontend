@@ -1,5 +1,8 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
+import bell from '@hapi/bell'
+import cookie from '@hapi/cookie'
+import { hapiI18nPlugin } from './common/helpers/hapi-i18n.js'
 import { router } from './router.js'
 import { config } from '../config/config.js'
 import { pulse } from './common/helpers/pulse.js'
@@ -11,19 +14,9 @@ import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
-import { fileURLToPath } from 'url'
-import fs from 'fs'
-import bell from '@hapi/bell'
-import cookie from '@hapi/cookie'
-import { defraId } from './common/helpers/auth/defra-id.js'
+import { registerLanguageExtension } from './common/helpers/request-language.js'
 import { getUserSession } from './common/helpers/auth/utils.js'
-import { hapiI18n } from './common/helpers/hapi-i18n.js'
-
-// Current file path
-const __filename = fileURLToPath(import.meta.url)
-
-// Current directory path (equivalent to __dirname)
-const __dirname = path.dirname(__filename)
+import { defraId } from './common/helpers/auth/defra-id.js'
 
 export async function createServer() {
   setupProxy()
@@ -65,8 +58,6 @@ export async function createServer() {
     }
   })
 
-  server.ext('onRequest', handleTranslations)
-
   server.app.cache = server.cache({
     cache: 'session',
     expiresIn: config.get('redis.ttl'),
@@ -74,6 +65,7 @@ export async function createServer() {
   })
 
   server.decorate('request', 'getUserSession', getUserSession)
+  registerLanguageExtension(server)
 
   await server.register([
     requestLogger,
@@ -85,28 +77,11 @@ export async function createServer() {
     cookie,
     defraId,
     nunjucksConfig,
-    router,
-    hapiI18n
+    hapiI18nPlugin,
+    router // Register all the controllers/routes defined in src/server/router.js
   ])
 
   server.ext('onPreResponse', catchAll)
 
   return server
-}
-
-function handleTranslations(request, h) {
-  const lang = request.query.lang || 'en'
-  const filePath = path.join(
-    __dirname,
-    '../client/common/locales',
-    lang,
-    'translation.json'
-  )
-  try {
-    request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-  } catch {
-    request.app.translations = {}
-  }
-  request.app.currentLang = lang
-  return h.continue
 }

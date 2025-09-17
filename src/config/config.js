@@ -266,6 +266,12 @@ export const config = convict({
       default: 'http://localhost:3000',
       env: 'APP_BASE_URL'
     }
+  },
+  showBetaBanner: {
+    doc: 'Show the beta banner on the site',
+    format: Boolean,
+    default: true,
+    env: 'SHOW_BETA_BANNER'
   }
 })
 

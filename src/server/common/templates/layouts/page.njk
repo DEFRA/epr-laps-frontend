@@ -35,16 +35,18 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: "Local Authority Payments account for EPR",
+    serviceName: translations['local-authority'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
- {{ govukPhaseBanner({
+{% if showBetaBanner %}
+  {{ govukPhaseBanner({
     tag: {
-      text: "BETA"
+      text: translations['beta']
     },
-    html: 'This is a new service - your <a class="govuk-link" href="#">feedback</a> will help improve it.'
+    html: translations['this-is-a-new-s'] | safe
   }) }}
+{% endif %}
   
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
@@ -53,7 +55,7 @@
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
         
       </div>
-      <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
          {{
           dwpLanguageToggle({
             selectedLang: currentLang,
