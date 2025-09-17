@@ -35,16 +35,16 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: "Local Authority Payments account for EPR",
+    serviceName: translations['local-authority'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
 {% if showBetaBanner %}
   {{ govukPhaseBanner({
     tag: {
-      text: "Beta"
+      text: translations['beta']
     },
-    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback (opens in new tab)</a>'
+    html: translations['this-is-a-new-s'] | safe
   }) }}
 {% endif %}
   
@@ -55,7 +55,7 @@
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
         
       </div>
-      <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
          {{
           dwpLanguageToggle({
             selectedLang: currentLang,
