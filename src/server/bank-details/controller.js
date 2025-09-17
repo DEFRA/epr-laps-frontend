@@ -1,19 +1,26 @@
 /**
  * A GDS styled example bank details controller
  */
-
 export const bankDetailsController = {
   handler: (_request, h) => {
+    const translations = _request.app.translations || {}
+    const currentLang = _request.app.currentLang || 'en'
+
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       heading: 'Glamshire County Council',
+      important: translations['important'],
+      currentLang,
+      isConfirmed: false,
+      translations,
       breadcrumbs: [
         {
-          text: 'Local Authority Payments (LAPs) home',
+          text: translations['laps-home'],
           href: '/'
         },
         {
-          text: 'Bank details'
+          text: translations['bank-details'],
+          href: '/'
         }
       ]
     })

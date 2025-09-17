@@ -3,7 +3,12 @@ import { buildNavigation } from './build-navigation.js'
 function mockRequest(options) {
   return {
     ...options,
-    app: { translations: {} }
+    app: {
+      translations: {
+        'your-defra-acco': 'Your Defra account',
+        'sign-out': 'Sign out'
+      }
+    }
   }
 }
 
