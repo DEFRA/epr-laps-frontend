@@ -52,6 +52,7 @@ describe('context and cache', () => {
       })
 
       test('Should provide expected context', () => {
+        const contextResult = contextImport.context(mockRequest)
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
           breadcrumbs: [],
@@ -137,8 +138,7 @@ describe('context and cache', () => {
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
-
-        contextResult = contextImport.context(mockRequest)
+      
         // First call: should read from file
         contextImport.context(mockRequest)
       })
