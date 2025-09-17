@@ -36,15 +36,15 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: translations['local-authority'],
+    serviceName: 'Local Authority Payments (LAPs) home',
     serviceUrl: "#",
     navigation: navigation
   }) }}
  {{ govukPhaseBanner({
     tag: {
-      text: translations['beta']
+      text: 'Beta'
     },
-    html: translations['this-is-a-new-s'] | safe
+    html: 'This is a new service. Help us improve it and <a class=\"govuk-link\" href=\"#\">give your feedback(opens in new tab)</a>.'
   }) }}
   
     <div class="govuk-width-container">
