@@ -1,7 +1,6 @@
 /**
  * A GDS styled example bank details controller
  */
-
 export const bankDetailsController = {
   handler: (_request, h) => {
     const translations = _request.app.translations || {}
