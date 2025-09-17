@@ -6,6 +6,18 @@ describe('#bankDetailsController', () => {
 
   beforeAll(async () => {
     server = await createServer()
+
+    server.ext('onRequest', (request, h) => {
+      request.app.translations = {
+        'bank-details': 'Bank details',
+        'the-nominated-h': 'Notification heading',
+        'your-local': 'Your local info',
+        'laps-home': 'Local Authority Payments (LAPs) home'
+      }
+      request.app.currentLang = 'en'
+      return h.continue
+    })
+
     await server.initialize()
   })
 
