@@ -44,7 +44,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: ''
+    default: 'EPR-LAPs'
   },
   root: {
     doc: 'Project root',
@@ -219,6 +219,13 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+
+  showBetaBanner: {
+    doc: 'Show the beta banner on the site',
+    format: Boolean,
+    default: true,
+    env: 'SHOW_BETA_BANNER'
   }
 })
 

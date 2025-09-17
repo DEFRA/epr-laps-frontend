@@ -1,12 +1,13 @@
 export function buildNavigation(request) {
+  const translations = request?.app?.translations || {}
   return [
     {
-      text: 'Your Defra account',
+      text: translations['your-defra-acco'],
       href: '/defra-account',
-      current: request?.path === '/your-defra-account'
+      current: request?.path === '/defra-account'
     },
     {
-      text: 'Sign out',
+      text: translations['sign-out'],
       href: '/sign-out',
       current: request?.path === '/sign-out'
     }

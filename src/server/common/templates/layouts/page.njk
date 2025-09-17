@@ -22,7 +22,6 @@
     homepageUrl: "https://www.gov.uk/",
     classes: "app-header",
     containerClasses: "govuk-width-container",
-    serviceName: serviceName,
     serviceUrl: serviceUrl,
     useTudorCrown: true
   }) }}
@@ -36,16 +35,18 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: 'Local Authority Payments (LAPs) home',
+    serviceName: translations['local-authority'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
- {{ govukPhaseBanner({
+{% if showBetaBanner %}
+  {{ govukPhaseBanner({
     tag: {
-      text: 'Beta'
+      text: translations['beta']
     },
-    html: 'This is a new service. Help us improve it and <a class=\"govuk-link\" href=\"#\">give your feedback(opens in new tab)</a>.'
+    html: translations['this-is-a-new-s'] | safe
   }) }}
+{% endif %}
   
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
@@ -54,7 +55,7 @@
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
         
       </div>
-   <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
          {{
           dwpLanguageToggle({
             selectedLang: currentLang,
@@ -74,20 +75,44 @@
 {% block footer %}
   {{ govukFooter({
     meta: {
-      items: [
-        {
-          href: "https://www.gov.uk/help/privacy-notice",
-          text: "Privacy"
-        },
-        {
-          href: "https://www.gov.uk/help/cookies",
-          text: "Cookies"
-        },
-        {
-          href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility statement"
+    items: [
+      {
+        href: "https://www.gov.uk/help",
+        text: "Help"
+      },
+      {
+        href: "https://www.gov.uk/help/privacy-notice",
+        text: "Privacy"
+      },
+      {
+        href: "https://www.gov.uk/help/cookies",
+        text: "Cookies"
+      },
+      {
+        href: "https://www.gov.uk/help/accessibility-statement",
+        text: "Accessibility statement"
+      },
+      {
+        href: "https://www.gov.uk/contact",
+        text: "Contact"
+      },
+      {
+        href: "https://www.gov.uk/help/terms-conditions",
+        text: "Terms and conditions"
+      },
+      {
+        href: "https://www.gov.uk/cymraeg",
+        text: "Rhestr o Wasanaethau Cymraeg",
+        attributes: {
+          lang: "cy",
+          hreflang: "cy"
         }
-      ]
+      },
+      {
+        href: "https://www.gov.uk/government/organisations/government-digital-service",
+        text: "Government Digital Service"
+      }
+    ]
     }
   }) }}
 {% endblock %}

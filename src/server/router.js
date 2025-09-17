@@ -1,7 +1,6 @@
 import inert from '@hapi/inert'
 
 import { home } from './home/index.js'
-import { about } from './about/index.js'
 import { health } from './health/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 import { paymentDocuments } from './payment-documents/index.js'
@@ -21,7 +20,6 @@ export const router = {
       // Application specific routes, add your own routes here
       await server.register([
         home,
-        about,
         paymentDocuments,
         bankDetails,
         getHelp,
