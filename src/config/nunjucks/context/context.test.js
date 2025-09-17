@@ -138,8 +138,6 @@ describe('context and cache', () => {
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-        // First call: should read from file
-        // contextImport.context(mockRequest)
         contextResult = contextImport.context(mockRequest)
       })
 
@@ -148,9 +146,8 @@ describe('context and cache', () => {
       })
 
       test('Should use cache on second call', () => {
-        mockReadFileSync.mockClear() // Reset call count
+        mockReadFileSync.mockClear()
 
-        // Second call: should use cache (not call readFileSync again)
         contextImport.context(mockRequest)
 
         expect(mockReadFileSync).not.toHaveBeenCalled()

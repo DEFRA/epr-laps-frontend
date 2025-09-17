@@ -7,7 +7,7 @@
 
   {% set html %}
     <p class="govuk-notification-banner__heading">
-      {{ notificationHeading }}
+      {{ translations['the-nominated-h'] }}
     </p>
   {% endset %}
 
@@ -25,7 +25,7 @@
   }) }}
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
   <h2 class="govuk-heading-s">
-    {{yourlocal}}
+    {{ translations['your-local'] }}
   </h2>
  {% if isConfirmed %}
   {{ govukTag({
