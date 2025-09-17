@@ -138,7 +138,7 @@ describe('context and cache', () => {
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
-      
+
         // First call: should read from file
         contextImport.context(mockRequest)
       })
