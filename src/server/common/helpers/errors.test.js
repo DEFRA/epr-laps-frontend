@@ -1,46 +1,49 @@
-import { vi } from 'vitest'
-
 import { catchAll } from './errors.js'
-// import { createServer } from '../../server.js'
 import { statusCodes } from '../constants/status-codes.js'
-// import { getOidcConfig } from './auth/get-oidc-config.js'
+import { getOidcConfig } from './auth/get-oidc-config.js'
+import { initializeTestServer } from '../test-helpers/test-server.js'
 
 vi.mock('./auth/get-oidc-config.js')
-// describe('#errors', () => {
-//   let server
+describe('#errors', () => {
+  let server
 
-//   beforeAll(async () => {
-//     try {
-//       vi.mocked(getOidcConfig).mockResolvedValue({
-//         authorization_endpoint: 'https://test-idm-endpoint/authorize',
-//         token_endpoint: 'https://test-idm-endpoint/token',
-//         end_session_endpoint: 'https://test-idm-endpoint/logout'
-//       })
-//       server = await createServer()
-//       await server.initialize()
-//     } catch (error) {
-//       console.error('Server initialization failed:')
-//       console.error('Error message:', error.message)
-//       console.error('Stack trace:', error.stack)
-//       console.error('Error details:', error)
-//     }
-//   })
+  beforeAll(async () => {
+    vi.mocked(getOidcConfig).mockResolvedValue({
+      authorization_endpoint: 'https://test-idm-endpoint/authorize',
+      token_endpoint: 'https://test-idm-endpoint/token',
+      end_session_endpoint: 'https://test-idm-endpoint/logout'
+    })
 
-//   afterAll(async () => {
-//     getOidcConfig.mockReset()
-//     await server.stop({ timeout: 0 })
-//   })
+    server = await initializeTestServer()
+  })
 
-//   test('Should provide expected Not Found page', async () => {
-//     const { payload, statusCode } = await server.inject({
-//       method: 'GET',
-//       url: '/non-existent-path'
-//     })
+  afterAll(async () => {
+    if (server) {
+      await server.stop()
+    }
+    vi.clearAllMocks()
+  })
 
-//     expect(payload).toMatch(/<title>\s*Page not found\s*\|/i)
-//     expect(statusCode).toBe(statusCodes.notFound)
-//   })
-// })
+  test('Should provide expected Not Found page', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/non-existent-path',
+      auth: {
+        credentials: {
+          user: {
+            id: 'test-user-id',
+            email: 'test@example.com',
+            name: 'Test User'
+          }
+        },
+        strategy: 'session',
+        isAuthenticated: true
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.notFound)
+  })
+})
 
 describe('#catchAll', () => {
   const mockErrorLogger = vi.fn()
