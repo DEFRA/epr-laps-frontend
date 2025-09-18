@@ -1,4 +1,4 @@
-import { authorizeOidcController } from './authorize-oidc.js'
+import { authorizeOIDCController } from './authorize-oidc.js'
 import { setUserSession } from './utils.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 
@@ -7,7 +7,7 @@ vi.mock('./utils.js', () => ({
   setUserSession: vi.fn()
 }))
 
-describe('#authorizeOidcController', () => {
+describe('#authorizeOIDCController', () => {
   beforeEach(() => {
     vi.mocked(getOidcConfig).mockResolvedValue({
       authorization_endpoint: 'https://test-idm-endpoint/authorize',
@@ -25,13 +25,13 @@ describe('#authorizeOidcController', () => {
       auth: {
         isAuthenticated: false
       },
-      logger: { info: vi.fn() },
+      logger: { info: vi.fn(), debug: vi.fn() },
       yar: { flash: vi.fn().mockReturnValue(['/get-help']) }
     }
 
     const mockedResponse = { redirect: vi.fn() }
 
-    await authorizeOidcController.handler(mockRequest, mockedResponse)
+    await authorizeOIDCController.handler(mockRequest, mockedResponse)
     expect(mockedResponse.redirect).toHaveBeenCalledWith('/get-help')
   })
 
@@ -40,13 +40,13 @@ describe('#authorizeOidcController', () => {
       auth: {
         isAuthenticated: true
       },
-      logger: { info: vi.fn() },
+      logger: { info: vi.fn(), debug: vi.fn() },
       yar: { flash: vi.fn().mockReturnValue(['/get-help']) }
     }
 
     const mockedResponse = { redirect: vi.fn() }
 
-    await authorizeOidcController.handler(mockRequest, mockedResponse)
+    await authorizeOIDCController.handler(mockRequest, mockedResponse)
 
     expect(setUserSession).toHaveBeenCalledWith(mockRequest)
     expect(mockRequest.logger.info).toHaveBeenCalled()
@@ -62,7 +62,7 @@ describe('#authorizeOidcController', () => {
 
     const mockedResponse = { redirect: vi.fn() }
 
-    await authorizeOidcController.handler(mockRequest, mockedResponse)
+    await authorizeOIDCController.handler(mockRequest, mockedResponse)
 
     expect(mockRequest.yar.flash).toHaveBeenCalledWith('referrer')
     expect(mockedResponse.redirect).toHaveBeenCalledWith(customRedirectRoute)
@@ -76,7 +76,7 @@ describe('#authorizeOidcController', () => {
 
     const mockedResponse = { redirect: vi.fn() }
 
-    await authorizeOidcController.handler(mockRequest, mockedResponse)
+    await authorizeOIDCController.handler(mockRequest, mockedResponse)
 
     expect(mockRequest.yar.flash).toHaveBeenCalledWith('referrer')
     expect(mockedResponse.redirect).toHaveBeenCalledWith('/')

@@ -1,6 +1,6 @@
 import { setUserSession } from './utils.js'
 
-export const authorizeOidcController = {
+export const authorizeOIDCController = {
   method: ['GET', 'POST'],
   path: '/auth-response',
   options: {
@@ -12,8 +12,8 @@ export const authorizeOidcController = {
 
       request.logger.info('User has been successfully authenticated')
 
-      request.logger.info(
-        `credentials ${JSON.stringify(request.auth.credentials)}`
+      request.logger.debug(
+        `auth credentials ${JSON.stringify(request.auth.credentials)}`
       )
     }
 

@@ -31,7 +31,8 @@ describe('#signOutController', () => {
   test('should redirect users to auth page when there is no authentication', async () => {
     getUserSession.mockReturnValueOnce(null)
     const mockedRequest = {
-      auth: { credentials: {} }
+      auth: { credentials: {} },
+      logger: { info: vi.fn(), debug: vi.fn() }
     }
     const mockedResponse = { redirect: vi.fn() }
 
@@ -48,7 +49,8 @@ describe('#signOutController', () => {
 
     const mockedRequest = {
       auth: { credentials: { sessionId: 'testSessionId' } },
-      headers: { referer: 'http://localhost:3000' }
+      headers: { referer: 'http://localhost:3000' },
+      logger: { info: vi.fn(), debug: vi.fn() }
     }
 
     const mockedResponse = { redirect: vi.fn() }
