@@ -8,7 +8,11 @@ export const authorizeOIDCController = {
   },
   handler: async (request, h) => {
     request.logger.debug(`Auth status: ${request.auth?.isAuthenticated}`)
-    request.logger.debug(`Auth error: ${request.auth?.error}`)
+    if (request.auth?.error) {
+      request.logger.error(
+        `Authentication error: ${request.auth.error.message}`
+      )
+    }
     if (request.auth?.isAuthenticated) {
       await setUserSession(request)
 
