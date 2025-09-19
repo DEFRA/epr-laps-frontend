@@ -7,6 +7,8 @@ export const authorizeOIDCController = {
     auth: { strategy: 'defra-id', mode: 'try' }
   },
   handler: async (request, h) => {
+    request.logger.debug(`Auth status: ${request.auth?.isAuthenticated}`)
+    request.logger.debug(`Auth error: ${request.auth?.error}`)
     if (request.auth?.isAuthenticated) {
       await setUserSession(request)
 
@@ -17,6 +19,9 @@ export const authorizeOIDCController = {
       )
     }
 
+    request.logger.debug(
+      `referrer value from flash: ${request.yar.flash('referrer')}`
+    )
     const redirect = request.yar.flash('referrer')?.at(0) ?? '/'
 
     return h.redirect(redirect)
