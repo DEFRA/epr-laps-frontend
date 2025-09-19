@@ -10,7 +10,7 @@ export const openIdProvider = (name, oidcConf) => {
     auth: oidcConf.authorization_endpoint,
     token: oidcConf.token_endpoint,
     pkce: 'S256',
-    scope: authConfig.scopes,
+    scope: [...authConfig.scopes, authConfig.clientId],
     profile: (credentials, params) => {
       if (!credentials?.token) {
         throw new Error(
