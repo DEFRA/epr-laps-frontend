@@ -40,7 +40,8 @@ describe('#utils', () => {
             cache: mockCache
           }
         },
-        cookieAuth: mockCookieAuth
+        cookieAuth: mockCookieAuth,
+        logger: { debug: vi.fn() }
       }
 
       const mockExpiryDate = new Date('2024-01-01T12:00:00.000Z')

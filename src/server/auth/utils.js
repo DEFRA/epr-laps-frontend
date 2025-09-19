@@ -2,6 +2,7 @@ import { addSeconds } from 'date-fns'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
+  request.logger.debug(`Setting user session in cache: ${profile.sessionId}`)
   const expiresInSeconds = request.auth.credentials.expiresIn
   const expiresInMilliSeconds = expiresInSeconds * 1000
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
