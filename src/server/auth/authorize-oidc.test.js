@@ -57,7 +57,8 @@ describe('#authorizeOIDCController', () => {
 
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: vi.fn().mockReturnValue([customRedirectRoute]) }
+      yar: { flash: vi.fn().mockReturnValue([customRedirectRoute]) },
+      logger: { info: vi.fn(), debug: vi.fn() }
     }
 
     const mockedResponse = { redirect: vi.fn() }
@@ -71,7 +72,8 @@ describe('#authorizeOIDCController', () => {
   test('should fall back to / route when there is no referrer in flash', async () => {
     const mockRequest = {
       auth: { isAuthenticated: false },
-      yar: { flash: vi.fn().mockReturnValue([]) }
+      yar: { flash: vi.fn().mockReturnValue([]) },
+      logger: { info: vi.fn(), debug: vi.fn() }
     }
 
     const mockedResponse = { redirect: vi.fn() }
