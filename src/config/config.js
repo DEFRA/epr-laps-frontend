@@ -238,7 +238,7 @@ export const config = convict({
     clientId: {
       doc: 'The Defra Identity client ID.',
       format: String,
-      default: ' ',
+      default: '2fb0d715-affa-4bf1-836e-44a464e3fbea',
       env: 'DEFRA_ID_CLIENT_ID'
     },
     clientSecret: {
