@@ -8,6 +8,15 @@
 
   }) }}
 
+  {% if authedUser.displayName %}
+    <p>
+      Welcome, <strong>{{ authedUser.relationships }}</strong><br />
+    </p>
+  {% else %}
+    <p>No user</p>
+  {% endif %}
+
+
       <div class="govuk-grid-row">
         {{ appCustomCard({
           title: translations['payment-documen'],

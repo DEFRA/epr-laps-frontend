@@ -8,6 +8,8 @@ import { bankDetails } from './bank-details/index.js'
 import { getHelp } from './get-help/index.js'
 import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
+import { auth } from './auth/index.js'
+
 export const router = {
   plugin: {
     name: 'router',
@@ -24,6 +26,7 @@ export const router = {
         bankDetails,
         getHelp,
         signOut,
+        auth,
         defraAccount
       ])
 

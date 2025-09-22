@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 
 const mockReadFileSync = vi.fn()
 const mockLoggerError = vi.fn()
+const mockgetUserSession = vi.fn()
 
 vi.mock('node:fs', async () => {
   const nodeFs = await import('node:fs')
@@ -19,6 +20,7 @@ describe('context and cache', () => {
   beforeEach(() => {
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()
+    mockgetUserSession.mockReset()
     vi.resetModules()
   })
 
@@ -30,6 +32,10 @@ describe('context and cache', () => {
           'your-defra-acco': 'Your Defra account',
           'sign-out': 'Sign out'
         }
+        
+      getUserSession: mockgetUserSession,
+      state: {
+        userSession: null
       }
     }
 
@@ -41,14 +47,14 @@ describe('context and cache', () => {
         contextImport = await import('./context.js')
       })
 
-      beforeEach(() => {
+      beforeEach(async () => {
         // Return JSON string
         mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-        contextResult = contextImport.context(mockRequest)
+        contextResult = await contextImport.context(mockRequest)
       })
 
       test('Should provide expected context', () => {
@@ -98,10 +104,10 @@ describe('context and cache', () => {
         contextImport = await import('./context.js')
       })
 
-      beforeEach(() => {
+      beforeEach(async () => {
         mockReadFileSync.mockReturnValue(new Error('File not found'))
 
-        contextImport.context(mockRequest)
+        await contextImport.context(mockRequest)
       })
 
       test('Should log that the Webpack Manifest file is not available', () => {
@@ -123,6 +129,14 @@ describe('context and cache', () => {
       }
     }
 
+      getUserSession: mockgetUserSession,
+      state: {
+        userSession: null
+      }
+    }
+
+    let contextResult
+
     describe('Webpack manifest file cache', () => {
       let contextImport
       let contextResult
@@ -131,14 +145,14 @@ describe('context and cache', () => {
         contextImport = await import('./context.js')
       })
 
-      beforeEach(() => {
+      beforeEach(async () => {
         // Return JSON string
         mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-        contextResult = contextImport.context(mockRequest)
+        contextResult = await contextImport.context(mockRequest)
       })
 
       test('Should read file', () => {
