@@ -14,6 +14,7 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
+const oneDay = 1000 * 60 * 60 * 24
 
 export const config = convict({
   serviceVersion: {
@@ -198,6 +199,12 @@ export const config = convict({
       format: Boolean,
       default: isProduction,
       env: 'REDIS_TLS'
+    },
+    ttl: {
+      doc: 'Redis cache global ttl',
+      format: Number,
+      default: oneDay,
+      env: 'REDIS_TTL'
     }
   },
   nunjucks: {
@@ -220,7 +227,46 @@ export const config = convict({
       env: 'TRACING_HEADER'
     }
   },
-
+  defraId: {
+    oidcConfigurationUrl: {
+      doc: 'Defra ID OIDC Configuration URL',
+      format: String,
+      default:
+        'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration',
+      env: 'DEFRA_ID_OIDC_CONFIGURATION_URL'
+    },
+    clientId: {
+      doc: 'The Defra Identity client ID.',
+      format: String,
+      default: ' ',
+      env: 'DEFRA_ID_CLIENT_ID'
+    },
+    clientSecret: {
+      doc: 'The Defra Identity client secret.',
+      format: String,
+      default: 'test_value',
+      env: 'DEFRA_ID_CLIENT_SECRET'
+    },
+    serviceId: {
+      doc: 'The Defra Identity service ID.',
+      format: String,
+      default: 'service-test',
+      env: 'DEFRA_ID_SERVICE_ID'
+    },
+    scopes: {
+      doc: 'Defra ID Scopes',
+      format: Array,
+      sensitive: true,
+      env: 'AUTH_DEFRA_ID_SCOPES',
+      default: ['openid', 'offline_access']
+    },
+    redirectUrl: {
+      doc: 'The Defra Identity redirect URl.',
+      format: String,
+      default: 'http://localhost:3000',
+      env: 'APP_BASE_URL'
+    }
+  },
   showBetaBanner: {
     doc: 'Show the beta banner on the site',
     format: Boolean,

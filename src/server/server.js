@@ -1,5 +1,7 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
+import bell from '@hapi/bell'
+import cookie from '@hapi/cookie'
 import { hapiI18nPlugin } from './common/helpers/hapi-i18n.js'
 import { router } from './router.js'
 import { config } from '../config/config.js'
@@ -13,6 +15,8 @@ import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { registerLanguageExtension } from './common/helpers/request-language.js'
+import { getUserSession } from './common/helpers/auth/utils.js'
+import { defraId } from './common/helpers/auth/defra-id.js'
 
 export async function createServer() {
   setupProxy()
@@ -54,6 +58,13 @@ export async function createServer() {
     }
   })
 
+  server.app.cache = server.cache({
+    cache: 'session',
+    expiresIn: config.get('redis.ttl'),
+    segment: 'session'
+  })
+
+  server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
 
   await server.register([
@@ -62,6 +73,9 @@ export async function createServer() {
     secureContext,
     pulse,
     sessionCache,
+    bell,
+    cookie,
+    defraId,
     nunjucksConfig,
     hapiI18nPlugin,
     router // Register all the controllers/routes defined in src/server/router.js

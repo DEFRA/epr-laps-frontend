@@ -1,14 +1,25 @@
 import { createServer } from '../server.js'
 import { statusCodes } from '../common/constants/status-codes.js'
+import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
+import * as authUtils from '../common/helpers/auth/utils.js'
+import { homeController } from './controller.js'
+
+vi.mock('../common/helpers/auth/get-oidc-config.js')
 
 describe('#homeController', () => {
   let server
 
   beforeAll(async () => {
+    vi.mocked(getOidcConfig).mockResolvedValue({
+      authorization_endpoint: 'https://test-idm-endpoint/authorize',
+      token_endpoint: 'https://test-idm-endpoint/token',
+      end_session_endpoint: 'https://test-idm-endpoint/logout'
+    })
     server = await createServer()
 
     server.ext('onRequest', (request, h) => {
       request.app.translations = { 'local-authority': 'Mocked Local Authority' }
+      request.app.currentLang = 'en'
       return h.continue
     })
 
@@ -16,16 +27,56 @@ describe('#homeController', () => {
   })
 
   afterAll(async () => {
+    getOidcConfig.mockReset()
     await server.stop({ timeout: 0 })
   })
 
-  test('Should provide expected response', async () => {
-    const { result, statusCode } = await server.inject({
+  beforeEach(() => {
+    vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
+      userName: 'test user'
+    })
+    vi.clearAllMocks()
+  })
+
+  test('should redirect user when user is unauthenticated', async () => {
+    const mockRequest = {
+      app: {
+        translations: { 'local-authority': 'Mocked Local Authority' },
+        currentLang: 'en'
+      }
+    }
+    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
+
+    const { statusCode } = await server.inject({
       method: 'GET',
       url: '/'
     })
 
-    expect(result).toEqual(expect.stringContaining('Home |'))
-    expect(statusCode).toBe(statusCodes.ok)
+    await homeController.handler(mockRequest, mockedResponse)
+    expect(statusCode).toBe(statusCodes.redirect)
+  })
+
+  test('Should provide expected response', async () => {
+    const mockRequest = {
+      app: {
+        // translations: { 'local-authority': 'Mocked Local Authority' },
+        currentLang: 'en'
+      }
+    }
+    const mockedResponse = { view: vi.fn() }
+
+    await homeController.handler(mockRequest, mockedResponse)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith('home/index', {
+      pageTitle: 'Home',
+      currentLang: 'en',
+      breadcrumbs: [
+        {
+          text: undefined,
+          href: '/?lang=en'
+        }
+      ],
+      translations: {}
+    })
   })
 })

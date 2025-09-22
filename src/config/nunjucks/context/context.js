@@ -14,7 +14,11 @@ const manifestPath = path.join(
 
 let webpackManifest
 
-export function context(request) {
+async function context(request) {
+  const authedUser = await request.getUserSession(
+    request,
+    request.state?.userSession
+  )
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -24,6 +28,7 @@ export function context(request) {
   }
 
   return {
+    authedUser,
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
@@ -36,3 +41,5 @@ export function context(request) {
     }
   }
 }
+
+export { context }
