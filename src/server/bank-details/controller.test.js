@@ -21,7 +21,6 @@ describe('#bankDetailsController', () => {
         'bank-details': 'Bank details',
         'the-nominated-h': 'Notification heading',
         'your-local': "Your local authority's bank details",
-        important: 'Important',
         'laps-home': 'Local Authority Payments (LAPs) home'
       }
       request.app.currentLang = 'en'
@@ -66,8 +65,7 @@ describe('#bankDetailsController', () => {
         translations: {
           'bank-details': 'Bank details',
           'laps-home': 'Local Authority Payments (LAPs) home',
-          'your-local': "Your local authority's bank details",
-          important: 'Important'
+          'your-local': "Your local authority's bank details"
         },
         currentLang: 'en'
       },
@@ -94,10 +92,8 @@ describe('#bankDetailsController', () => {
       translations: {
         'bank-details': 'Bank details',
         'laps-home': 'Local Authority Payments (LAPs) home',
-        'your-local': "Your local authority's bank details",
-        important: 'Important'
+        'your-local': "Your local authority's bank details"
       },
-      important: 'Important',
       isConfirmed: false
     })
   })
@@ -108,8 +104,7 @@ describe('#bankDetailsController', () => {
         translations: {
           'bank-details': 'Bank details',
           'laps-home': 'Local Authority Payments (LAPs) home',
-          'your-local': "Your local authority's bank details",
-          important: 'Important'
+          'your-local': "Your local authority's bank details"
         },
         currentLang: 'en'
       },

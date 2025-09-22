@@ -9,7 +9,6 @@ export const bankDetailsController = {
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       heading: 'Glamshire County Council',
-      important: translations['important'],
       currentLang,
       isConfirmed: false,
       translations,
