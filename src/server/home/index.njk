@@ -11,7 +11,7 @@
       <div class="govuk-grid-row">
         {{ appCustomCard({
           title: translations['payment-documen'],
-         link: "/payment-documents",
+         link: "/payment-documents?lang=" + currentLang,
          body: translations['you-can-view-an'],
          list: [
            translations['estimated-grant'],
@@ -20,7 +20,7 @@
         }) }}
         {{ appCustomCard({
           title: translations['bank-details'],
-          link: "/bank-details",
+          link: "/bank-details?lang=" + currentLang,
           body: translations['you-can:'],
           list: [
             translations['view-bank-detai']
@@ -30,7 +30,7 @@
         <div class="govuk-grid-row">
         {{ appCustomCard({
           title: translations['get-help'],
-          link: "/get-help",
+          link: "/get-help?lang=" + currentLang,
           body: translations['you-can-view-ou'],
           list: [
             translations['read-local-auth'],

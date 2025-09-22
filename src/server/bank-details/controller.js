@@ -2,9 +2,9 @@
  * A GDS styled example bank details controller
  */
 export const bankDetailsController = {
-  handler: (_request, h) => {
-    const translations = _request.app.translations || {}
-    const currentLang = _request.app.currentLang || 'en'
+  handler: (request, h) => {
+    const translations = request.app.translations || {}
+    const currentLang = request.app.currentLang || 'en'
 
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
@@ -16,11 +16,11 @@ export const bankDetailsController = {
       breadcrumbs: [
         {
           text: translations['laps-home'],
-          href: '/'
+          href: `/?lang=${currentLang}`
         },
         {
           text: translations['bank-details'],
-          href: '/'
+          href: `/bank-details?lang=${currentLang}`
         }
       ]
     })
