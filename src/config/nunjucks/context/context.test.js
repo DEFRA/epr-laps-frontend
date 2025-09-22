@@ -34,7 +34,7 @@ describe('context and cache', () => {
         },
         currentLang: 'en'
       },
-      getUserSession: mockgetUserSession.mockResolvedValue(),
+      getUserSession: mockgetUserSession,
       state: {
         userSession: null
       }
@@ -129,7 +129,7 @@ describe('context and cache', () => {
         },
         currentLang: 'en'
       },
-      getUserSession: mockgetUserSession.mockResolvedValue(),
+      getUserSession: mockgetUserSession,
       state: {
         userSession: null
       }
