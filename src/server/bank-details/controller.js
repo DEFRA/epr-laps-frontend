@@ -20,7 +20,7 @@ export const bankDetailsController = {
           .code(statusCodes.unauthorized)
       }
 
-      const bankDetailsAPIUrl = config.get('bankDetailAPIUrl')
+      const bankDetailsAPIUrl = config.get('BACKEND_API')
       // Calling API
       const { payload } = await Wreck.get(bankDetailsAPIUrl, {
         headers: {
