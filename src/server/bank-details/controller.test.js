@@ -3,9 +3,13 @@ import { vi, describe, test, beforeEach, expect } from 'vitest'
 import Wreck from '@hapi/wreck'
 import { context } from './../../config/nunjucks/context/context.js'
 
+const mockLoggerError = vi.fn()
+
 vi.mock('@hapi/wreck')
 vi.mock('./../../config/nunjucks/context/context.js')
-
+vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
+}))
 describe('#bankDetailsController', () => {
   const h = {
     view: vi.fn(),

@@ -4,7 +4,10 @@
 import { context } from './../../config/nunjucks/context/context.js'
 import { config } from '../../config/config.js'
 import { statusCodes } from '../common/constants/status-codes.js'
+import { createLogger } from '../../server/common/helpers/logging/logger.js'
 import Wreck from '@hapi/wreck'
+
+const logger = createLogger()
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -54,6 +57,7 @@ export const bankDetailsController = {
         apiData: payload.data
       })
     } catch (error) {
+      logger.error('Error fetching bank details:', error)
       return h
         .response({ error: 'Failed to fetch bank details' })
         .code(statusCodes.internalServerError)
