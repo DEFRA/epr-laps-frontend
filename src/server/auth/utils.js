@@ -56,7 +56,7 @@ export const getRequest = async (url, headers) => {
 export const fetchWithToken = async (request, pathTemplate) => {
   const { token, localAuthority } = await getToken(request)
 
-  const apiBaseUrl = config.get('BACKEND_API')
+  const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${pathTemplate.replace(':localAuthority', encodeURIComponent(localAuthority))}`
 
   const headers = setHeaders(token)

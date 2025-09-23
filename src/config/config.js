@@ -273,7 +273,7 @@ export const config = convict({
     default: true,
     env: 'SHOW_BETA_BANNER'
   },
-  BACKEND_API: {
+  backendApiUrl: {
     doc: 'URL to get the bank details',
     format: String,
     default: 'http://localhost:3001/',
