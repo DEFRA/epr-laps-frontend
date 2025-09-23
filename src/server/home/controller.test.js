@@ -19,6 +19,7 @@ describe('#homeController', () => {
 
     server.ext('onRequest', (request, h) => {
       request.app.translations = { 'local-authority': 'Mocked Local Authority' }
+      request.app.currentLang = 'en'
       return h.continue
     })
 
@@ -82,7 +83,7 @@ describe('#homeController', () => {
         breadcrumbs: [
           {
             text: undefined,
-            href: '/'
+            href: '/?lang=en'
           }
         ],
         translations: {}

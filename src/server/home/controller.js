@@ -23,7 +23,7 @@ export const homeController = {
       breadcrumbs: [
         {
           text: translations['local-authority'],
-          href: '/'
+          href: `/?lang=${currentLang}`
         }
       ]
     })
