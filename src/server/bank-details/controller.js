@@ -1,44 +1,23 @@
 /**
  * A GDS styled example bank details controller
  */
-import { context } from './../../config/nunjucks/context/context.js'
-import { config } from '../../config/config.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 import { createLogger } from '../../server/common/helpers/logging/logger.js'
-import Wreck from '@hapi/wreck'
+import { fetchWithToken } from '../../server/auth/utils.js'
 
 const logger = createLogger()
 
 export const bankDetailsController = {
   handler: async (request, h) => {
     try {
-      // Build context from request (this gives you authedUser, navigation, etc.)
-      const ctx = await context(request)
-
-      // Token is stored in ctx.authedUser
-      const token = ctx.authedUser?.token
-      if (!token) {
-        return h
-          .response({ error: 'Unauthorized' })
-          .code(statusCodes.unauthorized)
-      }
-
-      const bankDetailsAPIUrl = config.get('BACKEND_API')
-      const localAuthority = ctx.localAuthority
-      // Construct the URL
-      const url = `${bankDetailsAPIUrl}/bank-details/${encodeURIComponent(localAuthority)}`
-
-      // Calling API
-      const { payload } = await Wreck.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        json: true
-      })
-
       const translations = request.app.translations || {}
       const currentLang = request.app.currentLang || 'en'
-      // Render the view static and API data
+
+      // Fetch bank details via the wrapper function
+      const payload = await fetchWithToken(
+        request,
+        '/bank-details/:localAuthority'
+      )
       return h.view('bank-details/index.njk', {
         pageTitle: 'Bank Details',
         heading: 'Glamshire County Council',
@@ -58,6 +37,14 @@ export const bankDetailsController = {
       })
     } catch (error) {
       logger.error('Error fetching bank details:', error)
+
+      // Handle unauthorized separately
+      if (error.message === 'Unauthorized') {
+        return h
+          .response({ error: 'Unauthorized' })
+          .code(statusCodes.unauthorized)
+      }
+
       return h
         .response({ error: 'Failed to fetch bank details' })
         .code(statusCodes.internalServerError)
