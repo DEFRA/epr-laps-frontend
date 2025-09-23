@@ -21,8 +21,12 @@ export const bankDetailsController = {
       }
 
       const bankDetailsAPIUrl = config.get('BACKEND_API')
+      const localAuthority = ctx.localAuthority
+      // Construct the URL
+      const url = `${bankDetailsAPIUrl}/bank-details/${encodeURIComponent(localAuthority)}`
+
       // Calling API
-      const { payload } = await Wreck.get(bankDetailsAPIUrl, {
+      const { payload } = await Wreck.get(url, {
         headers: {
           Authorization: `Bearer ${token}`
         },
