@@ -26,7 +26,9 @@ describe('#utils', () => {
         auth: {
           credentials: {
             profile: {
-              sessionId: 'test-session-id-123'
+              sessionId: 'test-session-id-123',
+              relationships: ['rel-1:someId:Mock Org Name'],
+              currentRelationshipId: 'rel-1'
             },
             expiresIn: 3600,
             token: 'mock-access-token',
@@ -55,6 +57,19 @@ describe('#utils', () => {
       expect(mockCookieAuth.set).toHaveBeenCalledWith({
         sessionId: 'test-session-id-123'
       })
+    })
+
+    it('should store session in cache with correct organisationName', async () => {
+      await setUserSession(mockRequest)
+
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'test-session-id-123',
+        expect.objectContaining({
+          organisationName: 'Mock Org Name',
+          sessionId: 'test-session-id-123'
+        }),
+        3600 * 1000
+      )
     })
   })
 })

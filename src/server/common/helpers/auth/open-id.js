@@ -19,6 +19,30 @@ export const openIdProvider = (name, oidcConf) => {
       }
 
       const payload = Jwt.token.decode(credentials.token).decoded.payload
+
+      // Extract organisationName using currentRelationshipId
+      const currentRelId = payload.currentRelationshipId
+      let organisationName = 'Local Authority'
+
+      if (Array.isArray(payload.relationships) && currentRelId) {
+        const matched = payload.relationships.find((rel) => {
+          const parts = rel.split(':')
+          return parts[0] === currentRelId
+        })
+
+        if (matched) {
+          const parts = matched.split(':')
+          if (parts.length >= 3) {
+            organisationName = parts[2]
+          }
+        }
+      } else {
+        console.warn(
+          'No relationships or no currentRelationshipId in payload',
+          payload
+        )
+      }
+
       const displayName = [payload.firstName, payload.lastName]
         .filter((part) => part)
         .join(' ')
@@ -40,6 +64,7 @@ export const openIdProvider = (name, oidcConf) => {
         enrolmentRequestCount: payload.enrolmentRequestCount,
         currentRelationshipId: payload.currentRelationshipId,
         relationships: payload.relationships,
+        organisationName,
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,

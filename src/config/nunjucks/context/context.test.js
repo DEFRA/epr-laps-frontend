@@ -22,6 +22,11 @@ describe('context and cache', () => {
     mockLoggerError.mockReset()
     mockgetUserSession.mockReset()
     vi.resetModules()
+
+    mockgetUserSession.mockResolvedValue({
+      userName: 'test user',
+      organisationName: 'Mocked Organisation'
+    })
   })
 
   describe('#context', () => {
@@ -54,6 +59,11 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
+          authedUser: {
+            userName: 'test user',
+            organisationName: 'Mocked Organisation'
+          },
+          laName: 'Mocked Organisation',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
@@ -151,6 +161,11 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
+          authedUser: {
+            userName: 'test user',
+            organisationName: 'Mocked Organisation'
+          },
+          laName: 'Mocked Organisation',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [

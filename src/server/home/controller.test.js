@@ -32,7 +32,8 @@ describe('#homeController', () => {
 
   beforeEach(() => {
     vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
-      userName: 'test user'
+      userName: 'test user',
+      organisationName: 'Mocked Organisation'
     })
     vi.clearAllMocks()
   })
@@ -42,7 +43,8 @@ describe('#homeController', () => {
       app: {
         translations: { 'local-authority': 'Mocked Local Authority' },
         currentLang: 'en'
-      }
+      },
+      state: { userSession: null }
     }
     const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
@@ -56,26 +58,35 @@ describe('#homeController', () => {
   })
 
   test('Should provide expected response', async () => {
+    const mockCacheGet = vi.fn().mockResolvedValue({
+      sessionId: 'mock-session',
+      organisationName: 'Mocked Organisation'
+    })
     const mockRequest = {
-      app: {
-        // translations: { 'local-authority': 'Mocked Local Authority' },
-        currentLang: 'en'
+      app: { currentLang: 'en' },
+      state: { userSession: { sessionId: 'mock-session' } },
+      server: {
+        app: { cache: { get: mockCacheGet } }
       }
     }
     const mockedResponse = { view: vi.fn() }
 
     await homeController.handler(mockRequest, mockedResponse)
 
-    expect(mockedResponse.view).toHaveBeenCalledWith('home/index', {
-      pageTitle: 'Home',
-      currentLang: 'en',
-      breadcrumbs: [
-        {
-          text: undefined,
-          href: '/'
-        }
-      ],
-      translations: {}
-    })
+    expect(mockedResponse.view).toHaveBeenCalledWith(
+      'home/index',
+      expect.objectContaining({
+        pageTitle: 'Home',
+        currentLang: 'en',
+        heading: 'Mocked Organisation',
+        breadcrumbs: [
+          {
+            text: undefined,
+            href: '/'
+          }
+        ],
+        translations: {}
+      })
+    )
   })
 })

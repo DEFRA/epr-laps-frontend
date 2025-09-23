@@ -19,6 +19,7 @@ async function context(request) {
     request,
     request.state?.userSession
   )
+
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -35,6 +36,7 @@ async function context(request) {
     breadcrumbs: [],
     navigation: buildNavigation(request),
     showBetaBanner: config.get('showBetaBanner'),
+    laName: authedUser?.organisationName || 'Local Authority',
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`
