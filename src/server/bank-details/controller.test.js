@@ -1,9 +1,9 @@
 import { bankDetailsController } from './controller.js'
 import { vi, describe, test, beforeEach, expect } from 'vitest'
-import axios from 'axios'
+import Wreck from '@hapi/wreck'
 import { context } from './../../config/nunjucks/context/context.js'
 
-vi.mock('axios')
+vi.mock('@hapi/wreck')
 vi.mock('./../../config/nunjucks/context/context.js')
 
 describe('#bankDetailsController', () => {
@@ -30,7 +30,9 @@ describe('#bankDetailsController', () => {
   test('should render view with API data for authenticated user', async () => {
     const apiData = { bankName: 'Test Bank' }
     context.mockResolvedValue({ authedUser: { token: 'token123' } })
-    axios.get.mockResolvedValue({ data: apiData })
+
+    // Wreck.get resolves with { payload: { data: ... } }
+    Wreck.get.mockResolvedValue({ payload: { data: apiData } })
 
     const request = {
       app: {
@@ -44,8 +46,9 @@ describe('#bankDetailsController', () => {
 
     await bankDetailsController.handler(request, h)
 
-    expect(axios.get).toHaveBeenCalledWith(expect.any(String), {
-      headers: { Authorization: 'Bearer token123' }
+    expect(Wreck.get).toHaveBeenCalledWith(expect.any(String), {
+      headers: { Authorization: 'Bearer token123' },
+      json: true
     })
 
     expect(h.view).toHaveBeenCalledWith(
@@ -63,7 +66,7 @@ describe('#bankDetailsController', () => {
   test('should fallback to empty translations and en for currentLang', async () => {
     const apiData = { bankName: 'Test Bank' }
     context.mockResolvedValue({ authedUser: { token: 'token123' } })
-    axios.get.mockResolvedValue({ data: apiData })
+    Wreck.get.mockResolvedValue({ payload: { data: apiData } })
 
     const request = { app: {} }
 
@@ -76,7 +79,7 @@ describe('#bankDetailsController', () => {
 
   test('should return 500 if API call fails', async () => {
     context.mockResolvedValue({ authedUser: { token: 'token123' } })
-    axios.get.mockRejectedValue(new Error('API error'))
+    Wreck.get.mockRejectedValue(new Error('API error'))
 
     const request = { app: {} }
     await bankDetailsController.handler(request, h)

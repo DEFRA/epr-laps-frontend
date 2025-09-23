@@ -2,8 +2,9 @@
  * A GDS styled example bank details controller
  */
 import { context } from './../../config/nunjucks/context/context.js'
-import axios from 'axios'
 import { config } from '../../config/config.js'
+import { statusCodes } from '../common/constants/status-codes.js'
+import Wreck from '@hapi/wreck'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -14,15 +15,18 @@ export const bankDetailsController = {
       // Token is stored in ctx.authedUser
       const token = ctx.authedUser?.token
       if (!token) {
-        return h.response({ error: 'Unauthorized' }).code(401)
+        return h
+          .response({ error: 'Unauthorized' })
+          .code(statusCodes.unauthorized)
       }
 
       const bankDetailsAPIUrl = config.get('bankDetailAPIUrl')
       // Calling API
-      const apiResponse = await axios.get(`${bankDetailsAPIUrl}`, {
+      const { payload } = await Wreck.get(bankDetailsAPIUrl, {
         headers: {
           Authorization: `Bearer ${token}`
-        }
+        },
+        json: true
       })
 
       const translations = request.app.translations || {}
@@ -43,10 +47,12 @@ export const bankDetailsController = {
             href: `/bank-details?lang=${currentLang}`
           }
         ],
-        apiData: apiResponse.data
+        apiData: payload.data
       })
     } catch (error) {
-      return h.response({ error: 'Failed to fetch bank details' }).code(500)
+      return h
+        .response({ error: 'Failed to fetch bank details' })
+        .code(statusCodes.internalServerError)
     }
   }
 }
