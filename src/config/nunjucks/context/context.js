@@ -27,8 +27,6 @@ async function context(request) {
     }
   }
 
-  console.log('authedUSER >>', authedUser)
-
   return {
     authedUser,
     assetPath: `${assetPath}/assets`,
