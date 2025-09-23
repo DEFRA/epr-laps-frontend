@@ -4,18 +4,18 @@
 <div class="govuk-grid-row">
 <div class="govuk-grid-column-two-thirds">
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+  {% if apiData.confirmed %}
+    {% set html %}
+      <p class="govuk-notification-banner__heading">
+        {{ translations['the-nominated-h'] }}
+      </p>
+    {% endset %}
 
-  {% set html %}
-    <p class="govuk-notification-banner__heading">
-      {{ translations['the-nominated-h'] }}
-    </p>
-  {% endset %}
-
-  {{ govukNotificationBanner({
-    titleText: translations['important'],
-    html: html
-  }) }}
-
+    {{ govukNotificationBanner({
+      titleText: translations['important'],
+      html: html
+    }) }}
+  {% endif %}
   {% from "govuk/components/table/macro.njk" import govukTable %}
   {% from "govuk/components/tag/macro.njk" import govukTag %}
 
@@ -27,7 +27,7 @@
   <h2 class="govuk-heading-s">
     {{ translations['your-local'] }}
   </h2>
- {% if isConfirmed %}
+ {% if apiData.confirmed %}
   {{ govukTag({
     text: translations['confirmed'],
     classes: "govuk-tag--green"
@@ -50,7 +50,7 @@
         text: translations['account-name'] 
       },
       {
-        text: "Glamshire County Council" 
+        text: apiData.accountName 
       }
     ],
     [
@@ -58,7 +58,7 @@
         text: translations['sort-code'] 
       },
       {
-        text: "12 34 56"
+        text: apiData.sortCode
       }
     ],
     [
@@ -66,7 +66,7 @@
         text: translations['account-number']
       },
       {
-        text: "78910112"
+        text: apiData.accountNumber
       }
     ]
   ]

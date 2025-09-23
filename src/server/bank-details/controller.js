@@ -3,6 +3,7 @@
  */
 import { context } from './../../config/nunjucks/context/context.js'
 import axios from 'axios'
+import { config } from '../../config/config.js'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -12,21 +13,17 @@ export const bankDetailsController = {
 
       // Token is stored in ctx.authedUser
       const token = ctx.authedUser?.token
-      console.log('THE TOKEN', token)
       if (!token) {
         return h.response({ error: 'Unauthorized' }).code(401)
       }
 
+      const bankDetailsAPIUrl = config.get('bankDetailAPIUrl')
       // Calling API
-      const apiResponse = await axios.get(
-        'http://localhost:3001/bank-details/sh',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      const apiResponse = await axios.get(`${bankDetailsAPIUrl}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      )
-      console.log('Bank details API response >>', apiResponse.data)
+      })
 
       const translations = request.app.translations || {}
       const currentLang = request.app.currentLang || 'en'
@@ -35,7 +32,6 @@ export const bankDetailsController = {
         pageTitle: 'Bank Details',
         heading: 'Glamshire County Council',
         currentLang,
-        isConfirmed: false,
         translations,
         breadcrumbs: [
           {
@@ -50,7 +46,6 @@ export const bankDetailsController = {
         apiData: apiResponse.data
       })
     } catch (error) {
-      console.error('Error fetching bank details:', error)
       return h.response({ error: 'Failed to fetch bank details' }).code(500)
     }
   }

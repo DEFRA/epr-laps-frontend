@@ -272,6 +272,13 @@ export const config = convict({
     format: Boolean,
     default: true,
     env: 'SHOW_BETA_BANNER'
+  },
+  bankDetailAPIUrl: {
+    doc: 'URL to get the bank details',
+    format: String,
+    default: '',
+    env: 'BANK_API_URL',
+    sensitive: true
   }
 })
 
