@@ -1,136 +1,101 @@
-import { createServer } from '../server.js'
-import { statusCodes } from '../common/constants/status-codes.js'
-import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 import { bankDetailsController } from './controller.js'
-import * as authUtils from '../common/helpers/auth/utils.js'
+import { vi, describe, test, beforeEach, expect } from 'vitest'
+import { statusCodes } from '../common/constants/status-codes.js'
 
-vi.mock('../common/helpers/auth/get-oidc-config.js')
+// mock logger
+const mockLoggerError = vi.fn()
+
+// mock fetchWithToken
+const mockFetchWithToken = vi.fn()
+
+vi.mock('../../server/auth/utils.js', () => ({
+  fetchWithToken: (...args) => mockFetchWithToken(...args)
+}))
+
+vi.mock('../../server/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
+}))
+
 describe('#bankDetailsController', () => {
-  let server
-
-  beforeAll(async () => {
-    vi.mocked(getOidcConfig).mockResolvedValue({
-      authorization_endpoint: 'https://test-idm-endpoint/authorize',
-      token_endpoint: 'https://test-idm-endpoint/token',
-      end_session_endpoint: 'https://test-idm-endpoint/logout'
-    })
-    server = await createServer()
-
-    server.ext('onRequest', (request, h) => {
-      request.app.translations = {
-        'bank-details': 'Bank details',
-        'the-nominated-h': 'Notification heading',
-        'your-local': "Your local authority's bank details",
-        'laps-home': 'Local Authority Payments (LAPs) home'
-      }
-      request.app.currentLang = 'en'
-      return h.continue
-    })
-
-    await server.initialize()
-  })
-
-  afterAll(async () => {
-    getOidcConfig.mockReset()
-    await server.stop({ timeout: 0 })
-  })
+  const h = {
+    view: vi.fn(),
+    response: vi.fn().mockReturnThis(),
+    code: vi.fn().mockReturnThis()
+  }
 
   beforeEach(() => {
-    vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
-      userName: 'test user'
-    })
     vi.clearAllMocks()
   })
 
-  test('should redirect user when user is unauthenticated', async () => {
-    const mockRequest = {
-      app: { translations: {}, currentLang: 'en' },
-      state: { userSession: null }
-    }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
+  test('should return 401 if unauthorized error is thrown', async () => {
+    mockFetchWithToken.mockRejectedValue(new Error('Unauthorized'))
 
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/bank-details'
-    })
+    const request = { app: {} }
+    await bankDetailsController.handler(request, h)
 
-    await bankDetailsController.handler(mockRequest, mockedResponse)
-
-    expect(statusCode).toBe(statusCodes.redirect)
+    expect(h.response).toHaveBeenCalledWith({ error: 'Unauthorized' })
+    expect(h.code).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
-  test('should render appropirate template when user is authenticated', async () => {
-    const mockRequest = {
+  test('should render view with API data for authenticated user', async () => {
+    const apiData = { bankName: 'Test Bank' }
+    mockFetchWithToken.mockResolvedValue(apiData)
+
+    const request = {
       app: {
         translations: {
           'bank-details': 'Bank details',
-          'laps-home': 'Local Authority Payments (LAPs) home',
-          'your-local': "Your local authority's bank details"
+          'laps-home': 'LAPs home'
         },
         currentLang: 'en'
-      },
-      state: { userSession: { userName: 'test user' } }
+      }
     }
 
-    const h = { redirect: vi.fn(), view: vi.fn() }
-    await bankDetailsController.handler(mockRequest, h)
+    await bankDetailsController.handler(request, h)
 
-    expect(h.view).toHaveBeenCalledWith('bank-details/index.njk', {
-      pageTitle: 'Bank Details',
-      heading: 'Glamshire County Council',
-      breadcrumbs: [
-        {
-          text: 'Local Authority Payments (LAPs) home',
-          href: '/?lang=en'
-        },
-        {
-          text: 'Bank details',
-          href: '/bank-details?lang=en'
-        }
-      ],
-      currentLang: 'en',
-      translations: {
-        'bank-details': 'Bank details',
-        'laps-home': 'Local Authority Payments (LAPs) home',
-        'your-local': "Your local authority's bank details"
-      },
-      isConfirmed: false
+    expect(mockFetchWithToken).toHaveBeenCalledWith(
+      request,
+      '/bank-details/:localAuthority'
+    )
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/index.njk',
+      expect.objectContaining({
+        pageTitle: 'Bank Details',
+        heading: 'Glamshire County Council',
+        translations: request.app.translations,
+        currentLang: 'en',
+        apiData,
+        breadcrumbs: [
+          { text: 'LAPs home', href: '/?lang=en' },
+          { text: 'Bank details', href: '/bank-details?lang=en' }
+        ]
+      })
+    )
+  })
+
+  test('should fallback to empty translations and en for currentLang', async () => {
+    const apiData = { bankName: 'Test Bank' }
+    mockFetchWithToken.mockResolvedValue(apiData)
+
+    const request = { app: {} }
+
+    await bankDetailsController.handler(request, h)
+
+    const viewArgs = h.view.mock.calls[0][1]
+    expect(viewArgs.translations).toEqual({})
+    expect(viewArgs.currentLang).toBe('en')
+  })
+
+  test('should return 500 if API call fails for other reasons', async () => {
+    mockFetchWithToken.mockRejectedValue(new Error('API error'))
+
+    const request = { app: {} }
+    await bankDetailsController.handler(request, h)
+
+    expect(h.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch bank details'
     })
+    expect(h.code).toHaveBeenCalledWith(statusCodes.internalServerError)
   })
-
-  test('Should have translations and currentLang available', async () => {
-    const mockRequest = {
-      app: {
-        translations: {
-          'bank-details': 'Bank details',
-          'laps-home': 'Local Authority Payments (LAPs) home',
-          'your-local': "Your local authority's bank details"
-        },
-        currentLang: 'en'
-      },
-      state: { userSession: { userName: 'test user' } }
-    }
-
-    const h = { view: vi.fn() }
-
-    await bankDetailsController.handler(mockRequest, h)
-
-    const callArgs = h.view.mock.calls[0][1]
-    expect(callArgs.translations['bank-details']).toBe('Bank details')
-    expect(callArgs.currentLang).toBe('en')
-  })
-})
-
-test('Should fall back to defaults when translations and currentLang are missing', async () => {
-  const mockRequest = {
-    app: {}, // no translations or currentLang
-    state: { userSession: { userName: 'test user' } }
-  }
-  const h = { view: vi.fn() }
-
-  await bankDetailsController.handler(mockRequest, h)
-
-  const callArgs = h.view.mock.calls[0][1]
-  expect(callArgs.translations).toEqual({})
-  expect(callArgs.currentLang).toBe('en')
 })
