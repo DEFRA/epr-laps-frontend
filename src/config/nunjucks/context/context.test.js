@@ -1,8 +1,12 @@
 import { vi } from 'vitest'
+import { config } from '../../config.js'
 
 const mockReadFileSync = vi.fn()
 const mockLoggerError = vi.fn()
 const mockgetUserSession = vi.fn()
+
+const manageDefraAccountUrl =
+  'https://your-account.cpdev.cui.defra.gov.uk/management'
 
 vi.mock('node:fs', async () => {
   const nodeFs = await import('node:fs')
@@ -22,6 +26,17 @@ describe('context and cache', () => {
     mockLoggerError.mockReset()
     mockgetUserSession.mockReset()
     vi.resetModules()
+
+    config.get = vi.fn().mockImplementation((key) => {
+      const configValues = {
+        root: '/',
+        assetPath: '/public',
+        serviceName: 'EPR-LAPs',
+        showBetaBanner: true,
+        'defraId.manageAccountUrl': manageDefraAccountUrl
+      }
+      return configValues[key]
+    })
   })
 
   describe('#context', () => {
@@ -67,7 +82,7 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'Your Defra account',
-              href: '/defra-account'
+              href: manageDefraAccountUrl
             },
             {
               current: false,
@@ -174,7 +189,7 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'Your Defra account',
-              href: '/defra-account'
+              href: manageDefraAccountUrl
             },
             {
               current: false,

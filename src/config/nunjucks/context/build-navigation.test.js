@@ -1,4 +1,8 @@
 import { buildNavigation } from './build-navigation.js'
+import { config } from '../../config.js'
+
+const manageDefraAccountUrl =
+  'https://your-account.cpdev.cui.defra.gov.uk/management'
 
 function mockRequest(options) {
   return {
@@ -12,6 +16,17 @@ function mockRequest(options) {
   }
 }
 
+config.get = vi.fn().mockImplementation((key) => {
+  const configValues = {
+    root: '/',
+    assetPath: '/public',
+    serviceName: 'EPR-LAPs',
+    showBetaBanner: true,
+    'defraId.manageAccountUrl': manageDefraAccountUrl
+  }
+  return configValues[key]
+})
+
 describe('#buildNavigation', () => {
   test('Should provide expected navigation details', () => {
     expect(
@@ -20,7 +35,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Your Defra account',
-        href: '/defra-account'
+        href: manageDefraAccountUrl
       },
       {
         current: false,
@@ -35,7 +50,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Your Defra account',
-        href: '/defra-account'
+        href: manageDefraAccountUrl
       },
       {
         current: false,
