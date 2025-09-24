@@ -1,5 +1,5 @@
 import jwt from '@hapi/jwt'
-import { openIdProvider } from './open-id'
+import { openIdProvider, extractOrgName } from './open-id.js'
 
 describe('#openIdProvider', () => {
   let provider
@@ -110,5 +110,39 @@ describe('#openIdProvider', () => {
     const credentials = { token }
     await provider.profile(credentials, { id_token: 'id-token' }, {})
     expect(credentials.profile.organisationName).toBe('Local Authority')
+  })
+})
+
+describe('#extractOrgName', () => {
+  test('Should return organisation name when relationship matches', () => {
+    const payload = {
+      currentRelationshipId: '123',
+      relationships: ['123:456:MyOrg:0:employee:0']
+    }
+    expect(extractOrgName(payload).organisationName).toBe('MyOrg')
+  })
+
+  test('Should fallback to Local Authority when no relationships', () => {
+    const payload = {
+      currentRelationshipId: null,
+      relationships: null
+    }
+    expect(extractOrgName(payload).organisationName).toBe('Local Authority')
+  })
+
+  test('Should fallback to Local Authority when relationship does not match', () => {
+    const payload = {
+      currentRelationshipId: '999',
+      relationships: ['123:456:OtherOrg:0:employee:0']
+    }
+    expect(extractOrgName(payload).organisationName).toBe('Local Authority')
+  })
+
+  test('Should handle malformed relationship strings gracefully', () => {
+    const payload = {
+      currentRelationshipId: '123',
+      relationships: ['123']
+    }
+    expect(extractOrgName(payload).organisationName).toBe('Local Authority')
   })
 })

@@ -9,6 +9,10 @@ vi.mock('./get-oidc-config.js')
 vi.mock('./open-id.js')
 vi.mock('./validate.js')
 
+vi.mock('../../../../server/common/helpers/logging/logger-options.js', () => ({
+  loggerOptions: { enabled: false, ignorePaths: [] }
+}))
+
 const mockedGetOidcConfig = vi.mocked(getOidcConfig)
 const mockedOpenIdProvider = vi.mocked(openIdProvider)
 const mockedValidateUserSession = vi.mocked(validateUserSession)

@@ -70,7 +70,6 @@ describe('context and cache', () => {
             userName: 'test user',
             organisationName: 'Mocked Organisation'
           },
-          laName: 'Mocked Organisation',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
@@ -182,7 +181,6 @@ describe('context and cache', () => {
             userName: 'test user',
             organisationName: 'Mocked Organisation'
           },
-          laName: 'Mocked Organisation',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
@@ -203,10 +201,10 @@ describe('context and cache', () => {
         })
       })
 
-      test('Should fallback to default Local Authority when organisationName is missing', async () => {
+      test('Should handle missing organisationName', async () => {
         mockgetUserSession.mockResolvedValueOnce({ userName: 'test user' })
         const result = await contextImport.context(mockRequest)
-        expect(result.laName).toBe('Local Authority')
+        expect(result.authedUser.organisationName).toBeUndefined()
       })
     })
   })

@@ -1,10 +1,13 @@
 import Jwt from '@hapi/jwt'
 import { config } from '../../../../config/config.js'
+import { createLogger } from '../logging/logger.js'
+
+const logger = createLogger()
 
 const RELATIONSHIP_PARTS_MIN = 3 // minimum number of parts in a relationship string
 const ORG_NAME_INDEX = 2 // index of organisation name in the relationship string
 
-function extractOrgName(payload) {
+export function extractOrgName(payload) {
   let organisationName = 'Local Authority'
 
   if (Array.isArray(payload.relationships) && payload.currentRelationshipId) {
@@ -20,7 +23,7 @@ function extractOrgName(payload) {
       }
     }
   } else {
-    console.warn(
+    logger.warn(
       'No relationships or no currentRelationshipId in payload',
       payload
     )
