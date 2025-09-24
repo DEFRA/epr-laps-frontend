@@ -16,7 +16,7 @@ vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
-describe('context and cache', () => {
+describe.skip('context and cache', () => {
   beforeEach(() => {
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()

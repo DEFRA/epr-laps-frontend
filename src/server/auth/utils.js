@@ -1,7 +1,7 @@
 import { addSeconds } from 'date-fns'
-import { context } from './../../config/nunjucks/context/context.js'
 import Wreck from '@hapi/wreck'
 import { config } from '../../config/config.js'
+import { jwtDecode } from 'jwt-decode'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
@@ -28,13 +28,12 @@ export const setUserSession = async (request) => {
 }
 
 // To get token from request/context
-export const getToken = async (request) => {
-  const ctx = await context(request)
-  const token = ctx.authedUser?.token
-  if (!token) {
-    throw new Error('Unauthorized')
-  }
-  return { token, localAuthority: ctx.localAuthority }
+export const getToken = (request) => {
+  // get the token from the request auth credentials or cookie
+  const token =
+    request.auth?.credentials?.token || request.state?.userSession?.token
+  if (!token) throw new Error('Unauthorized')
+  return { token, localAuthority: request.auth?.credentials?.localAuthority }
 }
 
 // To set headers for API call
@@ -62,4 +61,18 @@ export const fetchWithToken = async (request, pathTemplate) => {
   const headers = setHeaders(token)
 
   return getRequest(url, headers)
+}
+
+export const getRoleFromToken = (request) => {
+  try {
+    const { token } = getToken(request)
+    const decoded = jwtDecode(token)
+    const roles = decoded?.roles || []
+    if (!roles.length) return null
+    const parts = roles[0].split(':')
+    return parts.length >= 2 ? parts[1] : roles[0]
+  } catch (err) {
+    request?.logger?.error?.('Failed to extract role from token', err)
+    return null
+  }
 }
