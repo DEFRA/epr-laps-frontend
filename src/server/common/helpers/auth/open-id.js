@@ -1,6 +1,9 @@
 import Jwt from '@hapi/jwt'
 import { config } from '../../../../config/config.js'
 
+const RELATIONSHIP_PARTS_MIN = 3 // minimum number of parts in a relationship string
+const ORG_NAME_INDEX = 2 // index of organisation name in the relationship string
+
 export const openIdProvider = (name, oidcConf) => {
   const authConfig = config.get('defraId')
   return {
@@ -32,8 +35,8 @@ export const openIdProvider = (name, oidcConf) => {
 
         if (matched) {
           const parts = matched.split(':')
-          if (parts.length >= 3) {
-            organisationName = parts[2]
+          if (parts.length >= RELATIONSHIP_PARTS_MIN) {
+            organisationName = parts[ORG_NAME_INDEX]
           }
         }
       } else {
