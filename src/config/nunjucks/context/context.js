@@ -19,7 +19,6 @@ async function context(request) {
     request,
     request.state?.userSession
   )
-
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))

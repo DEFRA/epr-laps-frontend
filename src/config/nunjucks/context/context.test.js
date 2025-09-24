@@ -23,10 +23,7 @@ describe('context and cache', () => {
     mockgetUserSession.mockReset()
     vi.resetModules()
 
-    mockgetUserSession.mockResolvedValue({
-      userName: 'test user',
-      organisationName: 'Mocked Organisation'
-    })
+    mockgetUserSession.mockResolvedValue({})
   })
 
   describe('#context', () => {
@@ -66,10 +63,7 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
-          authedUser: {
-            userName: 'test user',
-            organisationName: 'Mocked Organisation'
-          },
+          authedUser: {},
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
@@ -177,11 +171,8 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
-          authedUser: {
-            userName: 'test user',
-            organisationName: 'Mocked Organisation'
-          },
           breadcrumbs: [],
+          authedUser: {},
           getAssetPath: expect.any(Function),
           navigation: [
             {
@@ -199,12 +190,6 @@ describe('context and cache', () => {
           serviceUrl: '/',
           showBetaBanner: true
         })
-      })
-
-      test('Should handle missing organisationName', async () => {
-        mockgetUserSession.mockResolvedValueOnce({ userName: 'test user' })
-        const result = await contextImport.context(mockRequest)
-        expect(result.authedUser.organisationName).toBeUndefined()
       })
     })
   })
