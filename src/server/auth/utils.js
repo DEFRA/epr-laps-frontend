@@ -32,7 +32,9 @@ export const getToken = (request) => {
   // get the token from the request auth credentials or cookie
   const token =
     request.auth?.credentials?.token || request.state?.userSession?.token
-  if (!token) throw new Error('Unauthorized')
+  if (!token) {
+    throw new Error('Unauthorized')
+  }
   return { token, localAuthority: request.auth?.credentials?.localAuthority }
 }
 
@@ -53,7 +55,7 @@ export const getRequest = async (url, headers) => {
 }
 
 export const fetchWithToken = async (request, pathTemplate) => {
-  const { token, localAuthority } = await getToken(request)
+  const { token, localAuthority } = getToken(request)
 
   const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${pathTemplate.replace(':localAuthority', encodeURIComponent(localAuthority))}`
@@ -68,7 +70,9 @@ export const getRoleFromToken = (request) => {
     const { token } = getToken(request)
     const decoded = jwtDecode(token)
     const roles = decoded?.roles || []
-    if (!roles.length) return null
+    if (!roles.length) {
+      return null
+    }
     const parts = roles[0].split(':')
     return parts.length >= 2 ? parts[1] : roles[0]
   } catch (err) {
