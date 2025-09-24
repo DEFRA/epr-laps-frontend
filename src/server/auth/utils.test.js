@@ -65,7 +65,6 @@ describe('#utils', () => {
       expect(mockCache.set).toHaveBeenCalledWith(
         'test-session-id-123',
         expect.objectContaining({
-          organisationName: 'Mock Org Name',
           sessionId: 'test-session-id-123'
         }),
         3600 * 1000

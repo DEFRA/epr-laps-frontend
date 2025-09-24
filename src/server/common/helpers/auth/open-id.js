@@ -4,6 +4,35 @@ import { config } from '../../../../config/config.js'
 const RELATIONSHIP_PARTS_MIN = 3 // minimum number of parts in a relationship string
 const ORG_NAME_INDEX = 2 // index of organisation name in the relationship string
 
+function extractOrgName(payload) {
+  let organisationName = 'Local Authority'
+
+  if (Array.isArray(payload.relationships) && payload.currentRelationshipId) {
+    const matched = payload.relationships.find((rel) => {
+      const parts = rel.split(':')
+      return parts[0] === payload.currentRelationshipId
+    })
+
+    if (matched) {
+      const parts = matched.split(':')
+      if (parts.length >= RELATIONSHIP_PARTS_MIN) {
+        organisationName = parts[ORG_NAME_INDEX]
+      }
+    }
+  } else {
+    console.warn(
+      'No relationships or no currentRelationshipId in payload',
+      payload
+    )
+  }
+
+  const displayName = [payload.firstName, payload.lastName]
+    .filter(Boolean)
+    .join(' ')
+
+  return { organisationName, displayName }
+}
+
 export const openIdProvider = (name, oidcConf) => {
   const authConfig = config.get('defraId')
   return {
@@ -23,32 +52,7 @@ export const openIdProvider = (name, oidcConf) => {
 
       const payload = Jwt.token.decode(credentials.token).decoded.payload
 
-      // Extract organisationName using currentRelationshipId
-      const currentRelId = payload.currentRelationshipId
-      let organisationName = 'Local Authority'
-
-      if (Array.isArray(payload.relationships) && currentRelId) {
-        const matched = payload.relationships.find((rel) => {
-          const parts = rel.split(':')
-          return parts[0] === currentRelId
-        })
-
-        if (matched) {
-          const parts = matched.split(':')
-          if (parts.length >= RELATIONSHIP_PARTS_MIN) {
-            organisationName = parts[ORG_NAME_INDEX]
-          }
-        }
-      } else {
-        console.warn(
-          'No relationships or no currentRelationshipId in payload',
-          payload
-        )
-      }
-
-      const displayName = [payload.firstName, payload.lastName]
-        .filter((part) => part)
-        .join(' ')
+      const { organisationName, displayName } = extractOrgName(payload)
 
       credentials.profile = {
         id: payload.sub,

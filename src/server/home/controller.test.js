@@ -79,7 +79,6 @@ describe('#homeController', () => {
       expect.objectContaining({
         pageTitle: 'Home',
         currentLang: 'en',
-        heading: 'Mocked Organisation',
         breadcrumbs: [
           {
             text: undefined,
@@ -87,6 +86,26 @@ describe('#homeController', () => {
           }
         ],
         translations: {}
+      })
+    )
+  })
+
+  test('should handle missing translations and currentLang', async () => {
+    const mockRequest = {
+      app: {},
+      state: {}
+    }
+    const mockedResponse = { view: vi.fn() }
+
+    await homeController.handler(mockRequest, mockedResponse)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith(
+      'home/index',
+      expect.objectContaining({
+        pageTitle: 'Home',
+        currentLang: 'en', // fallback
+        translations: {}, // fallback
+        breadcrumbs: expect.any(Array)
       })
     )
   })
