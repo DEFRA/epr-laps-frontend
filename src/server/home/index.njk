@@ -4,18 +4,9 @@
 {% block content %}
   {{ appHeading({
    text: translations['local-authority'],
-    caption: "Glamshire County Council"
+    caption: authedUser.organisationName
 
   }) }}
-
-  {% if authedUser.displayName %}
-    <p>
-      Welcome, <strong>{{ authedUser.relationships }}</strong><br />
-    </p>
-  {% else %}
-    <p>No user</p>
-  {% endif %}
-
 
       <div class="govuk-grid-row">
         {{ appCustomCard({
