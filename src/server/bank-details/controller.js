@@ -18,6 +18,7 @@ export const bankDetailsController = {
         request,
         '/bank-details/:localAuthority'
       )
+
       return h.view('bank-details/index.njk', {
         pageTitle: 'Bank Details',
         heading: 'Glamshire County Council',
@@ -33,7 +34,7 @@ export const bankDetailsController = {
             href: `/bank-details?lang=${currentLang}`
           }
         ],
-        apiData: payload.data
+        apiData: payload
       })
     } catch (error) {
       logger.error('Error fetching bank details:', error)

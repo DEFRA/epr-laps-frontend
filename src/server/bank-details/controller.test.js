@@ -1,15 +1,21 @@
 import { bankDetailsController } from './controller.js'
 import { vi, describe, test, beforeEach, expect } from 'vitest'
-import Wreck from '@hapi/wreck'
-import { context } from './../../config/nunjucks/context/context.js'
+import { statusCodes } from '../common/constants/status-codes.js'
 
+// mock logger
 const mockLoggerError = vi.fn()
 
-vi.mock('@hapi/wreck')
-vi.mock('./../../config/nunjucks/context/context.js')
-vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
+// mock fetchWithToken
+const mockFetchWithToken = vi.fn()
+
+vi.mock('../../server/auth/utils.js', () => ({
+  fetchWithToken: (...args) => mockFetchWithToken(...args)
+}))
+
+vi.mock('../../server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
+
 describe('#bankDetailsController', () => {
   const h = {
     view: vi.fn(),
@@ -21,22 +27,19 @@ describe('#bankDetailsController', () => {
     vi.clearAllMocks()
   })
 
-  test('should return 401 if user is unauthenticated', async () => {
-    context.mockResolvedValue({ authedUser: null })
+  test('should return 401 if unauthorized error is thrown', async () => {
+    mockFetchWithToken.mockRejectedValue(new Error('Unauthorized'))
 
     const request = { app: {} }
     await bankDetailsController.handler(request, h)
 
     expect(h.response).toHaveBeenCalledWith({ error: 'Unauthorized' })
-    expect(h.code).toHaveBeenCalledWith(401)
+    expect(h.code).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
   test('should render view with API data for authenticated user', async () => {
     const apiData = { bankName: 'Test Bank' }
-    context.mockResolvedValue({ authedUser: { token: 'token123' } })
-
-    // Wreck.get resolves with { payload: { data: ... } }
-    Wreck.get.mockResolvedValue({ payload: { data: apiData } })
+    mockFetchWithToken.mockResolvedValue(apiData)
 
     const request = {
       app: {
@@ -50,10 +53,10 @@ describe('#bankDetailsController', () => {
 
     await bankDetailsController.handler(request, h)
 
-    expect(Wreck.get).toHaveBeenCalledWith(expect.any(String), {
-      headers: { Authorization: 'Bearer token123' },
-      json: true
-    })
+    expect(mockFetchWithToken).toHaveBeenCalledWith(
+      request,
+      '/bank-details/:localAuthority'
+    )
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/index.njk',
@@ -62,15 +65,18 @@ describe('#bankDetailsController', () => {
         heading: 'Glamshire County Council',
         translations: request.app.translations,
         currentLang: 'en',
-        apiData
+        apiData,
+        breadcrumbs: [
+          { text: 'LAPs home', href: '/?lang=en' },
+          { text: 'Bank details', href: '/bank-details?lang=en' }
+        ]
       })
     )
   })
 
   test('should fallback to empty translations and en for currentLang', async () => {
     const apiData = { bankName: 'Test Bank' }
-    context.mockResolvedValue({ authedUser: { token: 'token123' } })
-    Wreck.get.mockResolvedValue({ payload: { data: apiData } })
+    mockFetchWithToken.mockResolvedValue(apiData)
 
     const request = { app: {} }
 
@@ -81,9 +87,8 @@ describe('#bankDetailsController', () => {
     expect(viewArgs.currentLang).toBe('en')
   })
 
-  test('should return 500 if API call fails', async () => {
-    context.mockResolvedValue({ authedUser: { token: 'token123' } })
-    Wreck.get.mockRejectedValue(new Error('API error'))
+  test('should return 500 if API call fails for other reasons', async () => {
+    mockFetchWithToken.mockRejectedValue(new Error('API error'))
 
     const request = { app: {} }
     await bankDetailsController.handler(request, h)
@@ -91,6 +96,6 @@ describe('#bankDetailsController', () => {
     expect(h.response).toHaveBeenCalledWith({
       error: 'Failed to fetch bank details'
     })
-    expect(h.code).toHaveBeenCalledWith(500)
+    expect(h.code).toHaveBeenCalledWith(statusCodes.internalServerError)
   })
 })
