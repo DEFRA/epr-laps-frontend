@@ -1,7 +1,7 @@
 import { addSeconds } from 'date-fns'
 import Wreck from '@hapi/wreck'
 import { config } from '../../config/config.js'
-import { jwtDecode } from 'jwt-decode'
+import jwtDecode from 'jwt-decode'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
