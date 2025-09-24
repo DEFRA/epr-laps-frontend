@@ -185,6 +185,12 @@ describe('context and cache', () => {
           showBetaBanner: true
         })
       })
+
+      test('Should fallback to default Local Authority when organisationName is missing', async () => {
+        mockgetUserSession.mockResolvedValueOnce({ userName: 'test user' })
+        const result = await contextImport.context(mockRequest)
+        expect(result.laName).toBe('Local Authority')
+      })
     })
   })
 })

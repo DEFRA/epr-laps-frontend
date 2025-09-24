@@ -29,9 +29,9 @@ describe('#openIdProvider', () => {
         aal: 'testAal',
         enrolmentCount: 1,
         enrolmentRequestCount: 1,
-        currentRelationshipId: 'testRelationshipId',
-        relationships: 'testRelationships',
-        roles: 'testRoles',
+        currentRelationshipId: 'rel-123',
+        relationships: ['rel-123:role:Mocked Organisation'],
+        roles: ['testRole'],
         aud: 'test',
         iss: 'test',
         user: 'Test User'
@@ -50,6 +50,11 @@ describe('#openIdProvider', () => {
     await provider.profile(credentials, { id_token: 'test-id-token' }, {})
 
     expect(credentials.profile).not.toBeNull()
+    expect(credentials.profile.organisationName).toBe('Mocked Organisation')
+    expect(credentials.profile.roles).toEqual(['testRole'])
+    expect(credentials.profile.relationships).toEqual([
+      'rel-123:role:Mocked Organisation'
+    ])
     expect(credentials.profile).toEqual(
       expect.objectContaining({
         id: 'testSub',
@@ -66,9 +71,9 @@ describe('#openIdProvider', () => {
         aal: 'testAal',
         enrolmentCount: 1,
         enrolmentRequestCount: 1,
-        currentRelationshipId: 'testRelationshipId',
-        relationships: 'testRelationships',
-        roles: 'testRoles',
+        currentRelationshipId: 'rel-123',
+        relationships: ['rel-123:role:Mocked Organisation'],
+        roles: ['testRole'],
         idToken: 'test-id-token',
         tokenUrl: 'http://test-token-endpoint',
         logoutUrl: 'http://test-end-session-endpoint'
@@ -86,5 +91,24 @@ describe('#openIdProvider', () => {
     expect(() =>
       provider.profile({ credentials: { token: null } }, {}, {})
     ).toThrow('Auth Access Token not present. Unable to retrieve profile.')
+  })
+
+  test('Should fallback to Local Authority when no relationships array', async () => {
+    const token = jwt.token.generate(
+      {
+        sub: 'testSub',
+        currentRelationshipId: null,
+        relationships: null,
+        firstName: 'Test',
+        lastName: 'User',
+        sessionId: 'testSessionId'
+      },
+      { key: 'test', algorithm: 'HS256' },
+      { ttlSec: 1 }
+    )
+
+    const credentials = { token }
+    await provider.profile(credentials, { id_token: 'id-token' }, {})
+    expect(credentials.profile.organisationName).toBe('Local Authority')
   })
 })
