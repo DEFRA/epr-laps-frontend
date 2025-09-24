@@ -31,7 +31,14 @@ describe('context and cache', () => {
 
   describe('#context', () => {
     const mockRequest = {
-      path: '/',
+      path: '/?lang=en',
+      app: {
+        translations: {
+          'your-defra-acco': 'Your Defra account',
+          'sign-out': 'Sign out'
+        },
+        currentLang: 'en'
+      },
       getUserSession: mockgetUserSession,
       state: {
         userSession: null
@@ -124,17 +131,23 @@ describe('context and cache', () => {
 
   describe('#context cache', () => {
     const mockRequest = {
-      path: '/',
+      path: '/?lang=en',
+      app: {
+        translations: {
+          'your-defra-acco': 'Your Defra account',
+          'sign-out': 'Sign out'
+        },
+        currentLang: 'en'
+      },
       getUserSession: mockgetUserSession,
       state: {
         userSession: null
       }
     }
 
-    let contextResult
-
     describe('Webpack manifest file cache', () => {
       let contextImport
+      let contextResult
 
       beforeAll(async () => {
         contextImport = await import('./context.js')
@@ -151,10 +164,14 @@ describe('context and cache', () => {
       })
 
       test('Should read file', () => {
-        expect(mockReadFileSync).toHaveBeenCalled()
+        expect(mockReadFileSync).toHaveBeenCalledTimes(1)
       })
 
-      test('Should use cache', () => {
+      test('Should use cache on second call', () => {
+        mockReadFileSync.mockClear()
+
+        contextImport.context(mockRequest)
+
         expect(mockReadFileSync).not.toHaveBeenCalled()
       })
 
