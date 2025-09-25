@@ -9,13 +9,13 @@ vi.mock('@hapi/wreck', async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
-    get: vi.fn(), // flattened, no default
+    get: vi.fn() // flattened, no default
   }
 })
 
 // Mock jwt-decode
 vi.mock('jwt-decode', () => ({
-  default: vi.fn(),
+  default: vi.fn()
 }))
 
 describe.skip('#utils', () => {
@@ -24,11 +24,11 @@ describe.skip('#utils', () => {
   beforeEach(() => {
     request = {
       auth: {
-        credentials: { token: 'test-token' },
+        credentials: { token: 'test-token' }
       },
       state: {
-        userSession: { token: 'state-token' },
-      },
+        userSession: { token: 'state-token' }
+      }
     }
   })
 
@@ -72,7 +72,7 @@ describe.skip('#utils', () => {
       expect(utils.getToken).toHaveBeenCalledWith(request)
       expect(Wreck.get).toHaveBeenCalledWith(`${apiBaseUrl}${path}`, {
         headers: { Authorization: 'Bearer mock-token' },
-        json: true,
+        json: true
       })
       expect(result).toEqual({ payload: { success: true } })
     })

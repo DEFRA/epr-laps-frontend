@@ -5,10 +5,10 @@ import { context } from '../../config/nunjucks/context/context.js'
 
 // Mock modules
 vi.mock('../../server/auth/utils.js', () => ({
-  fetchWithToken: vi.fn(),
+  fetchWithToken: vi.fn()
 }))
 vi.mock('../../config/nunjucks/context/context.js', () => ({
-  context: vi.fn(),
+  context: vi.fn()
 }))
 
 // Inline status codes
@@ -25,14 +25,14 @@ describe('#bankDetailsController', () => {
     request = {
       app: {
         translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
-        currentLang: 'en',
-      },
+        currentLang: 'en'
+      }
     }
 
     h = {
       response: vi.fn().mockReturnThis(),
       code: vi.fn().mockReturnThis(),
-      view: vi.fn(),
+      view: vi.fn()
     }
 
     // Mock context to resolve to mockContext
@@ -67,9 +67,9 @@ describe('#bankDetailsController', () => {
       translations: request.app.translations,
       breadcrumbs: [
         { text: 'Home', href: '/?lang=en' },
-        { text: 'Bank Details', href: '/bank-details?lang=en' },
+        { text: 'Bank Details', href: '/bank-details?lang=en' }
       ],
-      apiData,
+      apiData
     })
   })
 
@@ -77,7 +77,9 @@ describe('#bankDetailsController', () => {
     const emptyRequest = { app: {} }
     const apiData = {}
     fetchWithToken.mockResolvedValue(apiData)
-    vi.mocked(context).mockResolvedValue({ organisationName: 'Glamshire County Council' })
+    vi.mocked(context).mockResolvedValue({
+      organisationName: 'Glamshire County Council'
+    })
 
     await bankDetailsController.handler(emptyRequest, h)
 
@@ -88,9 +90,9 @@ describe('#bankDetailsController', () => {
       translations: {},
       breadcrumbs: [
         { text: undefined, href: '/?lang=en' },
-        { text: undefined, href: '/bank-details?lang=en' },
+        { text: undefined, href: '/bank-details?lang=en' }
       ],
-      apiData,
+      apiData
     })
   })
 })
