@@ -265,13 +265,13 @@ export const config = convict({
       format: String,
       default: 'http://localhost:3000',
       env: 'APP_BASE_URL'
+    },
+    manageAccountUrl: {
+      doc: 'The Defra account management URL.',
+      format: String,
+      default: 'https://your-account.cpdev.cui.defra.gov.uk/management',
+      env: 'DEFRA_ACCOUNT_MANAGEMENT_URL'
     }
-  },
-  manageAccountUrl: {
-    doc: 'The Defra account management URL.',
-    format: String,
-    default: 'https://your-account.cpdev.cui.defra.gov.uk/management',
-    env: 'DEFRA_ACCOUNT_MANAGEMENT_URL'
   },
   showBetaBanner: {
     doc: 'Show the beta banner on the site',
