@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import * as utils from './utils'
-import * as dateFns from 'date-fns'
 import { config } from '../../config/config.js'
 import Wreck from '@hapi/wreck'
 
