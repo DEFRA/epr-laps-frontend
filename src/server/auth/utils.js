@@ -34,7 +34,7 @@ export const getToken = async (request) => {
   if (!token) {
     throw new Error('Unauthorized')
   }
-  return { token, localAuthority: ctx.localAuthority }
+  return { token, localAuthority: ctx.organisationName }
 }
 
 // To set headers for API call
