@@ -1,4 +1,5 @@
 import { config } from '../../config.js'
+const ONE_ORGANIZATION = 1
 
 export async function buildNavigation(request) {
   const translations = request?.app?.translations || {}
@@ -13,7 +14,7 @@ export async function buildNavigation(request) {
       href: defraAccountUrl,
       current: false
     },
-    ...(userSession.relationships.length > 1
+    ...(userSession.relationships.length > ONE_ORGANIZATION
       ? [
           {
             text: translations['change-orga'],
