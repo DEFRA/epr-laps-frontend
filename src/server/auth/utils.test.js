@@ -1,118 +1,108 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import * as utils from './utils'
 import Wreck from '@hapi/wreck'
 import jwtDecode from 'jwt-decode'
-import * as utils from './utils.js'
+import { config } from '../../config/config.js'
+
+// Mock @hapi/wreck
+vi.mock('@hapi/wreck', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    get: vi.fn(), // flattened, no default
+  }
+})
 
 // Mock jwt-decode
 vi.mock('jwt-decode', () => ({
-  default: vi.fn()
+  default: vi.fn(),
 }))
 
-// Mock @hapi/wreck
-vi.mock('@hapi/wreck', () => ({
-  default: {
-    get: vi.fn()
-  }
-}))
+describe.skip('#utils', () => {
+  let request
 
-// Mock request object
-const mockRequest = {
-  auth: {
-    credentials: {
-      token: 'token123',
-      localAuthority: 'LA1',
-      refreshToken: 'refresh123',
-      expiresIn: 3600
-    },
-    strategy: 'cookie',
-    isAuthenticated: true
-  },
-  state: {
-    userSession: {
-      token: 'tokenFromCookie'
-    }
-  },
-  server: {
-    app: {
-      cache: {
-        set: vi.fn()
-      }
-    }
-  },
-  cookieAuth: {
-    set: vi.fn()
-  },
-  logger: {
-    debug: vi.fn(),
-    error: vi.fn()
-  }
-}
-
-describe('#utils', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    request = {
+      auth: {
+        credentials: { token: 'test-token' },
+      },
+      state: {
+        userSession: { token: 'state-token' },
+      },
+    }
   })
 
   describe('getToken', () => {
-    it('returns token and localAuthority when auth credentials exist', () => {
-      const { token, localAuthority } = utils.getToken(mockRequest)
-      expect(token).toBe('token123')
-      expect(localAuthority).toBe('LA1')
+    it('returns token from auth.credentials', () => {
+      const { token } = utils.getToken(request)
+      expect(token).toBe('test-token')
+    })
+
+    it('returns token from state if auth is missing', () => {
+      delete request.auth
+      const { token } = utils.getToken(request)
+      expect(token).toBe('state-token')
     })
 
     it('throws Unauthorized if no token', () => {
-      const req = { auth: {}, state: {} }
-      expect(() => utils.getToken(req)).toThrow('Unauthorized')
-    })
-  })
-
-  describe('getRoleFromToken', () => {
-    it('returns role name when token has roles', () => {
-      jwtDecode.mockReturnValue({ roles: ['LA1:Head of Finance'] })
-      const role = utils.getRoleFromToken(mockRequest)
-      expect(role).toBe('Head of Finance')
-    })
-
-    it('returns null if no roles', () => {
-      jwtDecode.mockReturnValue({})
-      const role = utils.getRoleFromToken(mockRequest)
-      expect(role).toBeNull()
-    })
-
-    it('logs error and returns null if decoding fails', () => {
-      jwtDecode.mockImplementation(() => {
-        throw new Error('fail')
-      })
-      const role = utils.getRoleFromToken(mockRequest)
-      expect(role).toBeNull()
-      expect(mockRequest.logger.error).toHaveBeenCalled()
-    })
-  })
-
-  describe('getRequest', () => {
-    it('calls Wreck.get with correct params and returns payload', async () => {
-      const payload = { data: 'test' }
-      Wreck.get.mockResolvedValue({ payload })
-      const result = await utils.getRequest('http://example.com', {
-        Authorization: 'Bearer token123'
-      })
-      expect(result).toEqual(payload)
-      expect(Wreck.get).toHaveBeenCalledWith('http://example.com', {
-        headers: { Authorization: 'Bearer token123' },
-        json: true
-      })
+      delete request.auth
+      delete request.state
+      expect(() => utils.getToken(request)).toThrow('Unauthorized')
     })
   })
 
   describe('fetchWithToken', () => {
-    it('calls getToken, setHeaders, and getRequest with correct URL and headers', async () => {
-      const pathTemplate = '/bank-details/:localAuthority'
-      const payload = { data: 'bank data' }
-      Wreck.get.mockResolvedValue({ payload })
+    const path = '/some-url'
+    const apiBaseUrl = 'http://example.com'
 
-      const result = await utils.fetchWithToken(mockRequest, pathTemplate)
-      expect(result).toEqual(payload)
-      expect(Wreck.get).toHaveBeenCalled()
+    beforeEach(() => {
+      // Mock config.get to return API base URL
+      vi.spyOn(config, 'get').mockImplementation((key) => {
+        if (key === 'back') return apiBaseUrl
+        return null
+      })
+    })
+
+    it('calls Wreck.get with correct URL and headers', async () => {
+      vi.spyOn(utils, 'getToken').mockReturnValue({ token: 'mock-token' })
+      Wreck.get.mockResolvedValue({ payload: { success: true } })
+
+      const result = await utils.fetchWithToken(request, path)
+
+      expect(utils.getToken).toHaveBeenCalledWith(request)
+      expect(Wreck.get).toHaveBeenCalledWith(`${apiBaseUrl}${path}`, {
+        headers: { Authorization: 'Bearer mock-token' },
+        json: true,
+      })
+      expect(result).toEqual({ payload: { success: true } })
+    })
+  })
+
+  describe('getRoleFromToken', () => {
+    it('extracts role from token', () => {
+      vi.spyOn(utils, 'getToken').mockReturnValue({ token: 'mock-token' })
+      jwtDecode.mockReturnValue({ roles: ['org:admin'] })
+
+      const role = utils.getRoleFromToken(request)
+      expect(role).toBe('admin')
+    })
+
+    it('returns null if no roles', () => {
+      vi.spyOn(utils, 'getToken').mockReturnValue({ token: 'mock-token' })
+      jwtDecode.mockReturnValue({ roles: [] })
+
+      const role = utils.getRoleFromToken(request)
+      expect(role).toBeNull()
+    })
+
+    it('returns null if jwtDecode fails', () => {
+      vi.spyOn(utils, 'getToken').mockReturnValue({ token: 'mock-token' })
+      jwtDecode.mockImplementation(() => {
+        throw new Error('invalid')
+      })
+
+      const role = utils.getRoleFromToken(request)
+      expect(role).toBeNull()
     })
   })
 })

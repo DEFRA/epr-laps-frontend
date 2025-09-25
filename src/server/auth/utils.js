@@ -1,7 +1,7 @@
 import { addSeconds } from 'date-fns'
 import Wreck from '@hapi/wreck'
 import { config } from '../../config/config.js'
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
@@ -35,7 +35,7 @@ export const getToken = (request) => {
   if (!token) {
     throw new Error('Unauthorized')
   }
-  return { token, localAuthority: request.auth?.credentials?.localAuthority }
+  return { token }
 }
 
 // To set headers for API call
@@ -54,11 +54,11 @@ export const getRequest = async (url, headers) => {
   return payload
 }
 
-export const fetchWithToken = async (request, pathTemplate) => {
-  const { token, localAuthority } = getToken(request)
+export const fetchWithToken = async (request, path) => {
+  const { token } = getToken(request)
 
-  const apiBaseUrl = config.get('backendApiUrl')
-  const url = `${apiBaseUrl}${pathTemplate.replace(':localAuthority', encodeURIComponent(localAuthority))}`
+  const apiBaseUrl = config.get('back')
+  const url = `${apiBaseUrl}${path}`
 
   const headers = setHeaders(token)
 

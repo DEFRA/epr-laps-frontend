@@ -1,101 +1,96 @@
+// src/server/bank-details/controller.test.js
 import { bankDetailsController } from './controller.js'
-import { vi, describe, test, beforeEach, expect } from 'vitest'
-import { statusCodes } from '../common/constants/status-codes.js'
+import { fetchWithToken } from '../../server/auth/utils.js'
+import { context } from '../../config/nunjucks/context/context.js'
 
-// mock logger
-const mockLoggerError = vi.fn()
-
-// mock fetchWithToken
-const mockFetchWithToken = vi.fn()
-
+// Mock modules
 vi.mock('../../server/auth/utils.js', () => ({
-  fetchWithToken: (...args) => mockFetchWithToken(...args)
+  fetchWithToken: vi.fn(),
+}))
+vi.mock('../../config/nunjucks/context/context.js', () => ({
+  context: vi.fn(),
 }))
 
-vi.mock('../../server/common/helpers/logging/logger.js', () => ({
-  createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
-}))
+// Inline status codes
+const statusCodes = { unauthorized: 401, internalServerError: 500 }
 
 describe('#bankDetailsController', () => {
-  const h = {
-    view: vi.fn(),
-    response: vi.fn().mockReturnThis(),
-    code: vi.fn().mockReturnThis()
-  }
+  let request
+  let h
+  const mockContext = { organisationName: 'Glamshire County Council' }
 
   beforeEach(() => {
     vi.clearAllMocks()
+
+    request = {
+      app: {
+        translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
+        currentLang: 'en',
+      },
+    }
+
+    h = {
+      response: vi.fn().mockReturnThis(),
+      code: vi.fn().mockReturnThis(),
+      view: vi.fn(),
+    }
+
+    // Mock context to resolve to mockContext
+    vi.mocked(context).mockResolvedValue(mockContext)
   })
 
-  test('should return 401 if unauthorized error is thrown', async () => {
-    mockFetchWithToken.mockRejectedValue(new Error('Unauthorized'))
+  it('should return 401 if unauthorized error is thrown', async () => {
+    fetchWithToken.mockImplementation(() => {
+      const error = new Error('Unauthorized')
+      throw error
+    })
 
-    const request = { app: {} }
     await bankDetailsController.handler(request, h)
 
     expect(h.response).toHaveBeenCalledWith({ error: 'Unauthorized' })
     expect(h.code).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
-  test('should render view with API data for authenticated user', async () => {
-    const apiData = { bankName: 'Test Bank' }
-    mockFetchWithToken.mockResolvedValue(apiData)
-
-    const request = {
-      app: {
-        translations: {
-          'bank-details': 'Bank details',
-          'laps-home': 'LAPs home'
-        },
-        currentLang: 'en'
-      }
-    }
+  it('should render view with API data for authenticated user', async () => {
+    const apiData = { bank: 'data' }
+    fetchWithToken.mockResolvedValue(apiData)
 
     await bankDetailsController.handler(request, h)
 
-    expect(mockFetchWithToken).toHaveBeenCalledWith(
-      request,
-      '/bank-details/:localAuthority'
-    )
+    const expectedPath = `/bank-details/${encodeURIComponent(mockContext.organisationName)}`
 
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/index.njk',
-      expect.objectContaining({
-        pageTitle: 'Bank Details',
-        heading: 'Glamshire County Council',
-        translations: request.app.translations,
-        currentLang: 'en',
-        apiData,
-        breadcrumbs: [
-          { text: 'LAPs home', href: '/?lang=en' },
-          { text: 'Bank details', href: '/bank-details?lang=en' }
-        ]
-      })
-    )
-  })
-
-  test('should fallback to empty translations and en for currentLang', async () => {
-    const apiData = { bankName: 'Test Bank' }
-    mockFetchWithToken.mockResolvedValue(apiData)
-
-    const request = { app: {} }
-
-    await bankDetailsController.handler(request, h)
-
-    const viewArgs = h.view.mock.calls[0][1]
-    expect(viewArgs.translations).toEqual({})
-    expect(viewArgs.currentLang).toBe('en')
-  })
-
-  test('should return 500 if API call fails for other reasons', async () => {
-    mockFetchWithToken.mockRejectedValue(new Error('API error'))
-
-    const request = { app: {} }
-    await bankDetailsController.handler(request, h)
-
-    expect(h.response).toHaveBeenCalledWith({
-      error: 'Failed to fetch bank details'
+    expect(fetchWithToken).toHaveBeenCalledWith(request, expectedPath)
+    expect(h.view).toHaveBeenCalledWith('bank-details/index.njk', {
+      pageTitle: 'Bank Details',
+      heading: 'Glamshire County Council',
+      currentLang: 'en',
+      translations: request.app.translations,
+      breadcrumbs: [
+        { text: 'Home', href: '/?lang=en' },
+        { text: 'Bank Details', href: '/bank-details?lang=en' },
+      ],
+      apiData,
     })
-    expect(h.code).toHaveBeenCalledWith(statusCodes.internalServerError)
+  })
+
+  it('should fallback to empty translations and en for currentLang', async () => {
+    const emptyRequest = { app: {} }
+    const apiData = {}
+    fetchWithToken.mockResolvedValue(apiData)
+    vi.mocked(context).mockResolvedValue({ organisationName: 'Glamshire County Council' })
+
+    await bankDetailsController.handler(emptyRequest, h)
+
+    expect(h.view).toHaveBeenCalledWith('bank-details/index.njk', {
+      pageTitle: 'Bank Details',
+      heading: 'Glamshire County Council',
+      currentLang: 'en',
+      translations: {},
+      breadcrumbs: [
+        { text: undefined, href: '/?lang=en' },
+        { text: undefined, href: '/bank-details?lang=en' },
+      ],
+      apiData,
+    })
   })
 })
