@@ -154,24 +154,27 @@ describe('#utils', () => {
     beforeEach(() => {
       vi.clearAllMocks()
     })
-  
+
     it('calls getToken, setHeaders, and getRequest with correct URL and headers', async () => {
       const token = 'token123'
-      const localAuthority = 'LA1'        // <--- use localAuthority
+      const localAuthority = 'LA1' // <--- use localAuthority
       const request = {}
-      const pathTemplate = '/bank-details/:localAuthority'  // <--- use :localAuthority
+      const pathTemplate = '/bank-details/:localAuthority' // <--- use :localAuthority
       const apiBaseUrl = 'http://backend.test'
       const payload = { data: 'bank data' }
-  
+
       // Mock context to return localAuthority
-      context.mockResolvedValue({ authedUser: { token }, organisationName: localAuthority })
+      context.mockResolvedValue({
+        authedUser: { token },
+        organisationName: localAuthority
+      })
       config.get.mockReturnValue(apiBaseUrl)
       Wreck.get.mockResolvedValue({ payload })
-  
+
       const result = await fetchWithToken(request, pathTemplate)
-  
+
       expect(result).toEqual(payload)
-  
+
       // pathTemplate should be replaced with localAuthority
       expect(Wreck.get).toHaveBeenCalledWith(
         `${apiBaseUrl}/bank-details/${encodeURIComponent(localAuthority)}`,
