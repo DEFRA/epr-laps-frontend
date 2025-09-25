@@ -4,7 +4,7 @@
 {% block content %}
 
   {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-   {% if roleName === 'Head of Finance' %}
+   {% if roleName === 'Head of Finance' and apiData.confirmed === false %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
       

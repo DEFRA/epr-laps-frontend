@@ -1,7 +1,6 @@
 import { addSeconds } from 'date-fns'
 import Wreck from '@hapi/wreck'
 import { config } from '../../config/config.js'
-import { jwtDecode } from 'jwt-decode'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
@@ -57,7 +56,7 @@ export const getRequest = async (url, headers) => {
 export const fetchWithToken = async (request, path) => {
   const { token } = getToken(request)
 
-  const apiBaseUrl = config.get('back')
+  const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${path}`
 
   const headers = setHeaders(token)
@@ -67,9 +66,7 @@ export const fetchWithToken = async (request, path) => {
 
 export const getRoleFromToken = (request) => {
   try {
-    const { token } = getToken(request)
-    const decoded = jwtDecode(token)
-    const roles = decoded?.roles || []
+    const roles = request.auth.credentials.roles
     if (!roles.length) {
       return null
     }
