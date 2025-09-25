@@ -3,7 +3,9 @@ import { config } from '../../config.js'
 
 const mockReadFileSync = vi.fn()
 const mockLoggerError = vi.fn()
-const mockgetUserSession = vi.fn()
+const mockgetUserSession = vi.fn().mockResolvedValue({
+  relationships: []
+})
 
 const manageDefraAccountUrl =
   'https://your-account.cpdev.cui.defra.gov.uk/management'
@@ -49,7 +51,9 @@ describe('context and cache', () => {
         },
         currentLang: 'en'
       },
-      getUserSession: mockgetUserSession,
+      getUserSession: vi.fn().mockResolvedValue({
+        relationships: []
+      }),
       state: {
         userSession: null
       }
@@ -75,6 +79,9 @@ describe('context and cache', () => {
 
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
+          authedUser: {
+            relationships: []
+          },
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
@@ -144,7 +151,9 @@ describe('context and cache', () => {
         },
         currentLang: 'en'
       },
-      getUserSession: mockgetUserSession,
+      getUserSession: vi.fn().mockResolvedValue({
+        relationships: []
+      }),
       state: {
         userSession: null
       }
@@ -182,6 +191,9 @@ describe('context and cache', () => {
 
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
+          authedUser: {
+            relationships: []
+          },
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
