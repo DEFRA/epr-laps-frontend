@@ -10,7 +10,8 @@ function mockRequest(options) {
     app: {
       translations: {
         'your-defra-acco': 'Your Defra account',
-        'sign-out': 'Sign out'
+        'sign-out': 'Sign out',
+        'change-orga': 'Change organisation'
       }
     }
   }

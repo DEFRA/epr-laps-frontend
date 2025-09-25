@@ -16,7 +16,7 @@ export async function buildNavigation(request) {
     ...(userSession.relationships.length > 1
       ? [
           {
-            text: 'Change organisation',
+            text: translations['change-orga'],
             href: '/defra-account/change-organisation',
             current: false
           }
