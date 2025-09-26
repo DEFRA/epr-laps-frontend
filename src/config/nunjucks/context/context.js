@@ -27,13 +27,14 @@ async function context(request) {
     }
   }
 
+  const navigation = await buildNavigation(request)
   return {
     authedUser,
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
     breadcrumbs: [],
-    navigation: buildNavigation(request),
+    navigation,
     showBetaBanner: config.get('showBetaBanner'),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
