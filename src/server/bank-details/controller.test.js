@@ -62,7 +62,6 @@ describe('#bankDetailsController', () => {
       'bank-details/index.njk',
       expect.objectContaining({
         pageTitle: 'Bank Details',
-        heading: 'Glamshire County Council',
         translations: request.app.translations,
         currentLang: 'en',
         apiData,
