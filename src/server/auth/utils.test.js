@@ -7,11 +7,9 @@ import {
   fetchWithToken
 } from './utils.js'
 import Wreck from '@hapi/wreck'
-import { context } from './../../config/nunjucks/context/context.js'
 import { config } from './../../config/config.js'
 
 vi.mock('@hapi/wreck')
-vi.mock('./../../config/nunjucks/context/context.js')
 vi.mock('./../../config/config.js', () => ({
   config: {
     get: vi.fn((key) => {
@@ -112,20 +110,33 @@ describe('#utils', () => {
   })
 
   describe('getToken', () => {
-    it('returns token and orgname when authedUser exists', async () => {
-      context.mockResolvedValue({
-        authedUser: { token: 'token123' },
-        organisationName: 'LA1'
-      })
-      const request = {}
-      const result = await getToken(request)
-      expect(result).toEqual({ token: 'token123', localAuthority: 'LA1' })
+    it('returns token when auth.credentials.token exists', () => {
+      const request = {
+        auth: {
+          credentials: {
+            token: 'token123'
+          }
+        }
+      }
+      const result = getToken(request)
+      expect(result).toEqual({ token: 'token123' })
     })
 
-    it('throws Unauthorized if no token', async () => {
-      context.mockResolvedValue({ authedUser: null })
+    it('returns token when userSession token exists', () => {
+      const request = {
+        state: {
+          userSession: {
+            token: 'session-token-456'
+          }
+        }
+      }
+      const result = getToken(request)
+      expect(result).toEqual({ token: 'session-token-456' })
+    })
+
+    it('throws Unauthorized if no token found', () => {
       const request = {}
-      await expect(getToken(request)).rejects.toThrow('Unauthorized')
+      expect(() => getToken(request)).toThrow('Unauthorized')
     })
   })
 
@@ -156,33 +167,29 @@ describe('#utils', () => {
     })
 
     it('calls getToken, setHeaders, and getRequest with correct URL and headers', async () => {
-      const token = 'token123'
-      const localAuthority = 'LA1' // <--- use localAuthority
-      const request = {}
-      const pathTemplate = '/bank-details/:localAuthority' // <--- use :localAuthority
+      const request = {
+        auth: {
+          credentials: {
+            token: 'token123'
+          }
+        }
+      }
+
+      const path = '/bank-details/LA1'
       const apiBaseUrl = 'http://backend.test'
       const payload = { data: 'bank data' }
 
-      // Mock context to return localAuthority
-      context.mockResolvedValue({
-        authedUser: { token },
-        organisationName: localAuthority
-      })
       config.get.mockReturnValue(apiBaseUrl)
       Wreck.get.mockResolvedValue({ payload })
 
-      const result = await fetchWithToken(request, pathTemplate)
+      const result = await fetchWithToken(request, path)
 
       expect(result).toEqual(payload)
 
-      // pathTemplate should be replaced with localAuthority
-      expect(Wreck.get).toHaveBeenCalledWith(
-        `${apiBaseUrl}/bank-details/${encodeURIComponent(localAuthority)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          json: true
-        }
-      )
+      expect(Wreck.get).toHaveBeenCalledWith(`${apiBaseUrl}${path}`, {
+        headers: { Authorization: 'Bearer token123' },
+        json: true
+      })
     })
   })
 })
