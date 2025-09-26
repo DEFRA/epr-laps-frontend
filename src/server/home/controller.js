@@ -15,6 +15,8 @@ export const homeController = {
         // Fetch bank details via the wrapper function
         const path = `/bank-details/${encodeURIComponent(localAuthority)}`
         payload = await fetchWithToken(request, path)
+
+        request.logger.info(`Successfully fetched bank details for ${localAuthority}`)
       }
       const translations = request.app.translations || {}
       const currentLang = request.app.currentLang || 'en'

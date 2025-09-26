@@ -15,6 +15,7 @@ export const bankDetailsController = {
       const path = `/bank-details/${encodeURIComponent(localAuthority)}`
       const payload = await fetchWithToken(request, path)
 
+      request.logger.info(`Successfully fetched bank details for ${localAuthority}`)
       return h.view('bank-details/index.njk', {
         pageTitle: 'Bank Details',
         currentLang,

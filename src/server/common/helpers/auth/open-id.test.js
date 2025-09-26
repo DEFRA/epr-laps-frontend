@@ -1,5 +1,5 @@
 import jwt from '@hapi/jwt'
-import { openIdProvider, extractOrgName } from './open-id.js'
+import { openIdProvider, extractOrgName, extractRoleName } from './open-id.js'
 
 describe('#openIdProvider', () => {
   let provider
@@ -146,3 +146,39 @@ describe('#extractOrgName', () => {
     expect(extractOrgName(payload).organisationName).toBe('Local Authority')
   })
 })
+
+describe('#extractRoleName', () => {
+  test('Should return null when roles array is missing', () => {
+    const payload = { currentRelationshipId: '123' }
+    expect(extractRoleName(payload).currentRole).toBeNull()
+  })
+
+  test('Should return null when roles array is empty', () => {
+    const payload = { currentRelationshipId: '123', roles: [] }
+    expect(extractRoleName(payload).currentRole).toBeNull()
+  })
+
+  test('Should return null when no role matches currentRelationshipId', () => {
+    const payload = { currentRelationshipId: '123', roles: ['999:Admin'] }
+    expect(extractRoleName(payload).currentRole).toBeNull()
+  })
+
+  test('Should return correct role when matching role exists', () => {
+    const payload = { currentRelationshipId: '123', roles: ['123:Admin'] }
+    expect(extractRoleName(payload).currentRole).toBe('Admin')
+  })
+
+  test('Should handle role string without colon gracefully', () => {
+    const payload = { currentRelationshipId: '123', roles: ['123'] }
+    expect(extractRoleName(payload).currentRole).toBe('123')
+  })
+
+  test('Should ignore other roles and return only the matching one', () => {
+    const payload = { 
+      currentRelationshipId: '123', 
+      roles: ['999:User', '123:Manager', '456:Admin'] 
+    }
+    expect(extractRoleName(payload).currentRole).toBe('Manager')
+  })
+})
+
