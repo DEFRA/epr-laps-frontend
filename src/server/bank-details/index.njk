@@ -20,7 +20,7 @@
   {% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {{ appHeading({
-    text: heading,
+    text: authedUser.organisationName,
     caption: translations['bank-details'] 
   }) }}
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
