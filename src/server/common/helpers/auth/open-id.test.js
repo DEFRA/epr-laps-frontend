@@ -174,11 +174,10 @@ describe('#extractRoleName', () => {
   })
 
   test('Should ignore other roles and return only the matching one', () => {
-    const payload = { 
-      currentRelationshipId: '123', 
-      roles: ['999:User', '123:Manager', '456:Admin'] 
+    const payload = {
+      currentRelationshipId: '123',
+      roles: ['999:User', '123:Manager', '456:Admin']
     }
     expect(extractRoleName(payload).currentRole).toBe('Manager')
   })
 })
-
