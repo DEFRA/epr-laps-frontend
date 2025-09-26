@@ -9,16 +9,14 @@ const mockGetRoleFromToken = vi.fn()
 const manageDefraAccountUrl =
   'https://your-account.cpdev.cui.defra.gov.uk/management'
 
-// Mock node:fs
 vi.mock('node:fs', async () => {
   const nodeFs = await import('node:fs')
+
   return {
     ...nodeFs,
     readFileSync: () => mockReadFileSync()
   }
 })
-
-// Mock logger
 vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
@@ -46,26 +44,25 @@ describe('context and cache', () => {
       }
       return configValues[key]
     })
-
     mockGetRoleFromToken.mockReturnValue('HOF')
   })
 
-  const mockRequest = {
-    path: '/?lang=en',
-    app: {
-      translations: {
-        'your-defra-acco': 'Your Defra account',
-        'sign-out': 'Sign out'
-      },
-      currentLang: 'en'
-    },
-    getUserSession: mockgetUserSession,
-    state: {
-      userSession: null
-    }
-  }
-
   describe('#context', () => {
+    const mockRequest = {
+      path: '/?lang=en',
+      app: {
+        translations: {
+          'your-defra-acco': 'Your Defra account',
+          'sign-out': 'Sign out'
+        },
+        currentLang: 'en'
+      },
+      getUserSession: mockgetUserSession,
+      state: {
+        userSession: null
+      }
+    }
+
     describe('When webpack manifest file read succeeds', () => {
       let contextImport
       let contextResult
@@ -77,9 +74,9 @@ describe('context and cache', () => {
       beforeEach(async () => {
         // Return JSON string
         mockReadFileSync.mockReturnValue(`{
-          "application.js": "javascripts/application.js",
-          "stylesheets/application.scss": "stylesheets/application.css"
-        }`)
+        "application.js": "javascripts/application.js",
+        "stylesheets/application.scss": "stylesheets/application.css"
+      }`)
 
         contextResult = await contextImport.context(mockRequest)
       })
@@ -87,7 +84,6 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
-          authedUser: undefined,
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
@@ -109,16 +105,20 @@ describe('context and cache', () => {
         })
       })
 
-      test('Should provide correct asset path for valid assets', () => {
-        expect(contextResult.getAssetPath('application.js')).toBe(
-          '/public/javascripts/application.js'
-        )
+      describe('With valid asset path', () => {
+        test('Should provide expected asset path', () => {
+          expect(contextResult.getAssetPath('application.js')).toBe(
+            '/public/javascripts/application.js'
+          )
+        })
       })
 
-      test('Should provide correct asset path for missing assets', () => {
-        expect(contextResult.getAssetPath('an-image.png')).toBe(
-          '/public/an-image.png'
-        )
+      describe('With invalid asset path', () => {
+        test('Should provide expected asset', () => {
+          expect(contextResult.getAssetPath('an-image.png')).toBe(
+            '/public/an-image.png'
+          )
+        })
       })
     })
 
@@ -130,9 +130,7 @@ describe('context and cache', () => {
       })
 
       beforeEach(async () => {
-        mockReadFileSync.mockImplementation(() => {
-          throw new Error('File not found')
-        })
+        mockReadFileSync.mockReturnValue(new Error('File not found'))
 
         await contextImport.context(mockRequest)
       })
@@ -146,6 +144,21 @@ describe('context and cache', () => {
   })
 
   describe('#context cache', () => {
+    const mockRequest = {
+      path: '/?lang=en',
+      app: {
+        translations: {
+          'your-defra-acco': 'Your Defra account',
+          'sign-out': 'Sign out'
+        },
+        currentLang: 'en'
+      },
+      getUserSession: mockgetUserSession,
+      state: {
+        userSession: null
+      }
+    }
+
     describe('Webpack manifest file cache', () => {
       let contextImport
       let contextResult
@@ -155,28 +168,30 @@ describe('context and cache', () => {
       })
 
       beforeEach(async () => {
+        // Return JSON string
         mockReadFileSync.mockReturnValue(`{
-          "application.js": "javascripts/application.js",
-          "stylesheets/application.scss": "stylesheets/application.css"
-        }`)
+        "application.js": "javascripts/application.js",
+        "stylesheets/application.scss": "stylesheets/application.css"
+      }`)
 
         contextResult = await contextImport.context(mockRequest)
       })
 
-      test('Should read file only once initially', () => {
+      test('Should read file', () => {
         expect(mockReadFileSync).toHaveBeenCalledTimes(1)
       })
 
-      test('Should use cache on subsequent calls', async () => {
+      test('Should use cache on second call', () => {
         mockReadFileSync.mockClear()
-        await contextImport.context(mockRequest)
+
+        contextImport.context(mockRequest)
+
         expect(mockReadFileSync).not.toHaveBeenCalled()
       })
 
-      test('Should provide expected context from cache', () => {
+      test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           assetPath: '/public/assets',
-          authedUser: undefined,
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
           navigation: [
@@ -196,6 +211,93 @@ describe('context and cache', () => {
           showBetaBanner: true,
           roleName: 'HOF'
         })
+      })
+    })
+  })
+
+  describe('#context edge cases', () => {
+    const mockRequest = {
+      path: '/?lang=en',
+      app: {
+        translations: {
+          'your-defra-acco': 'Your Defra account',
+          'sign-out': 'Sign out'
+        },
+        currentLang: 'en'
+      },
+      getUserSession: mockgetUserSession,
+      state: {
+        userSession: null
+      }
+    }
+
+    let contextImport
+    beforeAll(async () => {
+      contextImport = await import('./context.js')
+    })
+
+    describe('When webpack manifest contains invalid JSON', () => {
+      beforeEach(async () => {
+        mockReadFileSync.mockImplementation(() => '{ invalid json }')
+
+        await contextImport.context(mockRequest)
+      })
+
+      test('Should log an error because JSON.parse fails', () => {
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'Webpack assets-manifest.json not found'
+        )
+      })
+    })
+
+    describe('When user session exists', () => {
+      beforeEach(async () => {
+        mockReadFileSync.mockReturnValue(`{
+          "application.js": "javascripts/application.js"
+        }`)
+        mockgetUserSession.mockResolvedValue({
+          id: 'user123',
+          name: 'Test User'
+        })
+      })
+
+      test('Should include authedUser in context', async () => {
+        const ctx = await contextImport.context(mockRequest)
+        expect(ctx.authedUser).toEqual({ id: 'user123', name: 'Test User' })
+      })
+    })
+
+    describe('When showBetaBanner is false', () => {
+      let contextImport
+
+      beforeEach(async () => {
+        vi.resetModules()
+
+        vi.doMock('../../config.js', () => ({
+          config: {
+            get: vi.fn((key) => {
+              const values = {
+                root: '/',
+                assetPath: '/public',
+                serviceName: 'EPR-LAPs',
+                showBetaBanner: false,
+                'defraId.manageAccountUrl': manageDefraAccountUrl
+              }
+              return values[key]
+            })
+          }
+        }))
+
+        mockReadFileSync.mockReturnValue(`{
+          "application.js": "javascripts/application.js"
+        }`)
+
+        contextImport = await import('./context.js')
+      })
+
+      test('Should reflect showBetaBanner = false in context', async () => {
+        const ctx = await contextImport.context(mockRequest)
+        expect(ctx.showBetaBanner).toBe(false)
       })
     })
   })

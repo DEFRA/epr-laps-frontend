@@ -1,187 +1,196 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import * as utils from './utils'
-import { config } from '../../config/config.js'
+import { addSeconds } from 'date-fns'
+import {
+  setUserSession,
+  getToken,
+  setHeaders,
+  getRequest,
+  fetchWithToken
+} from './utils.js'
 import Wreck from '@hapi/wreck'
+import { config } from './../../config/config.js'
 
-// --------------------
-// Mock Wreck.get
-// --------------------
-vi.mock('@hapi/wreck', () => ({
-  get: vi.fn()
+vi.mock('@hapi/wreck')
+vi.mock('./../../config/nunjucks/context/context.js')
+vi.mock('./../../config/config.js', () => ({
+  config: {
+    get: vi.fn((key) => {
+      switch (key) {
+        case 'log':
+          return {
+            enabled: true,
+            level: 'info',
+            customLevels: { info: 30, error: 50 },
+            redact: ['req.headers.authorization']
+          }
+        case 'backendApiUrl':
+          return 'http://backend.test'
+        case 'root':
+          return '/mock/root'
+        case 'assetPath':
+          return '/mock/assets'
+        case 'serviceName':
+          return 'test-service'
+        case 'serviceVersion':
+          return '1.0.0'
+        default:
+          return ''
+      }
+    })
+  }
 }))
 
-// --------------------
-// Mock config.get
-// --------------------
-vi.spyOn(config, 'get').mockImplementation((key) => {
-  if (key === 'back') return 'http://example.com'
-  return null
-})
+vi.mock('date-fns', () => ({
+  addSeconds: vi.fn()
+}))
 
-describe.skip('#utils', () => {
-  let request
-
-  beforeEach(() => {
-    request = {
-      auth: {
-        credentials: {
-          token: 'test-token',
-          refreshToken: 'refresh-token',
-          expiresIn: 3600,
-          profile: { sessionId: 'abc123' }
-        },
-        strategy: 'some-strategy',
-        isAuthenticated: true
-      },
-      state: {
-        userSession: { token: 'state-token' }
-      },
-      logger: { debug: vi.fn(), error: vi.fn() },
-      server: { app: { cache: { set: vi.fn() } } },
-      cookieAuth: { set: vi.fn() }
-    }
-
-    // Mock addSeconds from date-fns
-    vi.mock('date-fns', () => ({
-      addSeconds: (date, seconds) => new Date(date.getTime() + seconds * 1000)
-    }))
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
-  // --------------------
-  // getToken
-  // --------------------
-  describe('getToken', () => {
-    it('returns token from auth.credentials', () => {
-      const { token } = utils.getToken(request)
-      expect(token).toBe('test-token')
-    })
-
-    it('returns token from state if auth is missing', () => {
-      delete request.auth
-      const { token } = utils.getToken(request)
-      expect(token).toBe('state-token')
-    })
-
-    it('throws Unauthorized if no token', () => {
-      delete request.auth
-      delete request.state
-      expect(() => utils.getToken(request)).toThrow('Unauthorized')
-    })
-  })
-
-  // --------------------
-  // setHeaders
-  // --------------------
-  describe('setHeaders', () => {
-    it('returns Authorization header', () => {
-      expect(utils.setHeaders('my-token')).toEqual({
-        Authorization: 'Bearer my-token'
-      })
-    })
-  })
-
-  // --------------------
-  // getRequest
-  // --------------------
-  describe('getRequest', () => {
-    it('calls Wreck.get and returns payload', async () => {
-      Wreck.get.mockResolvedValue({ payload: { data: 123 } })
-
-      const result = await utils.getRequest('http://example.com', {
-        Authorization: 'Bearer token'
-      })
-
-      expect(Wreck.get).toHaveBeenCalledWith('http://example.com', {
-        headers: { Authorization: 'Bearer token' },
-        json: true
-      })
-      expect(result).toEqual({ data: 123 })
-    })
-  })
-
-  // --------------------
-  // fetchWithToken
-  // --------------------
-  describe('fetchWithToken', () => {
-    const path = '/some-url'
-    it('calls Wreck.get with correct URL and headers', async () => {
-      vi.spyOn(utils, 'getToken').mockReturnValue({ token: 'mock-token' })
-      Wreck.get.mockResolvedValue({ payload: { success: true } })
-
-      const result = await utils.fetchWithToken(request, path)
-
-      expect(utils.getToken).toHaveBeenCalledWith(request)
-      expect(Wreck.get).toHaveBeenCalledWith('http://example.com/some-url', {
-        headers: { Authorization: 'Bearer mock-token' },
-        json: true
-      })
-      expect(result).toEqual({ payload: { success: true } })
-    })
-  })
-
-  // --------------------
-  // setUserSession
-  // --------------------
+describe('#utils', () => {
   describe('setUserSession', () => {
-    it('sets the user session in cache and cookie', async () => {
-      await utils.setUserSession(request)
+    let mockRequest
+    let mockCache
+    let mockCookieAuth
 
-      expect(request.logger.debug).toHaveBeenCalledWith(
-        'Setting user session in cache: abc123'
-      )
-      expect(request.server.app.cache.set).toHaveBeenCalledWith(
-        'abc123',
+    beforeEach(() => {
+      vi.clearAllMocks()
+
+      mockCache = {
+        set: vi.fn().mockResolvedValue()
+      }
+
+      mockCookieAuth = {
+        set: vi.fn()
+      }
+
+      mockRequest = {
+        auth: {
+          credentials: {
+            profile: {
+              sessionId: 'test-session-id-123',
+              relationships: ['rel-1:someId:Mock Org Name'],
+              currentRelationshipId: 'rel-1'
+            },
+            expiresIn: 3600,
+            token: 'mock-access-token',
+            refreshToken: 'mock-refresh-token'
+          },
+          strategy: 'oauth',
+          isAuthenticated: true
+        },
+        server: {
+          app: {
+            cache: mockCache
+          }
+        },
+        cookieAuth: mockCookieAuth,
+        logger: { debug: vi.fn() }
+      }
+
+      const mockExpiryDate = new Date('2024-01-01T12:00:00.000Z')
+      addSeconds.mockReturnValue(mockExpiryDate)
+    })
+
+    it('should set cookie with session ID', async () => {
+      await setUserSession(mockRequest)
+
+      expect(mockCookieAuth.set).toHaveBeenCalledTimes(1)
+      expect(mockCookieAuth.set).toHaveBeenCalledWith({
+        sessionId: 'test-session-id-123'
+      })
+    })
+
+    it('should store session in cache with correct organisationName', async () => {
+      await setUserSession(mockRequest)
+
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'test-session-id-123',
         expect.objectContaining({
-          token: 'test-token',
-          refreshToken: 'refresh-token',
-          strategy: 'some-strategy',
-          isAuthenticated: true,
-          expiresIn: 3600 * 1000
+          sessionId: 'test-session-id-123'
         }),
         3600 * 1000
       )
-      expect(request.cookieAuth.set).toHaveBeenCalledWith({
-        sessionId: 'abc123'
-      })
     })
   })
 
-  // --------------------
-  // getRoleFromToken
-  // --------------------
-  describe('getRoleFromToken', () => {
-    it('extracts role from token with colon', () => {
-      vi.spyOn(utils, 'getToken').mockReturnValue({
-        token: { roles: ['app:admin'] }
-      })
-      const role = utils.getRoleFromToken(request)
-      expect(role).toBe('admin')
+  describe('getToken', () => {
+    it('returns token when auth.credentials.token exists', () => {
+      const request = {
+        auth: {
+          credentials: {
+            token: 'token123'
+          }
+        }
+      }
+      const result = getToken(request)
+      expect(result).toEqual({ token: 'token123' })
     })
 
-    it('returns the full role if no colon', () => {
-      vi.spyOn(utils, 'getToken').mockReturnValue({
-        token: { roles: ['user'] }
-      })
-      const role = utils.getRoleFromToken(request)
-      expect(role).toBe('user')
+    it('returns token when userSession token exists', () => {
+      const request = {
+        state: {
+          userSession: {
+            token: 'session-token-456'
+          }
+        }
+      }
+      const result = getToken(request)
+      expect(result).toEqual({ token: 'session-token-456' })
     })
 
-    it('returns null if roles array is empty', () => {
-      vi.spyOn(utils, 'getToken').mockReturnValue({ token: { roles: [] } })
-      const role = utils.getRoleFromToken(request)
-      expect(role).toBeNull()
+    it('throws Unauthorized if no token found', () => {
+      const request = {}
+      expect(() => getToken(request)).toThrow('Unauthorized')
+    })
+  })
+
+  describe('setHeaders', () => {
+    it('returns correct Authorization header', () => {
+      const token = 'my-token'
+      const headers = setHeaders(token)
+      expect(headers).toEqual({ Authorization: 'Bearer my-token' })
+    })
+  })
+
+  describe('getRequest', () => {
+    it('calls Wreck.get with correct params and returns payload', async () => {
+      const payload = { data: 'test' }
+      Wreck.get.mockResolvedValue({ payload })
+      const url = 'http://example.com'
+      const headers = { Authorization: 'Bearer token123' }
+
+      const result = await getRequest(url, headers)
+      expect(Wreck.get).toHaveBeenCalledWith(url, { headers, json: true })
+      expect(result).toEqual(payload)
+    })
+  })
+
+  describe('fetchWithToken', () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
     })
 
-    it('returns null if getToken throws', () => {
-      vi.spyOn(utils, 'getToken').mockImplementation(() => {
-        throw new Error('Unauthorized')
+    it('calls getToken, setHeaders, and getRequest with correct URL and headers', async () => {
+      const request = {
+        auth: {
+          credentials: {
+            token: 'token123'
+          }
+        }
+      }
+
+      const path = '/bank-details/LA1'
+      const apiBaseUrl = 'http://backend.test'
+      const payload = { data: 'bank data' }
+
+      config.get.mockReturnValue(apiBaseUrl)
+      Wreck.get.mockResolvedValue({ payload })
+
+      const result = await fetchWithToken(request, path)
+
+      expect(result).toEqual(payload)
+
+      expect(Wreck.get).toHaveBeenCalledWith(`${apiBaseUrl}${path}`, {
+        headers: { Authorization: 'Bearer token123' },
+        json: true
       })
-      const role = utils.getRoleFromToken(request)
-      expect(role).toBeNull()
     })
   })
 })
