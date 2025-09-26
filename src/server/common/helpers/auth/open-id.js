@@ -36,6 +36,18 @@ export function extractOrgName(payload) {
   return { organisationName, displayName }
 }
 
+export const extractRoleName = (payload) => {
+  const roles = payload.roles
+
+  if (!Array.isArray(roles) || roles.length === 0) {
+    return { currentRole: null }
+  }
+
+  const parts = roles[0].split(':')
+  const currentRole = parts.length >= 2 ? parts[1] : roles[0]
+  return { currentRole }
+}
+
 export const openIdProvider = (name, oidcConf) => {
   const authConfig = config.get('defraId')
   return {
@@ -56,6 +68,7 @@ export const openIdProvider = (name, oidcConf) => {
       const payload = Jwt.token.decode(credentials.token).decoded.payload
 
       const { organisationName, displayName } = extractOrgName(payload)
+      const { currentRole } = extractRoleName(payload)
 
       credentials.profile = {
         id: payload.sub,
@@ -75,6 +88,7 @@ export const openIdProvider = (name, oidcConf) => {
         currentRelationshipId: payload.currentRelationshipId,
         relationships: payload.relationships,
         organisationName,
+        currentRole,
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,

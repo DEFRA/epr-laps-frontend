@@ -3,13 +3,25 @@ import { statusCodes } from '../common/constants/status-codes.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
 import { homeController } from './controller.js'
+import * as contextModule from '../../config/nunjucks/context/context.js'
 
 vi.mock('../common/helpers/auth/get-oidc-config.js')
+
+vi.mock('../../config/nunjucks/context/context.js', () => ({
+  context: vi.fn()
+}))
 
 describe('#homeController', () => {
   let server
 
   beforeAll(async () => {
+    vi.mocked(contextModule.context).mockResolvedValue({
+      authedUser: {
+        currentRole: 'Finance',
+        organisationName: 'Mocked Organisation'
+      }
+    })
+
     vi.mocked(getOidcConfig).mockResolvedValue({
       authorization_endpoint: 'https://test-idm-endpoint/authorize',
       token_endpoint: 'https://test-idm-endpoint/token',
@@ -47,7 +59,13 @@ describe('#homeController', () => {
       },
       state: { userSession: null }
     }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
+    const mockedResponse = {
+      view: vi.fn(),
+      redirect: vi.fn(),
+      response: vi.fn().mockImplementation(() => ({
+        code: vi.fn().mockReturnThis()
+      }))
+    }
 
     const { statusCode } = await server.inject({
       method: 'GET',
@@ -70,7 +88,13 @@ describe('#homeController', () => {
         app: { cache: { get: mockCacheGet } }
       }
     }
-    const mockedResponse = { view: vi.fn() }
+    const mockedResponse = {
+      view: vi.fn(),
+      redirect: vi.fn(),
+      response: vi.fn().mockImplementation(() => ({
+        code: vi.fn().mockReturnThis()
+      }))
+    }
 
     await homeController.handler(mockRequest, mockedResponse)
 
@@ -91,22 +115,26 @@ describe('#homeController', () => {
   })
 
   test('should handle missing translations and currentLang', async () => {
-    const mockRequest = {
-      app: {},
-      state: {}
+    vi.mocked(contextModule.context).mockRejectedValue(new Error('Failed'))
+
+    const mockRequest = { app: {}, state: {} }
+    const mockedResponse = {
+      view: vi.fn(),
+      redirect: vi.fn(),
+      response: vi.fn().mockImplementation(() => ({
+        code: vi.fn().mockReturnThis()
+      }))
     }
-    const mockedResponse = { view: vi.fn() }
 
     await homeController.handler(mockRequest, mockedResponse)
 
-    expect(mockedResponse.view).toHaveBeenCalledWith(
-      'home/index',
-      expect.objectContaining({
-        pageTitle: 'Home',
-        currentLang: 'en', // fallback
-        translations: {}, // fallback
-        breadcrumbs: expect.any(Array)
-      })
+    expect(mockedResponse.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch bank details'
+    })
+
+    const responseObj = mockedResponse.response.mock.results[0].value
+    expect(responseObj.code).toHaveBeenCalledWith(
+      statusCodes.internalServerError
     )
   })
 })
