@@ -10,7 +10,6 @@ import Wreck from '@hapi/wreck'
 import { config } from './../../config/config.js'
 
 vi.mock('@hapi/wreck')
-vi.mock('./../../config/nunjucks/context/context.js')
 vi.mock('./../../config/config.js', () => ({
   config: {
     get: vi.fn((key) => {

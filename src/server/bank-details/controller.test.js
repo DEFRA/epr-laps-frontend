@@ -1,20 +1,14 @@
 import { bankDetailsController } from './controller.js'
 import { vi, describe, test, beforeEach, expect } from 'vitest'
 import { statusCodes } from '../common/constants/status-codes.js'
-import * as contextModule from '../../config/nunjucks/context/context.js'
 
-// mock logger
-const mockLoggerError = vi.fn()
+const mockLogger = { error: vi.fn(), info: vi.fn() }
 
 // mock fetchWithToken
 const mockFetchWithToken = vi.fn()
 
 vi.mock('../../server/auth/utils.js', () => ({
   fetchWithToken: (...args) => mockFetchWithToken(...args)
-}))
-
-vi.mock('../../server/common/helpers/logging/logger.js', () => ({
-  createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
 describe('#bankDetailsController', () => {
@@ -26,14 +20,17 @@ describe('#bankDetailsController', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.spyOn(contextModule, 'context').mockResolvedValue({
-      organisationName: 'Test LA'
-    })
   })
 
   test('should return 401 if unauthorized error is thrown', async () => {
     mockFetchWithToken.mockRejectedValue(new Error('Unauthorized'))
-    const request = { app: {} }
+
+    const request = {
+      app: {},
+      auth: { credentials: { organisationName: 'Test LA' } },
+      logger: mockLogger
+    }
+
     await bankDetailsController.handler(request, h)
 
     expect(h.response).toHaveBeenCalledWith({ error: 'Unauthorized' })
@@ -51,7 +48,9 @@ describe('#bankDetailsController', () => {
           'laps-home': 'LAPs home'
         },
         currentLang: 'en'
-      }
+      },
+      auth: { credentials: { organisationName: 'Test LA' } },
+      logger: mockLogger
     }
 
     await bankDetailsController.handler(request, h)
@@ -76,19 +75,29 @@ describe('#bankDetailsController', () => {
     const apiData = { bankName: 'Test Bank' }
     mockFetchWithToken.mockResolvedValue(apiData)
 
-    const request = { app: {} }
+    const request = {
+      app: {},
+      auth: { credentials: { organisationName: 'Test LA' } },
+      logger: mockLogger
+    }
 
     await bankDetailsController.handler(request, h)
 
     const viewArgs = h.view.mock.calls[0][1]
     expect(viewArgs.translations).toEqual({})
     expect(viewArgs.currentLang).toBe('en')
+    expect(viewArgs.apiData).toEqual(apiData)
   })
 
   test('should return 500 if API call fails for other reasons', async () => {
     mockFetchWithToken.mockRejectedValue(new Error('API error'))
 
-    const request = { app: {} }
+    const request = {
+      app: {},
+      auth: { credentials: { organisationName: 'Test LA' } },
+      logger: mockLogger
+    }
+
     await bankDetailsController.handler(request, h)
 
     expect(h.response).toHaveBeenCalledWith({
