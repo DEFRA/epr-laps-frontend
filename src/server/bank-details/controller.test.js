@@ -71,4 +71,29 @@ describe('#bankDetailsController', () => {
       })
     )
   })
+
+  test('should fallback to empty translations and en for currentLang', async () => {
+    const apiData = { bankName: 'Test Bank' }
+    mockFetchWithToken.mockResolvedValue(apiData)
+
+    const request = { app: {} }
+
+    await bankDetailsController.handler(request, h)
+
+    const viewArgs = h.view.mock.calls[0][1]
+    expect(viewArgs.translations).toEqual({})
+    expect(viewArgs.currentLang).toBe('en')
+  })
+
+  test('should return 500 if API call fails for other reasons', async () => {
+    mockFetchWithToken.mockRejectedValue(new Error('API error'))
+
+    const request = { app: {} }
+    await bankDetailsController.handler(request, h)
+
+    expect(h.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch bank details'
+    })
+    expect(h.code).toHaveBeenCalledWith(statusCodes.internalServerError)
+  })
 })
