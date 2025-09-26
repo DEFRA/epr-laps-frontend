@@ -38,14 +38,14 @@ export function extractOrgName(payload) {
 
 export const extractRoleName = (payload) => {
   const roles = payload.roles
-
   if (!Array.isArray(roles) || roles.length === 0) {
     return { currentRole: null }
   }
+
   // Find the matching role string
   const matchedRole = roles.find((role) => {
-    const parts = role.split(':')
-    return parts[0] === payload.currentRelationshipId
+    const roleParts = role.split(':')
+    return roleParts[0] === payload.currentRelationshipId
   })
 
   if (!matchedRole) {
@@ -54,6 +54,7 @@ export const extractRoleName = (payload) => {
 
   const parts = matchedRole.split(':')
   const currentRole = parts.length >= 2 ? parts[1] : matchedRole
+
   return { currentRole }
 }
 
