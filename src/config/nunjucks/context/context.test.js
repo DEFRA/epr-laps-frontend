@@ -41,17 +41,24 @@ describe('context and cache', () => {
     })
   })
 
+  const EN_NAME = 'Some Council Name'
+  const CY_NAME = 'Cyngor Rhai Enw'
+
   describe('#context', () => {
     const mockRequest = {
       path: '/?lang=en',
       app: {
         translations: {
           'your-defra-acco': 'Your Defra account',
-          'sign-out': 'Sign out'
+          'sign-out': 'Sign out',
+          laNames: {
+            [EN_NAME]: CY_NAME
+          }
         },
         currentLang: 'en'
       },
       getUserSession: vi.fn().mockResolvedValue({
+        organisationName: EN_NAME,
         relationships: []
       }),
       state: {
@@ -80,6 +87,7 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           authedUser: {
+            organisationName: EN_NAME,
             relationships: []
           },
           assetPath: '/public/assets',
@@ -100,6 +108,126 @@ describe('context and cache', () => {
           serviceName: 'EPR-LAPs',
           serviceUrl: '/',
           showBetaBanner: true
+        })
+      })
+
+      describe('organisationName translation', () => {
+        it('should translate organisationName to Welsh if language is cy and translation exists', async () => {
+          const req = {
+            ...mockRequest,
+            getUserSession: vi.fn().mockResolvedValue({
+              organisationName: EN_NAME,
+              relationships: []
+            }),
+            app: {
+              ...mockRequest.app,
+              currentLang: 'cy',
+              translations: {
+                ...mockRequest.app.translations,
+                laNames: { [EN_NAME]: CY_NAME } //dynamic
+              }
+            }
+          }
+          const contextImport = await import('./context.js')
+          const ctx = await contextImport.context(req)
+
+          expect(ctx.authedUser.organisationName).toBe(CY_NAME)
+        })
+
+        it('should not translate if organisationName does not exist in translations', async () => {
+          const req = {
+            ...mockRequest,
+            getUserSession: vi.fn().mockResolvedValue({
+              organisationName: 'Unknown Council',
+              relationships: []
+            }),
+            app: {
+              ...mockRequest.app,
+              currentLang: 'cy',
+              translations: {
+                ...mockRequest.app.translations,
+                laNames: {}
+              }
+            }
+          }
+          const contextImport = await import('./context.js')
+          const ctx = await contextImport.context(req)
+
+          expect(ctx.authedUser.organisationName).toBe('Unknown Council')
+        })
+
+        it('should not translate if language is English', async () => {
+          const req = {
+            ...mockRequest,
+            getUserSession: vi.fn().mockResolvedValue({
+              organisationName: EN_NAME,
+              relationships: []
+            }),
+            app: {
+              ...mockRequest.app,
+              currentLang: 'en',
+              translations: {
+                ...mockRequest.app.translations,
+                laNames: { [EN_NAME]: CY_NAME }
+              }
+            }
+          }
+          const contextImport = await import('./context.js')
+          const ctx = await contextImport.context(req)
+
+          expect(ctx.authedUser.organisationName).toBe(EN_NAME)
+        })
+      })
+
+      describe('branch coverage extras', () => {
+        it('should default to {} when translations is missing', async () => {
+          const req = {
+            ...mockRequest,
+            app: {}, // no translations
+            getUserSession: vi.fn().mockResolvedValue({
+              organisationName: 'Fallback Council',
+              relationships: []
+            })
+          }
+          const contextImport = await import('./context.js')
+          const ctx = await contextImport.context(req)
+
+          expect(ctx.authedUser.organisationName).toBe('Fallback Council')
+        })
+
+        it('should default to "en" when currentLang is missing', async () => {
+          const req = {
+            ...mockRequest,
+            app: { translations: mockRequest.app.translations }, // no currentLang
+            getUserSession: vi.fn().mockResolvedValue({
+              organisationName: EN_NAME,
+              relationships: []
+            })
+          }
+          const contextImport = await import('./context.js')
+          const ctx = await contextImport.context(req)
+
+          // stays as original because currentLang defaults to 'en'
+          expect(ctx.authedUser.organisationName).toBe(EN_NAME)
+        })
+
+        it('should handle when laNames is undefined', async () => {
+          const req = {
+            ...mockRequest,
+            app: {
+              ...mockRequest.app,
+              currentLang: 'cy',
+              translations: { ...mockRequest.app.translations } // no laNames key
+            },
+            getUserSession: vi.fn().mockResolvedValue({
+              organisationName: 'Some Council',
+              relationships: []
+            })
+          }
+          const contextImport = await import('./context.js')
+          const ctx = await contextImport.context(req)
+
+          expect(ctx.authedUser.organisationName).toBe('Some Council')
         })
       })
 
