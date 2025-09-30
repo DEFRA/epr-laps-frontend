@@ -63,7 +63,10 @@
   "view-(opens-in-": "Mae manylion banc eich awdurdod lleol wedi'u cadarnhau.",
   "change-orga": "Newid sefydliad",
   "laNames": {
-    "Glamshire County Council": "Cyngor Sir Forgannwg"
+    "Glamshire County Council": "Cyngor Sir Forgannwg",
+    "Devon County Council": "Cyngor Sir Dyfnaint",
+    "Hertfordshire County Council": "Cyngor Sir Hertfordshire",
+    "West Sussex County Council": "Cyngor Sir Gorllewin Sussex"
   },
   "you-are-now": "Rydych chi bellach wedi allgofnodi o Daliadau Awdurdod Lleol",
   "sign-in": "Mewngofnodwch"
