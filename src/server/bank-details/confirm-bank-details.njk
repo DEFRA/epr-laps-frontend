@@ -48,7 +48,7 @@
             ]
           }) }}
       
-          <div class="govuk-checkboxes govuk-!-margin-bottom-4" data-module="govuk-checkboxes">
+          <div class="govuk-checkboxes govuk-!-margin-bottom-4">
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="confirm-bank-details" name="confirm-bank-details" type="checkbox" value="confirmed">
               <label class="govuk-label govuk-checkboxes__label" for="confirm-bank-details">
@@ -80,7 +80,8 @@
           summaryText: translations['these-details-a'],
           html: detailsHtml
         }) }}
-        <button class="govuk-button" data-module="govuk-button" type="submit">
+        <button class="govuk-button" data-module="govuk-button" type="submit"
+        {% if not isContinueEnabled %} disabled {% endif %}>
           Continue
         </button>
       </form>
@@ -88,4 +89,18 @@
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.getElementById('confirm-bank-details');
+    const continueButton = document.querySelector('button[type="submit"]');
+    console.log('Checkbox:', checkbox, 'Button:', continueButton);
+
+    checkbox.addEventListener('change', function () {
+      console.log('Checkbox changed:', checkbox.checked);
+      continueButton.disabled = !checkbox.checked;
+    });
+  });
+</script>
+
 {% endblock %}
+

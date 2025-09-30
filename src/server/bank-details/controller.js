@@ -61,11 +61,14 @@ export const confirmBankDetailsController = {
     const userSession = await request.server.app.cache.get(sessionId)
     const apiData = userSession?.apiData || null
 
+    const isContinueEnabled = false
+
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       currentLang,
       translations,
-      apiData
+      apiData,
+      isContinueEnabled
     })
   }
 }
