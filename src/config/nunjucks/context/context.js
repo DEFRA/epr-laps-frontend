@@ -27,6 +27,9 @@ async function context(request) {
     }
   }
 
+  const translations = request?.app?.translations || {}
+  const currentLang = request?.app?.currentLang || 'en'
+
   const navigation = await buildNavigation(request)
   return {
     authedUser,
@@ -36,6 +39,8 @@ async function context(request) {
     breadcrumbs: [],
     navigation,
     showBetaBanner: config.get('showBetaBanner'),
+    translations,
+    currentLang,
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`

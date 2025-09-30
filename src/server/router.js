@@ -9,6 +9,7 @@ import { getHelp } from './get-help/index.js'
 import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
+import { noServiceRole } from './no-service-role/index.js'
 
 export const router = {
   plugin: {
@@ -27,7 +28,8 @@ export const router = {
         getHelp,
         signOut,
         auth,
-        defraAccount
+        defraAccount,
+        noServiceRole
       ])
 
       // Static assets

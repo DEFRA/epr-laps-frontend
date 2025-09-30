@@ -84,6 +84,11 @@ describe('context and cache', () => {
           },
           assetPath: '/public/assets',
           breadcrumbs: [],
+          currentLang: 'en',
+          translations: {
+            'your-defra-acco': 'Your Defra account',
+            'sign-out': 'Sign out'
+          },
           getAssetPath: expect.any(Function),
           navigation: [
             {
@@ -196,6 +201,11 @@ describe('context and cache', () => {
           },
           assetPath: '/public/assets',
           breadcrumbs: [],
+          currentLang: 'en',
+          translations: {
+            'your-defra-acco': 'Your Defra account',
+            'sign-out': 'Sign out'
+          },
           getAssetPath: expect.any(Function),
           navigation: [
             {

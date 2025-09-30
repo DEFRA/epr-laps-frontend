@@ -1,0 +1,35 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}
+  Check your details – {{ serviceName }} – GOV.UK Prototype Kit
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">You do not have a service role</h1>
+    <p class="govuk-body">
+      To access this content, your Defra account administrator must assign you a service role within the Local Authority Payments (LAPs) service.
+    </p>
+
+    <h2 class="govuk-heading-l">Contact us</h2>
+
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Email</h3>
+    <ul class="govuk-list">
+      <li><a href="mailto:#">EPRCustomerService@defra.gov.uk</a></li>
+     
+      <li>We aim to respond within 20 working days.</li>  
+    </ul>
+
+
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Telephone</h3>
+    <ul class="govuk-list">
+      <li>Telephone: 0300 060 0002</li>
+      <li>Monday to Friday 8m - 6pm (closed on weekends and bank holidays)</li>
+    </ul>
+
+  </div>
+</div>
+
+{% endblock %}
