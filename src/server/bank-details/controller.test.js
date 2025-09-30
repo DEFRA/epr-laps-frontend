@@ -279,4 +279,56 @@ describe('bankDetailsConfirmedController', () => {
     expect(result).toBe('rendered')
     expect(putWithToken).toHaveBeenCalled() // it *does* get called in current controller
   })
+
+  it('uses {} as translations if none provided', async () => {
+    const requestWithoutTranslations = {
+      ...baseRequest,
+      app: {
+        // explicitly remove translations
+        currentLang: 'cy' // something different so we can tell it's respected
+      }
+    }
+
+    putWithToken.mockRejectedValue(new Error('API failed'))
+
+    const result = await bankDetailsConfirmedController.handler(
+      requestWithoutTranslations,
+      mockH
+    )
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        translations: {}, // ✅ fallback covered
+        currentLang: 'cy' // still respects what’s provided
+      })
+    )
+    expect(result).toBe('rendered')
+  })
+
+  it('uses "en" as currentLang if none provided', async () => {
+    const requestWithoutLang = {
+      ...baseRequest,
+      app: {
+        translations: { foo: 'bar' } // still keep translations
+        // no currentLang
+      }
+    }
+
+    putWithToken.mockRejectedValue(new Error('API failed'))
+
+    const result = await bankDetailsConfirmedController.handler(
+      requestWithoutLang,
+      mockH
+    )
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        translations: { foo: 'bar' },
+        currentLang: 'en' // ✅ fallback covered
+      })
+    )
+    expect(result).toBe('rendered')
+  })
 })
