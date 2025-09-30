@@ -48,6 +48,8 @@ async function context(request) {
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
     breadcrumbs: [],
+    currentLang,
+    translations,
     navigation,
     showBetaBanner: config.get('showBetaBanner'),
     getAssetPath(asset) {

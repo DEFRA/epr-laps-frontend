@@ -4,13 +4,13 @@
 
 <div class="govuk-body">
   <h2 class="govuk-heading-xl">
-    You are now signed out of Local Authority Payments
+  {{ translations['you-are-now'] }}
   </h2>
   {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {{ govukButton({
-  text: "Sign in",
-  href: "/"
+  text: translations['sign-in'],
+  href: "/logout"
 }) }}
 </div>
 

@@ -48,7 +48,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Sign out',
-        href: '/sign-out'
+        href: '/sign-out?lang=en'
       }
     ])
   })
@@ -71,7 +71,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Sign out',
-        href: '/sign-out'
+        href: '/sign-out?lang=en'
       }
     ])
   })
@@ -99,7 +99,7 @@ describe('#buildNavigation', () => {
       },
       {
         current: false,
-        href: '/sign-out',
+        href: '/sign-out?lang=en',
         text: 'Sign out'
       }
     ])
