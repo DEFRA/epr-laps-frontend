@@ -15,10 +15,8 @@ const manifestPath = path.join(
 let webpackManifest
 
 async function context(request) {
-  const authedUser = await request.getUserSession(
-    request,
-    request.state?.userSession
-  )
+  const authedUser =
+    (await request.getUserSession(request, request.state?.userSession)) || {}
 
   const translations = request.app.translations || {}
   const currentLang = request.app.currentLang || 'en'

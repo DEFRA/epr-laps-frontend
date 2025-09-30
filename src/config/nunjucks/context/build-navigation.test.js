@@ -133,7 +133,7 @@ describe('#buildNavigation', () => {
   test('Should return empty array when path is /sign-out', async () => {
     const navigation = await buildNavigation(
       mockRequest({
-        path: '/sign-out',
+        path: '/logout',
         getUserSession: vi.fn().mockResolvedValue({
           relationships: []
         })

@@ -11,7 +11,7 @@ export async function buildNavigation(request) {
   )
 
   // If on sign-out page, return empty navigation
-  if (request.path === '/sign-out') {
+  if (request.path === '/logout') {
     return []
   }
 

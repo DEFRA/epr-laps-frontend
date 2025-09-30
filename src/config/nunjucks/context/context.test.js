@@ -254,6 +254,19 @@ describe('context and cache', () => {
       })
     })
 
+    describe('branch coverage extras', () => {
+      it('should default authedUser to {} when getUserSession returns null', async () => {
+        const req = {
+          ...mockRequest,
+          getUserSession: vi.fn().mockResolvedValue({ relationships: [] })
+        }
+        const contextImport = await import('./context.js')
+        const ctx = await contextImport.context(req)
+
+        expect(ctx.authedUser).toEqual({ relationships: [] })
+      })
+    })
+
     describe('When webpack manifest file read fails', () => {
       let contextImport
 

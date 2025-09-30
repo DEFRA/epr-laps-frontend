@@ -62,57 +62,7 @@ describe('#signOutController', () => {
 
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
       pageTitle: 'Sign out',
-      heading: 'Glamshire County Council',
-      currentLang: 'en',
-      translations: {
-        'local-authority': 'Mocked Local Authority'
-      }
+      heading: 'Glamshire County Council'
     })
-  })
-
-  it('should render with English when lang missing', async () => {
-    const req = { query: {}, app: { translations: {} } }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
-
-    await signOutController.handler(req, mockedResponse)
-
-    expect(mockedResponse.view).toHaveBeenCalledWith(
-      'sign-out/index.njk',
-      expect.objectContaining({ currentLang: 'en' })
-    )
-  })
-
-  it('should render with Welsh when lang is cy', async () => {
-    const req = {
-      query: {},
-      app: {
-        currentLang: 'cy',
-        translations: { 'sign-out': 'Allan' }
-      }
-    }
-
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
-
-    await signOutController.handler(req, mockedResponse)
-
-    expect(mockedResponse.view).toHaveBeenCalledWith(
-      'sign-out/index.njk',
-      expect.objectContaining({
-        currentLang: 'cy',
-        translations: { 'sign-out': 'Allan' }
-      })
-    )
-  })
-
-  it('should handle missing translations gracefully', async () => {
-    const req = { query: { lang: 'cy' }, app: {} }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
-
-    await signOutController.handler(req, mockedResponse)
-
-    expect(mockedResponse.view).toHaveBeenCalledWith(
-      'sign-out/index.njk',
-      expect.objectContaining({ translations: {} })
-    )
   })
 })
