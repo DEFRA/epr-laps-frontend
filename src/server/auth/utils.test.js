@@ -4,7 +4,9 @@ import {
   getToken,
   setHeaders,
   getRequest,
-  fetchWithToken
+  putRequest,
+  fetchWithToken,
+  putWithToken
 } from './utils.js'
 import Wreck from '@hapi/wreck'
 import { config } from './../../config/config.js'
@@ -190,6 +192,76 @@ describe('#utils', () => {
         headers: { Authorization: 'Bearer token123' },
         json: true
       })
+    })
+  })
+
+  describe('putRequest', () => {
+    it('calls Wreck.put with correct params and returns payload', async () => {
+      const responsePayload = { updated: true }
+      Wreck.put.mockResolvedValue({ payload: responsePayload })
+
+      const url = 'http://example.com/resource'
+      const payload = { foo: 'bar' }
+      const headers = { 'X-Custom': '123' }
+
+      const result = await putRequest(url, payload, headers)
+
+      expect(Wreck.put).toHaveBeenCalledWith(url, {
+        payload: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom': '123'
+        },
+        json: true
+      })
+      expect(result).toEqual(responsePayload)
+    })
+  })
+
+  describe('putWithToken', () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
+      config.get.mockImplementation((key) => {
+        if (key === 'backendApiUrl') return 'http://backend.test'
+        return ''
+      })
+    })
+
+    it('calls putRequest with correct URL, payload, and token headers', async () => {
+      const token = 'token123'
+      const request = {
+        auth: {
+          credentials: { token }
+        }
+      }
+      const path = '/resource/1'
+      const payload = { foo: 'bar' }
+      const responsePayload = { success: true }
+
+      Wreck.put.mockResolvedValue({ payload: responsePayload })
+
+      const result = await putWithToken(request, path, payload)
+
+      expect(result).toEqual(responsePayload)
+
+      expect(Wreck.put).toHaveBeenCalledWith(
+        'http://backend.test/resource/1',
+        expect.objectContaining({
+          payload: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          json: true
+        })
+      )
+    })
+
+    it('throws if no token found', async () => {
+      const request = { auth: {} }
+      await expect(putWithToken(request, '/test', {})).rejects.toThrow(
+        'Unauthorized'
+      )
     })
   })
 })
