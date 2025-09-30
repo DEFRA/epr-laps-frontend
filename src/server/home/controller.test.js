@@ -14,13 +14,11 @@ describe('#homeController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Mock getUserSession
     vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
       userName: 'test user',
       organisationName: 'Mocked Organisation'
     })
 
-    // Common mocked response object
     mockedResponse = {
       view: vi.fn(),
       redirect: vi.fn(),
@@ -29,10 +27,18 @@ describe('#homeController', () => {
       }))
     }
 
-    // Default request
     mockRequest = {
       app: {},
       auth: { credentials: {} },
+      state: { userSession: { sessionId: 'test-session-id' } },
+      server: {
+        app: {
+          cache: {
+            get: vi.fn().mockResolvedValue({}),
+            set: vi.fn().mockResolvedValue()
+          }
+        }
+      },
       logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() }
     }
   })
@@ -97,22 +103,25 @@ describe('#homeController', () => {
     const apiData = { bankName: 'Test Bank' }
     vi.mocked(fetchWithToken).mockResolvedValue(apiData)
 
-    mockRequest.app = {
-      translations: { 'local-authority': 'Mocked Local Authority' },
-      currentLang: 'en'
-    }
-    mockRequest.auth.credentials = {
-      currentRole: 'Head of Finance',
-      organisationName: 'Mocked Organisation'
-    }
+    // ✅ Make sure the role and organisation name are set
+    mockRequest.auth.credentials.currentRole = 'Head of Finance'
+    mockRequest.auth.credentials.organisationName = 'Mocked Organisation'
 
     await homeController.handler(mockRequest, mockedResponse)
 
+    // Check that fetchWithToken was called with the correct args
     expect(fetchWithToken).toHaveBeenCalledWith(
       mockRequest,
       `/bank-details/${encodeURIComponent('Mocked Organisation')}`
     )
 
+    // Check cache set
+    expect(mockRequest.server.app.cache.set).toHaveBeenCalledWith(
+      'test-session-id',
+      expect.objectContaining({ apiData })
+    )
+
+    // Check view rendering
     expect(mockedResponse.view).toHaveBeenCalledWith(
       'home/index',
       expect.objectContaining({

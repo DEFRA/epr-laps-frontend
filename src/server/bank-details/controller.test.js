@@ -1,4 +1,7 @@
-import { bankDetailsController } from './controller.js'
+import {
+  bankDetailsController,
+  confirmBankDetailsController
+} from './controller.js'
 import { vi, describe, test, beforeEach, expect } from 'vitest'
 import { statusCodes } from '../common/constants/status-codes.js'
 
@@ -104,5 +107,64 @@ describe('#bankDetailsController', () => {
       error: 'Failed to fetch bank details'
     })
     expect(h.code).toHaveBeenCalledWith(statusCodes.internalServerError)
+  })
+})
+
+describe('confirmBankDetailsController', () => {
+  let mockRequest, mockH, mockViewReturn
+
+  beforeEach(() => {
+    mockViewReturn = 'rendered-view'
+
+    // Mock h.view
+    mockH = {
+      view: vi.fn(() => mockViewReturn)
+    }
+
+    // Mock request
+    mockRequest = {
+      app: {
+        translations: { 'local-authority': 'Local Authority' }
+      },
+      currentLang: 'en',
+      state: {
+        userSession: {
+          sessionId: 'test-session-id'
+        }
+      },
+      server: {
+        app: {
+          cache: {
+            get: vi.fn()
+          }
+        }
+      }
+    }
+  })
+
+  it('should render view with apiData when present in session', async () => {
+    const apiDataMock = { accountNumber: '12345678', sortCode: '12-34-56' }
+    mockRequest.server.app.cache.get.mockResolvedValue({
+      apiData: apiDataMock
+    })
+
+    const result = await confirmBankDetailsController.handler(
+      mockRequest,
+      mockH
+    )
+
+    expect(mockRequest.server.app.cache.get).toHaveBeenCalledWith(
+      'test-session-id'
+    )
+    expect(mockH.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        pageTitle: 'Confirm Bank Details',
+        apiData: apiDataMock,
+        translations: { 'local-authority': 'Local Authority' },
+        currentLang: 'en'
+      })
+    )
+    expect(result).toBe(mockViewReturn)
   })
 })

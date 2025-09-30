@@ -40,7 +40,7 @@
   "telephone": "Telephone",
   "0300-060-0002": "0300 060 0002",
   "monday-to-frida": "Monday to Friday 8am to 6pm (closed on weekends and bank holidays)",
-  "confirm-your-lo": "Confirm your local authority's bank details",
+  "confirm-your-lo": "Confirm your local authority bank details",
   "name-of-account": "Name of account",
   "change-your-loc": "Change your local authority's bank details",
   "please-raise-a-": "please raise a help request via <a class=\"govuk-link\" href=\"#\">Get help and guidance</a> the page",
@@ -63,5 +63,7 @@
   "view-(opens-in-": "View (opens in a new tab)",
   "change-orga": "Change organisation",
   "you-are-now": "You are now signed out of Local Authority Payments",
-  "sign-in": "Sign in"
+  "sign-in": "Sign in",
+  "back-link": "Back",
+  "continue": "Continue"
 }

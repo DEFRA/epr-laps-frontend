@@ -31,6 +31,8 @@ export const getToken = (request) => {
   // get the token from the request auth credentials or cookie
   const token =
     request.auth?.credentials?.token || request.state?.userSession?.token
+
+  console.log('The token', token)
   if (!token) {
     throw new Error('Unauthorized')
   }
@@ -50,15 +52,16 @@ export const getRequest = async (url, headers) => {
     headers,
     json: true
   })
+  console.log('PAyload', payload)
   return payload
 }
 
 export const fetchWithToken = async (request, path) => {
   const { token } = getToken(request)
-
+  console.log('TOKEN from fetchWithToken', token)
   const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${path}`
-
+  console.log('THE URL', url)
   const headers = setHeaders(token)
 
   return getRequest(url, headers)

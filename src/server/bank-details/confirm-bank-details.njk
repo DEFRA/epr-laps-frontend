@@ -1,40 +1,9 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
-{% block beforeContent %}
-
-<div class="govuk-width-container">
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {{ govukBreadcrumbs({
-        items: [
-          {
-            text: "LAPs home",
-            href: "/laps/home-page"
-          },
-          {
-            text: "Confirm bank details"
-          }
-        ]
-      }) }}
-    </div>
-    <div class="govuk-grid-column-one-third">
-      {{
-        dwpLanguageToggle({
-          selectedLang: "en",
-          href: {
-            en: "/patterns/toggle-to-welsh/examples/en",
-            cy: "/patterns/toggle-to-welsh/examples/cy"
-          }
-        })
-      }}
-    </div>
-  </div>
-</div>
-
-{% endblock %}
-
+{% set showBackLink = true %}
 {% block content %}
 
 <div class="govuk-grid-row">
@@ -53,13 +22,13 @@
     {% endif %}
 
     <div class="govuk-form-group {% if data['error'] == 'true' %}govuk-form-group--error{% endif %}">
-      <form method="post" action="/laps/confirm-bank-details">
+      <form method="post" action="bank-details/bank-details-confirmed">
         <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
 
             <span class="govuk-caption-xl">Glamshire County Council</span>
             <h1 class="govuk-fieldset__heading">
-              Confirm your local authority's bank details
+              {{ translations['confirm-your-lo'] }}
             </h1>
           </legend>
 
@@ -67,26 +36,26 @@
             rows: [
               {
                 key: {
-                  text: "Name of account"
+                  text: translations['account-name'] 
                 },
                 value: {
-                  text: "Glamshire County Council"
+                  text: apiData.accountName
                 }
               },
               {
                 key: {
-                  text: "Sort code"
+                  text: translations['sort-code'] 
                 },
                 value: {
-                  text: "12 34 56"
+                  text: apiData.sortCode
                 }
               },
               {
                 key: {
-                  text: "Account number"
+                  text: translations['account-number']
                 },
                 value: {
-                  text: "78910112"
+                  text: apiData.accountNumber
                 }
               }
             ]
