@@ -49,7 +49,7 @@ async function context(request) {
     currentLang,
     translations,
     navigation,
-    showBetaBanner: true,
+    showBetaBanner: config.get('showBetaBanner'),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`

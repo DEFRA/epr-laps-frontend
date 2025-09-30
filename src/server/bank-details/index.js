@@ -23,6 +23,19 @@ export const bankDetails = {
         path: '/bank-details/bank-details-confirmed',
         ...bankDetailsConfirmedController
       })
+      server.route({
+        method: 'GET',
+        path: '/bank-details/bank-details-confirmed',
+        handler: (request, h) => {
+          const translations = request.app.translations || {}
+          const currentLang = request.app.currentLang || 'en'
+          return h.view('bank-details/bank-details-confirmed.njk', {
+            pageTitle: 'Bank Details Confirmed',
+            currentLang,
+            translations
+          })
+        }
+      })
     }
   }
 }

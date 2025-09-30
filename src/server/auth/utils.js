@@ -32,7 +32,6 @@ export const getToken = (request) => {
   const token =
     request.auth?.credentials?.token || request.state?.userSession?.token
 
-  console.log('The token', token)
   if (!token) {
     throw new Error('Unauthorized')
   }
@@ -52,17 +51,39 @@ export const getRequest = async (url, headers) => {
     headers,
     json: true
   })
-  console.log('PAyload', payload)
   return payload
+}
+
+export const putRequest = async (url, payload, headers = {}) => {
+  const { payload: responsePayload } = await Wreck.put(url, {
+    payload: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    json: true
+  })
+  return responsePayload
 }
 
 export const fetchWithToken = async (request, path) => {
   const { token } = getToken(request)
-  console.log('TOKEN from fetchWithToken', token)
+
   const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${path}`
-  console.log('THE URL', url)
+
   const headers = setHeaders(token)
 
   return getRequest(url, headers)
+}
+
+export const putWithToken = async (request, path, payload) => {
+  const { token } = getToken(request)
+
+  const apiBaseUrl = config.get('backendApiUrl')
+  const url = `${apiBaseUrl}${path}`
+
+  const headers = setHeaders(token)
+
+  return putRequest(url, payload, headers)
 }

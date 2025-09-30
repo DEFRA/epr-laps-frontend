@@ -103,7 +103,6 @@ describe('#homeController', () => {
     const apiData = { bankName: 'Test Bank' }
     vi.mocked(fetchWithToken).mockResolvedValue(apiData)
 
-    // ✅ Make sure the role and organisation name are set
     mockRequest.auth.credentials.currentRole = 'Head of Finance'
     mockRequest.auth.credentials.organisationName = 'Mocked Organisation'
 

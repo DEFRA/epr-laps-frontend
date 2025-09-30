@@ -2,7 +2,7 @@
  * A GDS styled example bank details controller
  */
 import { statusCodes } from '../common/constants/status-codes.js'
-import { fetchWithToken } from '../../server/auth/utils.js'
+import { fetchWithToken, putWithToken } from '../../server/auth/utils.js'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -14,7 +14,6 @@ export const bankDetailsController = {
       // Fetch bank details via the wrapper function
       const path = `/bank-details/${encodeURIComponent(localAuthority)}`
       const payload = await fetchWithToken(request, path)
-      console.log('payload', payload)
 
       request.logger.info(
         `Successfully fetched bank details for ${localAuthority}`
@@ -77,10 +76,39 @@ export const bankDetailsConfirmedController = {
   handler: async (request, h) => {
     const translations = request.app.translations || {}
     const currentLang = request.app.currentLang || 'en'
-    return h.view('bank-details/bank-details-confirmed.njk', {
-      pageTitle: 'Confirm Bank Details',
-      currentLang,
-      translations
-    })
+    const sessionId = request.state.userSession.sessionId
+    const userSession = await request.server.app.cache.get(sessionId)
+    const apiData = userSession?.apiData || null
+    const localAuthority = request.auth.credentials.organisationName
+
+    try {
+      // Call reusable PUT function
+      await putWithToken(
+        request,
+        `bank-details/${encodeURIComponent(localAuthority)}`,
+        {
+          id: apiData.id,
+          accountName: apiData.accountName,
+          sortCode: apiData.sortCode,
+          accountNumber: apiData.accountNumber,
+          confirmed: true
+        }
+      )
+
+      // Redirect on success
+      return h.redirect(
+        `/bank-details/bank-details-confirmed?lang=${currentLang}`
+      )
+    } catch (err) {
+      // Re-render the form with error
+      return h.view('bank-details/confirm-bank-details.njk', {
+        pageTitle: 'Confirm Bank Details',
+        currentLang,
+        translations,
+        apiData,
+        isContinueEnabled: true,
+        error: 'Failed to update bank details. Please try again.'
+      })
+    }
   }
 }
