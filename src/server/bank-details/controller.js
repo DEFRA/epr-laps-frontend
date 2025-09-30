@@ -61,6 +61,7 @@ export const confirmBankDetailsController = {
     const userSession = await request.server.app.cache.get(sessionId)
     console.log('USER session from confirm bank', userSession)
     const apiData = userSession?.apiData || null
+
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       currentLang,

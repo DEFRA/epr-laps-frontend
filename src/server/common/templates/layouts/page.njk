@@ -55,7 +55,7 @@
       {% if showBackLink %}
         {{ govukBackLink({
           text: translations['back-link'],
-          href: "/"
+          href: "javascript:history.back()"
         }) }}
       {% else %}
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}

@@ -1,6 +1,7 @@
 import {
   bankDetailsController,
-  confirmBankDetailsController
+  confirmBankDetailsController,
+  bankDetailsConfirmedController
 } from './controller.js'
 import { vi, describe, test, beforeEach, expect } from 'vitest'
 import { statusCodes } from '../common/constants/status-codes.js'
@@ -166,5 +167,85 @@ describe('confirmBankDetailsController', () => {
       })
     )
     expect(result).toBe(mockViewReturn)
+  })
+})
+
+describe('bankDetailsConfirmedController', () => {
+  it('renders the correct view with default language', async () => {
+    const mockH = {
+      view: vi.fn().mockReturnValue('rendered')
+    }
+    const mockRequest = {
+      app: {
+        translations: { 'confirm-your-lo': 'Confirm your local authority' },
+        currentLang: 'en'
+      }
+    }
+
+    const result = await bankDetailsConfirmedController.handler(
+      mockRequest,
+      mockH
+    )
+
+    expect(mockH.view).toHaveBeenCalledTimes(1)
+    expect(mockH.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      expect.objectContaining({
+        pageTitle: 'Confirm Bank Details',
+        currentLang: 'en',
+        translations: { 'confirm-your-lo': 'Confirm your local authority' }
+      })
+    )
+    expect(result).toBe('rendered')
+  })
+
+  it('defaults currentLang to "en" if not set', async () => {
+    const mockH = {
+      view: vi.fn().mockReturnValue('rendered')
+    }
+    const mockRequest = {
+      app: {
+        translations: { 'confirm-your-lo': 'Confirm your local authority' }
+      }
+    }
+
+    const result = await bankDetailsConfirmedController.handler(
+      mockRequest,
+      mockH
+    )
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      expect.objectContaining({
+        currentLang: 'en'
+      })
+    )
+    expect(result).toBe('rendered')
+  })
+
+  it('uses the specified language if currentLang is set', async () => {
+    const mockH = {
+      view: vi.fn().mockReturnValue('rendered')
+    }
+    const mockRequest = {
+      app: {
+        translations: { 'confirm-your-lo': 'Confirmez votre autorité locale' },
+        currentLang: 'fr'
+      }
+    }
+
+    const result = await bankDetailsConfirmedController.handler(
+      mockRequest,
+      mockH
+    )
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      expect.objectContaining({
+        currentLang: 'fr',
+        translations: { 'confirm-your-lo': 'Confirmez votre autorité locale' }
+      })
+    )
+    expect(result).toBe('rendered')
   })
 })
