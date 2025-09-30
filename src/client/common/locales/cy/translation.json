@@ -7,7 +7,7 @@
   "laps-home": "Hafan Taliadau Awdurdodau Lleol (LAP)",
   "english": "Hafan Taliadau Awdurdodau Lleol (LAP)",
   "cymraeg": "Saesneg",
-  "glamshire-count": "Cartref",
+  "glamshire-count": "Cyngor Sir Forgannwg",
   "payment-documen": "Hafan Taliadau Awdurdodau Lleol (LAP)",
   "you-can-view-an": "Cyngor Sir Morganniaeth",
   "estimated-grant": "Dogfennau talu",
@@ -61,5 +61,8 @@
   "document-name": "Dydd Llun i ddydd Gwener 8am i 6pm (ar gau ar benwythnosau a gwyliau banc)",
   "download": "Cadarnhawyd manylion banc",
   "view-(opens-in-": "Mae manylion banc eich awdurdod lleol wedi'u cadarnhau.",
-  "change-orga": "Newid sefydliad"
+  "change-orga": "Newid sefydliad",
+  "laNames": {
+    "Glamshire County Council": "Cyngor Sir Forgannwg"
+  }
 }
