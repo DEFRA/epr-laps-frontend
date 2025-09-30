@@ -69,3 +69,15 @@ export const confirmBankDetailsController = {
     })
   }
 }
+
+export const bankDetailsConfirmedController = {
+  handler: async (request, h) => {
+    const translations = request.app.translations || {}
+    const currentLang = request.app.currentLang || 'en'
+    return h.view('bank-details/bank-details-confirmed.njk', {
+      pageTitle: 'Confirm Bank Details',
+      currentLang,
+      translations
+    })
+  }
+}
