@@ -257,7 +257,7 @@ describe('bankDetailsConfirmedController', () => {
   it('renders form with error if checkbox is not checked', async () => {
     const requestWithoutCheckbox = {
       ...baseRequest,
-      payload: {} // no checkbox value
+      payload: {}
     }
 
     const result = await bankDetailsConfirmedController.handler(
@@ -284,8 +284,7 @@ describe('bankDetailsConfirmedController', () => {
     const requestWithoutTranslations = {
       ...baseRequest,
       app: {
-        // explicitly remove translations
-        currentLang: 'cy' // something different so we can tell it's respected
+        currentLang: 'cy'
       }
     }
 
@@ -299,8 +298,8 @@ describe('bankDetailsConfirmedController', () => {
     expect(mockH.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
       expect.objectContaining({
-        translations: {}, // ✅ fallback covered
-        currentLang: 'cy' // still respects what’s provided
+        translations: {},
+        currentLang: 'cy'
       })
     )
     expect(result).toBe('rendered')
