@@ -8,20 +8,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-
-    {% if data['error'] == 'true' %}
-    {{ govukErrorSummary({
-      titleText: "There is a problem",
-      errorList: [
-        {
-          text: "Confirm these details are correct",
-          href: "#confirm-bank-details"
-        }
-      ]
-    }) }}
-    {% endif %}
-
-    <div class="govuk-form-group {% if data['error'] == 'true' %}govuk-form-group--error{% endif %}">
+    <div class="govuk-form-group">
       <form method="post" action="/bank-details/bank-details-confirmed">
         <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -65,26 +52,34 @@
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="confirm-bank-details" name="confirm-bank-details" type="checkbox" value="confirmed">
               <label class="govuk-label govuk-checkboxes__label" for="confirm-bank-details">
-                I confirm these details are correct
+                {{ translations['i-confirm-these'] }}
               </label>
             </div>
           </div>
 
         </fieldset>
 
-        {{ govukDetails({
-          summaryText: "These details are incorrect",
-          html: "<p class='govuk-body'>To update your local authority's bank details, contact customer services.</p>
-                  <p class='govuk-body'>We'll let you know once the update is complete, and you'll be able to confirm the changes in your account.</p>
-                  <p class='govuk-body'><span class='govuk-!-font-weight-bold'>Email</span><br>
-                  <a href='mailto:EPRCustomerService@defra.gov.uk' class='govuk-link'>EPRCustomerService@defra.gov.uk</a><br>
-                  We aim to respond within 20 working days
-                  </p>
-                  <p class='govuk-body'><span class='govuk-!-font-weight-bold'>Telephone</span><br>
-                  0300 060 0002<br>
-                  Monday to Friday 8am to 6pm (closed on weekends and bank holidays)</p>"
-        }) }}
+        {% from "govuk/components/details/macro.njk" import govukDetails %}
 
+        {% set detailsHtml %}
+          <p>{{ translations['to-update-your-'] }}, {{ translations["please-raise-a-"] | safe }}</p>
+
+          <p><strong>{{ translations['email'] }}</strong><br>
+            <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
+            {{ translations['we-aim-to-respo'] }}
+          </p>
+
+          <p>
+            <strong>{{ translations['telephone'] }}</strong><br>
+            0300-060-0002<br>
+            {{ translations['monday-to-frida'] }}
+          </p>
+        {% endset %}
+
+        {{ govukDetails({
+          summaryText: translations['these-details-a'],
+          html: detailsHtml
+        }) }}
         <button class="govuk-button" data-module="govuk-button" type="submit">
           Continue
         </button>
