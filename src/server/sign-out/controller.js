@@ -1,10 +1,10 @@
 import { removeUserSession } from '../common/helpers/auth/utils.js'
 
 export const signOutController = {
-  handler: async (request, h) => {
+  handler: (request, h) => {
     // If user session exists, remove it
     if (request?.state?.userSession) {
-      await removeUserSession(request)
+      removeUserSession(request)
     }
 
     return h.view('sign-out/index.njk', {
