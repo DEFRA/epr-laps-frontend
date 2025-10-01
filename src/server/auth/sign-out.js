@@ -19,7 +19,7 @@ export const signOutController = {
     const { idToken } = userSession
     request.logger.info('User session removed. Signing user out of Defra ID')
     const logoutUrl = encodeURI(
-      `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${referrer}`
+      `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${referrer}logout`
     )
 
     request.logger.debug(`Redirecting user to: ${logoutUrl}`)
