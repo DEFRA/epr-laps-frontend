@@ -3,11 +3,18 @@ const ONE_ORGANIZATION = 1
 
 export async function buildNavigation(request) {
   const translations = request?.app?.translations || {}
+  const currentLang = request.query?.lang || 'en'
   const defraAccountUrl = config.get('defraId.manageAccountUrl')
   const userSession = await request.getUserSession(
     request,
     request.state?.userSession
   )
+
+  // If on sign-out page, return empty navigation
+  if (request.path === '/logout') {
+    return []
+  }
+
   return [
     {
       text: translations['your-defra-acco'],
@@ -25,7 +32,7 @@ export async function buildNavigation(request) {
       : []),
     {
       text: translations['sign-out'],
-      href: '/sign-out',
+      href: `/sign-out?lang=${currentLang}`,
       current: request?.path === '/sign-out'
     }
   ]

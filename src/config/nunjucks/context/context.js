@@ -15,10 +15,8 @@ const manifestPath = path.join(
 let webpackManifest
 
 async function context(request) {
-  const authedUser = await request.getUserSession(
-    request,
-    request.state?.userSession
-  )
+  const authedUser =
+    (await request.getUserSession(request, request.state?.userSession)) || {}
 
   const translations = request.app.translations || {}
   const currentLang = request.app.currentLang || 'en'
@@ -48,6 +46,8 @@ async function context(request) {
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
     breadcrumbs: [],
+    currentLang,
+    translations,
     navigation,
     showBetaBanner: config.get('showBetaBanner'),
     getAssetPath(asset) {

@@ -61,5 +61,7 @@
   "document-name": "Document name",
   "download": "Download",
   "view-(opens-in-": "View (opens in a new tab)",
-  "change-orga": "Change organisation"
+  "change-orga": "Change organisation",
+  "you-are-now": "You are now signed out of Local Authority Payments",
+  "sign-in": "Sign in"
 }

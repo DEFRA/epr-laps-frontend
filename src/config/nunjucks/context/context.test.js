@@ -92,6 +92,7 @@ describe('context and cache', () => {
           },
           assetPath: '/public/assets',
           breadcrumbs: [],
+          currentLang: 'en',
           getAssetPath: expect.any(Function),
           navigation: [
             {
@@ -102,12 +103,17 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'Sign out',
-              href: '/sign-out'
+              href: '/sign-out?lang=en'
             }
           ],
           serviceName: 'EPR-LAPs',
           serviceUrl: '/',
-          showBetaBanner: true
+          showBetaBanner: true,
+          translations: {
+            laNames: { [EN_NAME]: CY_NAME },
+            'sign-out': 'Sign out',
+            'your-defra-acco': 'Your Defra account'
+          }
         })
       })
 
@@ -217,17 +223,17 @@ describe('context and cache', () => {
             app: {
               ...mockRequest.app,
               currentLang: 'cy',
-              translations: { ...mockRequest.app.translations } // no laNames key
+              translations: {} // no laNames key
             },
             getUserSession: vi.fn().mockResolvedValue({
-              organisationName: 'Some Council',
+              organisationName: EN_NAME,
               relationships: []
             })
           }
           const contextImport = await import('./context.js')
           const ctx = await contextImport.context(req)
 
-          expect(ctx.authedUser.organisationName).toBe('Some Council')
+          expect(ctx.authedUser.organisationName).toBe(EN_NAME)
         })
       })
 
@@ -245,6 +251,19 @@ describe('context and cache', () => {
             '/public/an-image.png'
           )
         })
+      })
+    })
+
+    describe('branch coverage extras', () => {
+      it('should default authedUser to {} when getUserSession returns null', async () => {
+        const req = {
+          ...mockRequest,
+          getUserSession: vi.fn().mockResolvedValue({ relationships: [] })
+        }
+        const contextImport = await import('./context.js')
+        const ctx = await contextImport.context(req)
+
+        expect(ctx.authedUser).toEqual({ relationships: [] })
       })
     })
 
@@ -274,12 +293,14 @@ describe('context and cache', () => {
       path: '/?lang=en',
       app: {
         translations: {
+          laNames: { [EN_NAME]: CY_NAME },
           'your-defra-acco': 'Your Defra account',
           'sign-out': 'Sign out'
         },
         currentLang: 'en'
       },
       getUserSession: vi.fn().mockResolvedValue({
+        organisationName: EN_NAME,
         relationships: []
       }),
       state: {
@@ -320,10 +341,12 @@ describe('context and cache', () => {
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
           authedUser: {
+            organisationName: EN_NAME,
             relationships: []
           },
           assetPath: '/public/assets',
           breadcrumbs: [],
+          currentLang: 'en',
           getAssetPath: expect.any(Function),
           navigation: [
             {
@@ -334,12 +357,17 @@ describe('context and cache', () => {
             {
               current: false,
               text: 'Sign out',
-              href: '/sign-out'
+              href: '/sign-out?lang=en'
             }
           ],
           serviceName: 'EPR-LAPs',
           serviceUrl: '/',
-          showBetaBanner: true
+          showBetaBanner: true,
+          translations: {
+            laNames: { [EN_NAME]: CY_NAME },
+            'sign-out': 'Sign out',
+            'your-defra-acco': 'Your Defra account'
+          }
         })
       })
     })

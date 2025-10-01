@@ -22,6 +22,7 @@ export const signOutController = {
       `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${referrer}`
     )
 
+    request.logger.debug(`Redirecting user to: ${logoutUrl}`)
     return h.redirect(logoutUrl)
   }
 }

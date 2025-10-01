@@ -48,7 +48,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Sign out',
-        href: '/sign-out'
+        href: '/sign-out?lang=en'
       }
     ])
   })
@@ -71,7 +71,7 @@ describe('#buildNavigation', () => {
       {
         current: false,
         text: 'Sign out',
-        href: '/sign-out'
+        href: '/sign-out?lang=en'
       }
     ])
   })
@@ -99,9 +99,47 @@ describe('#buildNavigation', () => {
       },
       {
         current: false,
-        href: '/sign-out',
+        href: '/sign-out?lang=en',
         text: 'Sign out'
       }
     ])
+  })
+
+  test('Should default to provided query.lang when set', async () => {
+    const navigation = await buildNavigation(
+      mockRequest({
+        path: '/dashboard',
+        query: { lang: 'cy' }, // simulate Welsh language
+        getUserSession: vi.fn().mockResolvedValue({
+          relationships: []
+        })
+      })
+    )
+
+    expect(navigation).toEqual([
+      {
+        current: false,
+        text: 'Your Defra account',
+        href: manageDefraAccountUrl
+      },
+      {
+        current: false,
+        text: 'Sign out',
+        href: '/sign-out?lang=cy'
+      }
+    ])
+  })
+
+  test('Should return empty array when path is /sign-out', async () => {
+    const navigation = await buildNavigation(
+      mockRequest({
+        path: '/logout',
+        getUserSession: vi.fn().mockResolvedValue({
+          relationships: []
+        })
+      })
+    )
+
+    expect(navigation).toEqual([])
   })
 })
