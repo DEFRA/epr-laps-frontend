@@ -1,11 +1,15 @@
 import { statusCodes } from '../common/constants/status-codes.js'
-import { fetchWithToken } from '../../server/auth/utils.js'
 import { homeController } from './controller.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
+import * as contextModule from '../../config/nunjucks/context/context.js'
 
+// Mock fetchWithToken
 vi.mock('../../server/auth/utils.js', () => ({
   fetchWithToken: vi.fn()
 }))
+
+// Spy on context
+vi.spyOn(contextModule, 'context').mockResolvedValue({ apiData: null })
 
 describe('#homeController', () => {
   let mockRequest
@@ -43,27 +47,7 @@ describe('#homeController', () => {
     }
   })
 
-  test('should respond with error when fetchWithToken throws (unauthenticated users)', async () => {
-    // Force fetchWithToken to throw
-    vi.mocked(fetchWithToken).mockRejectedValue(new Error('Some error'))
-
-    // Set role to trigger fetch
-    mockRequest.auth.credentials.currentRole = 'Head of Finance'
-    mockRequest.auth.credentials.organisationName = 'Mocked Organisation'
-
-    await homeController.handler(mockRequest, mockedResponse)
-
-    expect(mockedResponse.response).toHaveBeenCalledWith({
-      error: 'Failed to fetch bank details'
-    })
-
-    const responseObj = mockedResponse.response.mock.results[0].value
-    expect(responseObj.code).toHaveBeenCalledWith(
-      statusCodes.internalServerError
-    )
-  })
-
-  test('Should provide expected response with translations', async () => {
+  test('should render view with translations', async () => {
     mockRequest.app = {
       translations: { 'local-authority': 'Mocked Local Authority' },
       currentLang: 'en'
@@ -76,15 +60,14 @@ describe('#homeController', () => {
       expect.objectContaining({
         pageTitle: 'Home',
         currentLang: 'en',
-        breadcrumbs: [{ text: 'Mocked Local Authority', href: '/?lang=en' }],
         translations: { 'local-authority': 'Mocked Local Authority' },
+        breadcrumbs: [{ text: 'Mocked Local Authority', href: '/?lang=en' }],
         apiData: null
       })
     )
   })
 
   test('should handle missing translations and currentLang', async () => {
-    // No translations or currentLang
     await homeController.handler(mockRequest, mockedResponse)
 
     expect(mockedResponse.view).toHaveBeenCalledWith(
@@ -99,34 +82,20 @@ describe('#homeController', () => {
     )
   })
 
-  test('should fetch bank details when roleName is Head of Finance', async () => {
-    const apiData = { bankName: 'Test Bank' }
-    vi.mocked(fetchWithToken).mockResolvedValue(apiData)
-
-    mockRequest.auth.credentials.currentRole = 'Head of Finance'
-    mockRequest.auth.credentials.organisationName = 'Mocked Organisation'
+  test('should respond with error when context throws', async () => {
+    vi.spyOn(contextModule, 'context').mockRejectedValueOnce(
+      new Error('Some error')
+    )
 
     await homeController.handler(mockRequest, mockedResponse)
 
-    // Check that fetchWithToken was called with the correct args
-    expect(fetchWithToken).toHaveBeenCalledWith(
-      mockRequest,
-      `/bank-details/${encodeURIComponent('Mocked Organisation')}`
-    )
+    expect(mockedResponse.response).toHaveBeenCalledWith({
+      error: 'Failed to render home page'
+    })
 
-    // Check cache set
-    expect(mockRequest.server.app.cache.set).toHaveBeenCalledWith(
-      'test-session-id',
-      expect.objectContaining({ apiData })
-    )
-
-    // Check view rendering
-    expect(mockedResponse.view).toHaveBeenCalledWith(
-      'home/index',
-      expect.objectContaining({
-        pageTitle: 'Home',
-        apiData
-      })
+    const responseObj = mockedResponse.response.mock.results[0].value
+    expect(responseObj.code).toHaveBeenCalledWith(
+      statusCodes.internalServerError
     )
   })
 })

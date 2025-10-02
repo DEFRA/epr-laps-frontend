@@ -5,6 +5,7 @@ import {
 } from './controller.js'
 import { vi, describe, test, beforeEach, expect } from 'vitest'
 import { statusCodes } from '../common/constants/status-codes.js'
+import { context } from '../../config/nunjucks/context/context.js'
 import { putWithToken } from '../auth/utils.js'
 
 const mockLogger = { error: vi.fn(), info: vi.fn() }
@@ -16,7 +17,7 @@ vi.mock('../../server/auth/utils.js', () => ({
   fetchWithToken: (...args) => mockFetchWithToken(...args),
   putWithToken: vi.fn()
 }))
-
+vi.mock('../../config/nunjucks/context/context.js')
 describe('#bankDetailsController', () => {
   const h = {
     view: vi.fn(),
@@ -119,53 +120,43 @@ describe('confirmBankDetailsController', () => {
   beforeEach(() => {
     mockViewReturn = 'rendered-view'
 
-    // Mock h.view
     mockH = {
       view: vi.fn(() => mockViewReturn)
     }
 
-    // Mock request
     mockRequest = {
       app: {
         translations: { 'local-authority': 'Local Authority' }
       },
-      currentLang: 'en',
-      state: {
-        userSession: {
-          sessionId: 'test-session-id'
-        }
-      },
-      server: {
-        app: {
-          cache: {
-            get: vi.fn()
-          }
-        }
-      }
+      currentLang: 'en'
     }
+
+    vi.clearAllMocks()
   })
 
-  it('should render view with apiData when present in session', async () => {
-    const apiDataMock = { accountNumber: '12345678', sortCode: '12-34-56' }
-    mockRequest.server.app.cache.get.mockResolvedValue({
-      apiData: apiDataMock
-    })
+  it('should render view with context data', async () => {
+    const contextData = {
+      apiData: { accountNumber: '12345678', sortCode: '12-34-56' },
+      authedUser: { organisationName: 'Some Council Name', relationships: [] }
+    }
+    context.mockResolvedValue(contextData)
 
+    // Act
     const result = await confirmBankDetailsController.handler(
       mockRequest,
       mockH
     )
 
-    expect(mockRequest.server.app.cache.get).toHaveBeenCalledWith(
-      'test-session-id'
-    )
+    // Assert
+    expect(context).toHaveBeenCalledWith(mockRequest)
     expect(mockH.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
       expect.objectContaining({
         pageTitle: 'Confirm Bank Details',
-        apiData: apiDataMock,
-        translations: { 'local-authority': 'Local Authority' },
-        currentLang: 'en'
+        translations: mockRequest.app.translations,
+        currentLang: 'en',
+        isContinueEnabled: false,
+        ...contextData
       })
     )
     expect(result).toBe(mockViewReturn)

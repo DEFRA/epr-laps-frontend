@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { config } from '../../config.js'
 import { buildNavigation } from './build-navigation.js'
 import { createLogger } from '../../../server/common/helpers/logging/logger.js'
+import { fetchWithToken } from '../../../server/auth/utils.js'
 
 const logger = createLogger()
 const assetPath = config.get('assetPath')
@@ -31,6 +32,20 @@ async function context(request) {
 
   authedUser.organisationName = displayOrgName
 
+  let apiData = null
+
+  if (authedUser?.currentRole === 'Head of Finance') {
+    try {
+      const path = `/bank-details/${encodeURIComponent(organisationName)}`
+      apiData = await fetchWithToken(request, path)
+      request.logger.info(
+        `Successfully fetched bank details for ${organisationName}`
+      )
+    } catch (err) {
+      request.logger.error(`Failed to fetch apiData in context:`, err)
+    }
+  }
+
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -42,6 +57,7 @@ async function context(request) {
   const navigation = await buildNavigation(request)
   return {
     authedUser,
+    apiData,
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',

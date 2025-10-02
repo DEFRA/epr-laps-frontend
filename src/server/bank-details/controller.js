@@ -3,6 +3,7 @@
  */
 import { statusCodes } from '../common/constants/status-codes.js'
 import { fetchWithToken, putWithToken } from '../../server/auth/utils.js'
+import { context } from '../../config/nunjucks/context/context.js'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -14,7 +15,7 @@ export const bankDetailsController = {
       // Fetch bank details via the wrapper function
       const path = `/bank-details/${encodeURIComponent(localAuthority)}`
       const payload = await fetchWithToken(request, path)
-
+      request.app.apiData = payload
       request.logger.info(
         `Successfully fetched bank details for ${localAuthority}`
       )
@@ -56,17 +57,14 @@ export const confirmBankDetailsController = {
     const translations = request.app.translations || {}
     const currentLang = request.app.currentLang || 'en'
 
-    const sessionId = request.state.userSession.sessionId
-    const userSession = await request.server.app.cache.get(sessionId)
-    const apiData = userSession?.apiData || null
-
+    const viewContext = await context(request)
     const isContinueEnabled = false
 
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       currentLang,
       translations,
-      apiData,
+      ...viewContext,
       isContinueEnabled
     })
   }

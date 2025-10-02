@@ -90,6 +90,7 @@ describe('context and cache', () => {
             organisationName: EN_NAME,
             relationships: []
           },
+          apiData: null,
           assetPath: '/public/assets',
           breadcrumbs: [],
           currentLang: 'en',
@@ -305,6 +306,10 @@ describe('context and cache', () => {
       }),
       state: {
         userSession: null
+      },
+      logger: {
+        info: vi.fn(),
+        error: vi.fn()
       }
     }
 
@@ -344,6 +349,7 @@ describe('context and cache', () => {
             organisationName: EN_NAME,
             relationships: []
           },
+          apiData: null,
           assetPath: '/public/assets',
           breadcrumbs: [],
           currentLang: 'en',
