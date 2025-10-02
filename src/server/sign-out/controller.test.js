@@ -3,11 +3,18 @@ import { statusCodes } from '../common/constants/status-codes.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
 import { signOutController } from './controller.js'
+import { removeUserSession } from '../common/helpers/auth/utils.js'
 
 vi.mock('../common/helpers/auth/get-oidc-config.js')
 
+vi.mock('../common/helpers/auth/utils.js', () => ({
+  removeUserSession: vi.fn(),
+  getUserSession: vi.fn()
+}))
+
 describe('#signOutController', () => {
   let server
+  let mockedResponse
 
   beforeAll(async () => {
     vi.mocked(getOidcConfig).mockResolvedValue({
@@ -25,10 +32,12 @@ describe('#signOutController', () => {
   })
 
   beforeEach(() => {
+    mockedResponse = { view: vi.fn(), redirect: vi.fn() }
+    vi.clearAllMocks()
+
     vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
       userName: 'test user'
     })
-    vi.clearAllMocks()
   })
 
   test('should redirect user when user is unauthenticated', async () => {
@@ -56,10 +65,39 @@ describe('#signOutController', () => {
         currentLang: 'en'
       }
     }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
     await signOutController.handler(mockRequest, mockedResponse)
 
+    expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
+      pageTitle: 'Sign out',
+      heading: 'Glamshire County Council'
+    })
+  })
+
+  it('should call removeUserSession if userSession exists', async () => {
+    const request = {
+      state: { userSession: { userId: '123' } },
+      auth: { credentials: { userId: '123' } }
+    }
+
+    await signOutController.handler(request, mockedResponse)
+
+    expect(removeUserSession).toHaveBeenCalledWith(
+      request,
+      request.auth.credentials
+    )
+    expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
+      pageTitle: 'Sign out',
+      heading: 'Glamshire County Council'
+    })
+  })
+
+  it('should not call removeUserSession if userSession is missing', async () => {
+    const request = { state: {} }
+
+    await signOutController.handler(request, mockedResponse)
+
+    expect(removeUserSession).not.toHaveBeenCalled()
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
       pageTitle: 'Sign out',
       heading: 'Glamshire County Council'
