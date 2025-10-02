@@ -75,11 +75,17 @@ describe('#signOutController', () => {
   })
 
   it('should call removeUserSession if userSession exists', async () => {
-    const request = { state: { userSession: { userId: '123' } } }
+    const request = {
+      state: { userSession: { userId: '123' } },
+      auth: { credentials: { userId: '123' } }
+    }
 
     await signOutController.handler(request, mockedResponse)
 
-    expect(removeUserSession).toHaveBeenCalledWith(request)
+    expect(removeUserSession).toHaveBeenCalledWith(
+      request,
+      request.auth.credentials
+    )
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
       pageTitle: 'Sign out',
       heading: 'Glamshire County Council'

@@ -4,7 +4,8 @@ export const signOutController = {
   handler: (request, h) => {
     // If user session exists, remove it
     if (request?.state?.userSession) {
-      removeUserSession(request)
+      const credentials = request.auth?.credentials
+      removeUserSession(request, credentials)
     }
 
     return h.view('sign-out/index.njk', {
