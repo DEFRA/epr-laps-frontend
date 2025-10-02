@@ -36,8 +36,8 @@ async function context(request) {
 
   if (authedUser?.currentRole === 'Head of Finance') {
     try {
-      const path = `/bank-details/${encodeURIComponent(organisationName)}`
-      apiData = await fetchWithToken(request, path)
+      const bankPath = `/bank-details/${encodeURIComponent(organisationName)}`
+      apiData = await fetchWithToken(request, bankPath)
       request.logger.info(
         `Successfully fetched bank details for ${organisationName}`
       )
