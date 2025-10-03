@@ -78,14 +78,9 @@ export const bankDetailsConfirmedController = {
 
     try {
       viewContext = await context(request)
-      const {
-        bankApiData,
-        currentLang: ctxCurrentLang,
-        translations: ctxTranslations = {}
-      } = viewContext
+      const { bankApiData, currentLang: ctxCurrentLang } = viewContext
 
       currentLang = ctxCurrentLang
-      translations = ctxTranslations
 
       // Call reusable PUT function
       await putWithToken(
