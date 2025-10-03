@@ -6,10 +6,9 @@ import { context } from '../../config/nunjucks/context/context.js'
 
 export const homeController = {
   handler: async (request, h) => {
-    const translations = request.app.translations || {}
-    const currentLang = request.app.currentLang || 'en'
     try {
       const viewContext = await context(request)
+      const { currentLang, translations } = viewContext
 
       return h.view('home/index', {
         pageTitle: 'Home',

@@ -90,7 +90,7 @@ describe('context and cache', () => {
 
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
-          apiData: null,
+          bankApiData: null,
           authedUser: {
             organisationName: EN_NAME,
             relationships: []
@@ -345,7 +345,7 @@ describe('context and cache', () => {
 
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
-          apiData: null,
+          bankApiData: null,
           authedUser: {
             organisationName: EN_NAME,
             relationships: []
@@ -420,7 +420,7 @@ describe('context and cache', () => {
         mockRequest,
         `/bank-details/${encodeURIComponent(EN_NAME)}`
       )
-      expect(ctx.apiData).toEqual(fakeApiData)
+      expect(ctx.bankApiData).toEqual(fakeApiData)
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         `Successfully fetched bank details for ${EN_NAME}`
       )
@@ -432,7 +432,7 @@ describe('context and cache', () => {
 
       const ctx = await contextImport.context(mockRequest)
 
-      expect(ctx.apiData).toBeNull()
+      expect(ctx.bankApiData).toBeNull()
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         'Failed to fetch apiData in context:',
         error

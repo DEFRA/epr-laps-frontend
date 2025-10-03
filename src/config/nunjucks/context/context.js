@@ -32,12 +32,12 @@ async function context(request) {
 
   authedUser.organisationName = displayOrgName
 
-  let apiData = null
+  let bankApiData = null
 
   if (authedUser?.currentRole === 'Head of Finance') {
     try {
       const bankPath = `/bank-details/${encodeURIComponent(organisationName)}`
-      apiData = await fetchWithToken(request, bankPath)
+      bankApiData = await fetchWithToken(request, bankPath)
       request.logger.info(
         `Successfully fetched bank details for ${organisationName}`
       )
@@ -57,7 +57,7 @@ async function context(request) {
   const navigation = await buildNavigation(request)
   return {
     authedUser,
-    apiData,
+    bankApiData,
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',

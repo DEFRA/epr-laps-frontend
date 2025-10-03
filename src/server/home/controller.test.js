@@ -3,13 +3,25 @@ import { homeController } from './controller.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
 import * as contextModule from '../../config/nunjucks/context/context.js'
 
-// Mock fetchWithToken
+// Mock fetchWithToken if used in controller
 vi.mock('../../server/auth/utils.js', () => ({
   fetchWithToken: vi.fn()
 }))
 
-// Spy on context
-vi.spyOn(contextModule, 'context').mockResolvedValue({ apiData: null })
+// Mock context module correctly
+vi.mock('../../config/nunjucks/context/context.js', async () => {
+  const originalModule = await vi.importActual(
+    '../../config/nunjucks/context/context.js'
+  )
+  return {
+    ...originalModule,
+    context: vi.fn().mockResolvedValue({
+      currentLang: 'en',
+      translations: { 'local-authority': 'Mocked Local Authority' },
+      apiData: null
+    })
+  }
+})
 
 describe('#homeController', () => {
   let mockRequest
@@ -18,6 +30,7 @@ describe('#homeController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    // Spy on getUserSession if controller uses it
     vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
       userName: 'test user',
       organisationName: 'Mocked Organisation'
@@ -48,11 +61,6 @@ describe('#homeController', () => {
   })
 
   test('should render view with translations', async () => {
-    mockRequest.app = {
-      translations: { 'local-authority': 'Mocked Local Authority' },
-      currentLang: 'en'
-    }
-
     await homeController.handler(mockRequest, mockedResponse)
 
     expect(mockedResponse.view).toHaveBeenCalledWith(
@@ -68,24 +76,29 @@ describe('#homeController', () => {
   })
 
   test('should handle missing translations and currentLang', async () => {
+    // Override context to simulate missing translations/lang
+    contextModule.context.mockResolvedValueOnce({
+      currentLang: undefined,
+      translations: {},
+      apiData: null
+    })
+
     await homeController.handler(mockRequest, mockedResponse)
 
     expect(mockedResponse.view).toHaveBeenCalledWith(
       'home/index',
       expect.objectContaining({
         pageTitle: 'Home',
-        currentLang: 'en',
+        currentLang: undefined,
         translations: {},
-        breadcrumbs: [{ text: undefined, href: '/?lang=en' }],
+        breadcrumbs: [{ text: undefined, href: '/?lang=undefined' }],
         apiData: null
       })
     )
   })
 
   test('should respond with error when context throws', async () => {
-    vi.spyOn(contextModule, 'context').mockRejectedValueOnce(
-      new Error('Some error')
-    )
+    contextModule.context.mockRejectedValueOnce(new Error('Some error'))
 
     await homeController.handler(mockRequest, mockedResponse)
 

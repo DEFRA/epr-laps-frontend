@@ -8,8 +8,8 @@ import { context } from '../../config/nunjucks/context/context.js'
 export const bankDetailsController = {
   handler: async (request, h) => {
     try {
-      const translations = request.app.translations || {}
-      const currentLang = request.app.currentLang || 'en'
+      const viewContext = await context(request)
+      const { currentLang, translations } = viewContext
 
       const localAuthority = request.auth.credentials.organisationName
       // Fetch bank details via the wrapper function
@@ -54,17 +54,16 @@ export const bankDetailsController = {
 
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
-    const translations = request.app.translations || {}
-    const currentLang = request.app.currentLang || 'en'
-
     const viewContext = await context(request)
+    const { bankApiData, translations, currentLang } = viewContext
+
     const isContinueEnabled = false
 
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       currentLang,
       translations,
-      ...viewContext,
+      bankApiData,
       isContinueEnabled
     })
   }
@@ -72,23 +71,28 @@ export const confirmBankDetailsController = {
 
 export const bankDetailsConfirmedController = {
   handler: async (request, h) => {
-    const translations = request.app.translations || {}
-    const currentLang = request.app.currentLang || 'en'
-    const sessionId = request.state.userSession.sessionId
-    const userSession = await request.server.app.cache.get(sessionId)
-    const apiData = userSession?.apiData || null
     const localAuthority = request.auth.credentials.organisationName
-
+    let viewContext
+    let translations
+    let currentLang
     try {
+      viewContext = await context(request)
+      const {
+        bankApiData,
+        translations: ctxTranslations,
+        currentLang: ctxCurrentLang
+      } = viewContext
+      translations = ctxTranslations
+      currentLang = ctxCurrentLang
       // Call reusable PUT function
       await putWithToken(
         request,
         `bank-details/${encodeURIComponent(localAuthority)}`,
         {
-          id: apiData.id,
-          accountName: apiData.accountName,
-          sortCode: apiData.sortCode,
-          accountNumber: apiData.accountNumber,
+          id: bankApiData.id,
+          accountName: bankApiData.accountName,
+          sortCode: bankApiData.sortCode,
+          accountNumber: bankApiData.accountNumber,
           confirmed: true
         }
       )
@@ -103,7 +107,7 @@ export const bankDetailsConfirmedController = {
         pageTitle: 'Confirm Bank Details',
         currentLang,
         translations,
-        apiData,
+        ...viewContext,
         isContinueEnabled: true,
         error: 'Failed to update bank details. Please try again.'
       })
