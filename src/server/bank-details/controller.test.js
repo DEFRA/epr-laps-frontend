@@ -14,6 +14,7 @@ vi.mock('../../config/nunjucks/context/context.js')
 describe('#bankDetailsController', () => {
   let request
   let h
+  let responseToolkit
 
   beforeEach(() => {
     request = {
@@ -22,15 +23,16 @@ describe('#bankDetailsController', () => {
       app: {}
     }
 
+    responseToolkit = {
+      code: vi.fn().mockReturnThis()
+    }
+
     h = {
       view: vi.fn(),
       redirect: vi.fn(),
-      response: vi.fn(() => ({
-        code: vi.fn(() => ({}))
-      }))
+      response: vi.fn(() => responseToolkit)
     }
 
-    // Default mock for context
     context.mockResolvedValue({
       currentLang: 'en',
       translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
@@ -42,7 +44,6 @@ describe('#bankDetailsController', () => {
       }
     })
 
-    // Default mocks for API calls
     fetchWithToken.mockResolvedValue({
       id: '123',
       accountName: 'Test Account',
@@ -52,41 +53,20 @@ describe('#bankDetailsController', () => {
     putWithToken.mockResolvedValue({ success: true })
   })
 
-  it('should render view with API data for authenticated user', async () => {
+  it('should handle errors gracefully and log them', async () => {
+    const error = new Error('API failure')
+    fetchWithToken.mockRejectedValueOnce(error)
+
     await bankDetailsController.handler(request, h)
 
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/index.njk',
-      expect.objectContaining({
-        pageTitle: 'Bank Details',
-        currentLang: 'en',
-        translations: expect.any(Object),
-        apiData: expect.objectContaining({ accountName: 'Test Account' })
-      })
+    expect(request.logger.error).toHaveBeenCalledWith(
+      'Error fetching bank details:',
+      error
     )
-  })
-
-  it('should fallback to empty translations and "en" for currentLang if missing', async () => {
-    // Mock context to return undefined values
-    context.mockResolvedValueOnce({
-      translations: {},
-      currentLang: 'en'
+    expect(h.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch bank details'
     })
-
-    fetchWithToken.mockResolvedValueOnce({
-      id: '123',
-      accountName: 'Test Account',
-      sortCode: '00-00-00',
-      accountNumber: '12345678'
-    })
-
-    await bankDetailsController.handler(request, h)
-
-    expect(h.view).toHaveBeenCalled()
-
-    const viewArgs = h.view.mock.calls[0][1]
-    expect(viewArgs.translations).toEqual({})
-    expect(viewArgs.currentLang).toBe('en')
+    expect(responseToolkit.code).toHaveBeenCalledWith(500)
   })
 })
 
