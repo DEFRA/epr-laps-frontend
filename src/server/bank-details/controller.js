@@ -73,17 +73,20 @@ export const bankDetailsConfirmedController = {
   handler: async (request, h) => {
     const localAuthority = request.auth.credentials.organisationName
     let viewContext
-    let translations
     let currentLang
+    let translations
+
     try {
       viewContext = await context(request)
       const {
         bankApiData,
-        translations: ctxTranslations,
-        currentLang: ctxCurrentLang
+        currentLang: ctxCurrentLang,
+        translations: ctxTranslations = {}
       } = viewContext
-      translations = ctxTranslations
+
       currentLang = ctxCurrentLang
+      translations = ctxTranslations
+
       // Call reusable PUT function
       await putWithToken(
         request,
@@ -102,7 +105,6 @@ export const bankDetailsConfirmedController = {
         `/bank-details/bank-details-confirmed?lang=${currentLang}`
       )
     } catch (err) {
-      // Re-render the form with error
       return h.view('bank-details/confirm-bank-details.njk', {
         pageTitle: 'Confirm Bank Details',
         currentLang,
