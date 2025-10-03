@@ -15,7 +15,7 @@ export const signOutController = {
     }
 
     removeUserSession(request, request.auth.credentials)
-    const referrer = request.headers.referer
+    const referrer = request.headers.referer || `${request.server.info.uri}/`
     const { idToken } = userSession
     request.logger.info('User session removed. Signing user out of Defra ID')
     const logoutUrl = encodeURI(
