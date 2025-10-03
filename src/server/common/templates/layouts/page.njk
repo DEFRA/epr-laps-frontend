@@ -5,10 +5,11 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 {% from "language-toggle/macro.njk" import dwpLanguageToggle %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
-
+{% from "loader/macro.njk" import appLoader %}
 {% set mainClasses = "app-main-wrapper" %}
 {% set language = currentLang %}
 
@@ -50,12 +51,18 @@
   
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
-      <div class="govuk-grid-column-two-thirds">
-        
+    <div class="govuk-grid-column-two-thirds">
+      {% if showBackLink %}
+        {{ govukBackLink({
+          text: translations['back-link'],
+          href: "javascript:history.back()"
+        }) }}
+      {% else %}
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
-        
+              {% endif %}
       </div>
-    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+
+      <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
          {{
           dwpLanguageToggle({
             selectedLang: currentLang,

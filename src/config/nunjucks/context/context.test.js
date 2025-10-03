@@ -1,5 +1,9 @@
 import { vi } from 'vitest'
 import { config } from '../../config.js'
+import { fetchWithToken } from '../../../server/auth/utils.js'
+vi.mock('../../../server/auth/utils.js', () => ({
+  fetchWithToken: vi.fn()
+}))
 
 const mockReadFileSync = vi.fn()
 const mockLoggerError = vi.fn()
@@ -86,6 +90,7 @@ describe('context and cache', () => {
 
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
+          bankApiData: null,
           authedUser: {
             organisationName: EN_NAME,
             relationships: []
@@ -340,6 +345,7 @@ describe('context and cache', () => {
 
       test('Should provide expected context', () => {
         expect(contextResult).toEqual({
+          bankApiData: null,
           authedUser: {
             organisationName: EN_NAME,
             relationships: []
@@ -370,6 +376,67 @@ describe('context and cache', () => {
           }
         })
       })
+    })
+  })
+
+  describe('context API data fetch', () => {
+    const mockRequest = {
+      path: '/?lang=en',
+      app: {
+        translations: {},
+        currentLang: 'en'
+      },
+      logger: {
+        info: vi.fn(),
+        error: vi.fn()
+      },
+      getUserSession: vi.fn().mockResolvedValue({
+        organisationName: EN_NAME,
+        relationships: [],
+        currentRole: 'Head of Finance'
+      }),
+      state: {
+        userSession: null
+      }
+    }
+
+    let contextImport
+
+    beforeAll(async () => {
+      contextImport = await import('./context.js')
+    })
+
+    beforeEach(() => {
+      vi.mocked(fetchWithToken).mockReset()
+    })
+
+    it('should fetch apiData when currentRole is Head of Finance', async () => {
+      const fakeApiData = { bankAccount: '12345' }
+      vi.mocked(fetchWithToken).mockResolvedValue(fakeApiData)
+
+      const ctx = await contextImport.context(mockRequest)
+
+      expect(fetchWithToken).toHaveBeenCalledWith(
+        mockRequest,
+        `/bank-details/${encodeURIComponent(EN_NAME)}`
+      )
+      expect(ctx.bankApiData).toEqual(fakeApiData)
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        `Successfully fetched bank details for ${EN_NAME}`
+      )
+    })
+
+    it('should log an error if fetchWithToken fails', async () => {
+      const error = new Error('API failed')
+      vi.mocked(fetchWithToken).mockRejectedValue(error)
+
+      const ctx = await contextImport.context(mockRequest)
+
+      expect(ctx.bankApiData).toBeNull()
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        'Failed to fetch apiData in context:',
+        error
+      )
     })
   })
 })

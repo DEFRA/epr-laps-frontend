@@ -31,6 +31,7 @@ export const getToken = (request) => {
   // get the token from the request auth credentials or cookie
   const token =
     request.auth?.credentials?.token || request.state?.userSession?.token
+
   if (!token) {
     throw new Error('Unauthorized')
   }
@@ -53,6 +54,18 @@ export const getRequest = async (url, headers) => {
   return payload
 }
 
+export const putRequest = async (url, payload, headers = {}) => {
+  const { payload: responsePayload } = await Wreck.put(url, {
+    payload: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    json: true
+  })
+  return responsePayload
+}
+
 export const fetchWithToken = async (request, path) => {
   const { token } = getToken(request)
 
@@ -62,4 +75,15 @@ export const fetchWithToken = async (request, path) => {
   const headers = setHeaders(token)
 
   return getRequest(url, headers)
+}
+
+export const putWithToken = async (request, path, payload) => {
+  const { token } = getToken(request)
+
+  const apiBaseUrl = config.get('backendApiUrl')
+  const url = `${apiBaseUrl}${path}`
+
+  const headers = setHeaders(token)
+
+  return putRequest(url, payload, headers)
 }

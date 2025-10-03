@@ -1,0 +1,34 @@
+@use "govuk-frontend" as *;
+
+.js-enabled {
+  .app-loader {
+    position: relative;
+    display: inline-block;
+    width: govuk-spacing(9);
+    height: govuk-spacing(9);
+    border-radius: 50%;
+  }
+
+  .app-loader--is-loading {
+    width: govuk-spacing(9);
+    height: govuk-spacing(9);
+    border: 0.5rem solid govuk-colour("light-grey");
+    border-top-color: $govuk-brand-colour;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    margin-left: govuk-spacing(1);
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+}
