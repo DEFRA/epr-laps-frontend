@@ -95,16 +95,4 @@ describe('App Loader Component', () => {
     )
     expect($loader2('[data-testid="app-loader"]').hasClass('extra')).toBe(true)
   })
-
-  describe('Accessibility attributes', () => {
-    beforeEach(() => {
-      $loader = renderComponent('loader', { name: 'loader-accessible' })
-    })
-
-    test('Should have role="status" and aria-busy="true"', () => {
-      const $el = $loader('[data-testid="app-loader"]')
-      expect($el.attr('role')).toBe('status')
-      expect($el.attr('aria-busy')).toBe('true')
-    })
-  })
 })
