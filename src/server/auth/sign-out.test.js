@@ -66,4 +66,52 @@ describe('#signOutController', () => {
       `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout`
     )
   })
+
+  it('uses referer if present', async () => {
+    const mockedUserSession = {
+      logoutUrl: 'http://logout.example.com',
+      idToken: 'testId'
+    }
+
+    getUserSession.mockReturnValueOnce(mockedUserSession)
+
+    const request = {
+      headers: { referer: 'http://example.com/' },
+      server: { info: { uri: 'http://localhost' } },
+      auth: { credentials: {} },
+      logger: { info: vi.fn(), debug: vi.fn() }
+    }
+
+    const h = { redirect: vi.fn() }
+
+    await signOutController.handler(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      expect.stringContaining('http://example.com/')
+    )
+  })
+
+  it('uses fallback if referer missing', async () => {
+    const mockedUserSession = {
+      logoutUrl: 'http://logout.example.com',
+      idToken: 'testId'
+    }
+
+    getUserSession.mockReturnValueOnce(mockedUserSession)
+
+    const request = {
+      headers: {},
+      server: { info: { uri: 'http://localhost' } },
+      auth: { credentials: {} },
+      logger: { info: vi.fn(), debug: vi.fn() }
+    }
+
+    const h = { redirect: vi.fn() }
+
+    await signOutController.handler(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      expect.stringContaining('http://localhost')
+    )
+  })
 })
