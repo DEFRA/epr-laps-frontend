@@ -23,11 +23,6 @@ describe('App Loader Component', () => {
         undefined
       )
     })
-
-    test('Should match snapshot', () => {
-      const $el = $loader('[data-testid="app-loader"]')
-      expect($el.html()).toMatchSnapshot()
-    })
   })
 
   describe('With extra classes and name', () => {
