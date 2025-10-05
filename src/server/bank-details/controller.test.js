@@ -88,7 +88,7 @@ describe('#bankDetailsController', () => {
         apiData: expect.any(Object)
       })
     )
-    expect(result).toBeUndefined() // handler returns h.view (no explicit return)
+    expect(result).toBeUndefined()
   })
 
   it('should handle Unauthorized error separately', async () => {
@@ -182,6 +182,23 @@ describe('#bankDetailsConfirmedController', () => {
       response: vi.fn(() => h)
     }
     h.response.code = vi.fn(() => h)
+
+    // Default mocks
+    context.mockResolvedValue({
+      currentLang: 'en',
+      translations: {
+        'laps-home': 'Home',
+        'bank-details': 'Bank Details'
+      },
+      bankApiData: {
+        id: '123',
+        accountName: 'Test Account',
+        sortCode: '00-00-00',
+        accountNumber: '12345678'
+      }
+    })
+
+    putWithToken.mockResolvedValue({ success: true })
   })
 
   it('calls putWithToken with correct arguments and redirects on success', async () => {
@@ -190,10 +207,60 @@ describe('#bankDetailsConfirmedController', () => {
     expect(putWithToken).toHaveBeenCalledWith(
       request,
       'bank-details/Test%20Local%20Authority',
-      expect.objectContaining({ confirmed: true })
+      expect.objectContaining({
+        id: '123',
+        accountName: 'Test Account',
+        sortCode: '00-00-00',
+        accountNumber: '12345678',
+        confirmed: true
+      })
     )
     expect(h.redirect).toHaveBeenCalledWith(
       '/bank-details/bank-details-confirmed?lang=en'
+    )
+  })
+
+  it('renders the confirm-bank-details view when an error occurs (catch block)', async () => {
+    // Simulate an error thrown from putWithToken
+    putWithToken.mockRejectedValueOnce(new Error('Network failure'))
+
+    const viewContext = {
+      currentLang: 'en',
+      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
+      bankApiData: { id: '123' }
+    }
+
+    context.mockResolvedValueOnce(viewContext)
+
+    await bankDetailsConfirmedController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        pageTitle: 'Confirm Bank Details',
+        currentLang: 'en',
+        ...viewContext,
+        isContinueEnabled: true,
+        error: 'Failed to update bank details. Please try again.'
+      })
+    )
+  })
+
+  it('renders confirm-bank-details view even if context fails before setting vars', async () => {
+    // Simulate context throwing before currentLang or translations are set
+    context.mockRejectedValueOnce(new Error('Context failure'))
+
+    await bankDetailsConfirmedController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        pageTitle: 'Confirm Bank Details',
+        currentLang: undefined,
+        translations: undefined,
+        isContinueEnabled: true,
+        error: 'Failed to update bank details. Please try again.'
+      })
     )
   })
 })
