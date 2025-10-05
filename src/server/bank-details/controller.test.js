@@ -10,6 +10,12 @@ import { context } from '../../config/nunjucks/context/context.js'
 // Mock dependencies
 vi.mock('../../server/auth/utils.js')
 vi.mock('../../config/nunjucks/context/context.js')
+vi.mock('../../utils/status-codes.js', () => ({
+  statusCodes: {
+    unauthorized: 401,
+    internalServerError: 500
+  }
+}))
 
 describe('#bankDetailsController', () => {
   let request
@@ -35,12 +41,9 @@ describe('#bankDetailsController', () => {
 
     context.mockResolvedValue({
       currentLang: 'en',
-      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
-      bankApiData: {
-        id: '123',
-        accountName: 'Test Account',
-        sortCode: '00-00-00',
-        accountNumber: '12345678'
+      translations: {
+        'laps-home': 'Home',
+        'bank-details': 'Bank Details'
       }
     })
 
@@ -50,10 +53,59 @@ describe('#bankDetailsController', () => {
       sortCode: '00-00-00',
       accountNumber: '12345678'
     })
-    putWithToken.mockResolvedValue({ success: true })
   })
 
-  it('should handle errors gracefully and log them', async () => {
+  it('should successfully render the bank details view', async () => {
+    const result = await bankDetailsController.handler(request, h)
+
+    expect(context).toHaveBeenCalledWith(request)
+    expect(fetchWithToken).toHaveBeenCalledWith(
+      request,
+      '/bank-details/Test%20Local%20Authority'
+    )
+    expect(request.app.apiData).toEqual({
+      id: '123',
+      accountName: 'Test Account',
+      sortCode: '00-00-00',
+      accountNumber: '12345678'
+    })
+    expect(request.logger.info).toHaveBeenCalledWith(
+      'Successfully fetched bank details for Test Local Authority'
+    )
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/index.njk',
+      expect.objectContaining({
+        pageTitle: 'Bank Details',
+        currentLang: 'en',
+        translations: {
+          'laps-home': 'Home',
+          'bank-details': 'Bank Details'
+        },
+        breadcrumbs: [
+          { text: 'Home', href: '/?lang=en' },
+          { text: 'Bank Details', href: '/bank-details?lang=en' }
+        ],
+        apiData: expect.any(Object)
+      })
+    )
+    expect(result).toBeUndefined() // handler returns h.view (no explicit return)
+  })
+
+  it('should handle Unauthorized error separately', async () => {
+    const unauthorizedError = new Error('Unauthorized')
+    fetchWithToken.mockRejectedValueOnce(unauthorizedError)
+
+    await bankDetailsController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      'Error fetching bank details:',
+      unauthorizedError
+    )
+    expect(h.response).toHaveBeenCalledWith({ error: 'Unauthorized' })
+    expect(responseToolkit.code).toHaveBeenCalledWith(401)
+  })
+
+  it('should handle generic errors gracefully', async () => {
     const error = new Error('API failure')
     fetchWithToken.mockRejectedValueOnce(error)
 
