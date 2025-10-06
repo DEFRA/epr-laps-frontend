@@ -16,17 +16,13 @@ export const signOutController = {
     }
 
     removeUserSession(request, request.auth.credentials)
-    const referrer =
-      request.headers.referer || config.get('defraId.redirectUrl')
     const { idToken } = userSession
     request.logger.info('User session removed. Signing user out of Defra ID')
-    // Remove trailing slash if present
-    const normalizedReferrer = referrer.endsWith('/')
-      ? referrer.slice(0, -1)
-      : referrer
+    // Always use fallback URL from config
+    const fallbackUrl = config.get('defraId.redirectUrl').replace(/\/$/, '') // remove trailing slash if present
 
     const logoutUrl = encodeURI(
-      `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${normalizedReferrer}/logout`
+      `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${fallbackUrl}/logout`
     )
 
     request.logger.debug(`Redirecting user to: ${logoutUrl}`)
