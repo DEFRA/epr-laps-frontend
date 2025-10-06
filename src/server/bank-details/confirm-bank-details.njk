@@ -59,8 +59,6 @@
 
         </fieldset>
 
-        {% from "govuk/components/details/macro.njk" import govukDetails %}
-
         {% set detailsHtml %}
           <p>{{ translations['to-update-your-'] }}, {{ translations["please-raise-a-"] | safe }}</p>
 
@@ -93,10 +91,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     const checkbox = document.getElementById('confirm-bank-details');
     const continueButton = document.querySelector('button[type="submit"]');
-    console.log('Checkbox:', checkbox, 'Button:', continueButton);
 
     checkbox.addEventListener('change', function () {
-      console.log('Checkbox changed:', checkbox.checked);
       continueButton.disabled = !checkbox.checked;
     });
   });

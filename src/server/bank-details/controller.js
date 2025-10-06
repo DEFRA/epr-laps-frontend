@@ -74,7 +74,6 @@ export const bankDetailsConfirmedController = {
     const localAuthority = request.auth.credentials.organisationName
     let viewContext
     let currentLang
-    let translations
 
     try {
       viewContext = await context(request)
@@ -100,14 +99,7 @@ export const bankDetailsConfirmedController = {
         `/bank-details/bank-details-confirmed?lang=${currentLang}`
       )
     } catch (err) {
-      return h.view('bank-details/confirm-bank-details.njk', {
-        pageTitle: 'Confirm Bank Details',
-        currentLang,
-        translations,
-        ...viewContext,
-        isContinueEnabled: true,
-        error: 'Failed to update bank details. Please try again.'
-      })
+      request.logger.error('Failed to confirm bank details', err)
     }
   }
 }

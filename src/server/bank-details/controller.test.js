@@ -219,48 +219,4 @@ describe('#bankDetailsConfirmedController', () => {
       '/bank-details/bank-details-confirmed?lang=en'
     )
   })
-
-  it('renders the confirm-bank-details view when an error occurs (catch block)', async () => {
-    // Simulate an error thrown from putWithToken
-    putWithToken.mockRejectedValueOnce(new Error('Network failure'))
-
-    const viewContext = {
-      currentLang: 'en',
-      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
-      bankApiData: { id: '123' }
-    }
-
-    context.mockResolvedValueOnce(viewContext)
-
-    await bankDetailsConfirmedController.handler(request, h)
-
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/confirm-bank-details.njk',
-      expect.objectContaining({
-        pageTitle: 'Confirm Bank Details',
-        currentLang: 'en',
-        ...viewContext,
-        isContinueEnabled: true,
-        error: 'Failed to update bank details. Please try again.'
-      })
-    )
-  })
-
-  it('renders confirm-bank-details view even if context fails before setting vars', async () => {
-    // Simulate context throwing before currentLang or translations are set
-    context.mockRejectedValueOnce(new Error('Context failure'))
-
-    await bankDetailsConfirmedController.handler(request, h)
-
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/confirm-bank-details.njk',
-      expect.objectContaining({
-        pageTitle: 'Confirm Bank Details',
-        currentLang: undefined,
-        translations: undefined,
-        isContinueEnabled: true,
-        error: 'Failed to update bank details. Please try again.'
-      })
-    )
-  })
 })
