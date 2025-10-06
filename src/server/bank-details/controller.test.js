@@ -63,7 +63,7 @@ describe('#bankDetailsController', () => {
       request,
       '/bank-details/Test%20Local%20Authority'
     )
-    expect(request.app.apiData).toEqual({
+    expect(request.app.bankApiData).toEqual({
       id: '123',
       accountName: 'Test Account',
       sortCode: '00-00-00',

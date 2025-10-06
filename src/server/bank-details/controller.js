@@ -15,7 +15,7 @@ export const bankDetailsController = {
       // Fetch bank details via the wrapper function
       const path = `/bank-details/${encodeURIComponent(localAuthority)}`
       const payload = await fetchWithToken(request, path)
-      request.app.apiData = payload
+      request.app.bankApiData = payload
       request.logger.info(
         `Successfully fetched bank details for ${localAuthority}`
       )
@@ -100,6 +100,9 @@ export const bankDetailsConfirmedController = {
       )
     } catch (err) {
       request.logger.error('Failed to confirm bank details', err)
+      return h
+        .response({ error: 'Failed to fetch bank details' })
+        .code(statusCodes.internalServerError)
     }
   }
 }
