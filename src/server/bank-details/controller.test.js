@@ -168,22 +168,27 @@ describe('#confirmBankDetailsController', () => {
 describe('#bankDetailsConfirmedController', () => {
   let request
   let h
+  let mockCode
 
   beforeEach(() => {
+    // Arrange: set up mocks
     request = {
       auth: { credentials: { organisationName: 'Test Local Authority' } },
       logger: { info: vi.fn(), error: vi.fn() },
       app: {}
     }
 
+    mockCode = vi.fn(() => h)
+
     h = {
       view: vi.fn(),
       redirect: vi.fn(),
-      response: vi.fn(() => h)
+      response: vi.fn(() => ({
+        code: mockCode
+      }))
     }
-    h.response.code = vi.fn(() => h)
 
-    // Default mocks
+    // Mock context() default success
     context.mockResolvedValue({
       currentLang: 'en',
       translations: {
@@ -198,7 +203,12 @@ describe('#bankDetailsConfirmedController', () => {
       }
     })
 
+    // Mock putWithToken default success
     putWithToken.mockResolvedValue({ success: true })
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('calls putWithToken with correct arguments and redirects on success', async () => {
@@ -215,8 +225,45 @@ describe('#bankDetailsConfirmedController', () => {
         confirmed: true
       })
     )
+
     expect(h.redirect).toHaveBeenCalledWith(
       '/bank-details/bank-details-confirmed?lang=en'
     )
+  })
+
+  it('returns an internal server error when putWithToken throws', async () => {
+    putWithToken.mockRejectedValue(new Error('Network error'))
+
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      'Failed to confirm bank details',
+      expect.any(Error)
+    )
+
+    expect(h.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch bank details'
+    })
+
+    expect(mockCode).toHaveBeenCalledWith(500)
+    expect(result).toEqual(h)
+  })
+
+  it('handles errors thrown by context()', async () => {
+    context.mockRejectedValue(new Error('Context failure'))
+
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      'Failed to confirm bank details',
+      expect.any(Error)
+    )
+
+    expect(h.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch bank details'
+    })
+
+    expect(mockCode).toHaveBeenCalledWith(500)
+    expect(result).toEqual(h)
   })
 })
