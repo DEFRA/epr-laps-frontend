@@ -1,87 +1,85 @@
-import { createServer } from '../server'
-import { getUserSession, removeUserSession } from '../common/helpers/auth/utils'
 import { signOutController } from './sign-out'
+import { getUserSession, removeUserSession } from '../common/helpers/auth/utils'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 
-vi.mock('../common/helpers/auth/get-oidc-config.js')
+vi.mock('../../config/config.js', () => ({
+  config: {
+    get: vi.fn((key) =>
+      key === 'defraId.redirectUrl' ? 'http://fallback-url/' : ''
+    )
+  }
+}))
+
+// Mock logger options to avoid Pino errors
+vi.mock('../common/helpers/logging/logger-options.js', () => ({
+  loggerOptions: { level: 'info', redact: [] }
+}))
+
 vi.mock('../common/helpers/auth/utils', () => ({
   getUserSession: vi.fn(),
   removeUserSession: vi.fn()
 }))
 
-describe('#signOutController', () => {
-  let server
+vi.mock('../common/helpers/auth/get-oidc-config.js')
 
-  beforeAll(async () => {
+describe('#signOutController', () => {
+  afterEach(() => vi.clearAllMocks())
+
+  beforeAll(() => {
     vi.mocked(getOidcConfig).mockResolvedValue({
       authorization_endpoint: 'https://test-idm-endpoint/authorize',
       token_endpoint: 'https://test-idm-endpoint/token',
       end_session_endpoint: 'https://test-idm-endpoint/logout'
     })
-
-    server = await createServer()
-    await server.initialize()
   })
 
-  afterAll(async () => {
-    getOidcConfig.mockReset()
-    await server.stop({ timeout: 0 })
-  })
-
-  test('should redirect users to auth page when there is no authentication', async () => {
+  test('redirects to / when no authentication', async () => {
     getUserSession.mockReturnValueOnce(null)
-    const mockedRequest = {
+    const request = {
       auth: { credentials: {} },
       logger: { info: vi.fn(), debug: vi.fn() }
     }
-    const mockedResponse = { redirect: vi.fn() }
+    const h = { redirect: vi.fn() }
 
-    await signOutController.handler(mockedRequest, mockedResponse)
+    await signOutController.handler(request, h)
 
-    expect(mockedResponse.redirect).toHaveBeenCalledWith('/')
+    expect(h.redirect).toHaveBeenCalledWith('/')
   })
 
-  test('should call removeUserSession and redirect uri when user is authenticated', async () => {
-    const mockedUserSession = {
-      logoutUrl: 'testLogout',
-      idToken: 'testId'
-    }
+  test('removes session and redirects when authenticated', async () => {
+    const mockedUserSession = { logoutUrl: 'testLogout', idToken: 'testId' }
+    getUserSession.mockReturnValueOnce(mockedUserSession)
 
-    const mockedRequest = {
-      auth: { credentials: { sessionId: 'testSessionId' } },
+    const request = {
+      auth: { credentials: { sessionId: 'abc' } },
       headers: { referer: 'http://localhost:3000/' },
       logger: { info: vi.fn(), debug: vi.fn() }
     }
+    const h = { redirect: vi.fn() }
 
-    const mockedResponse = { redirect: vi.fn() }
+    await signOutController.handler(request, h)
 
-    getUserSession.mockReturnValueOnce(mockedUserSession)
-
-    await signOutController.handler(mockedRequest, mockedResponse)
     expect(removeUserSession).toHaveBeenCalledWith(
-      mockedRequest,
-      mockedRequest.auth.credentials
+      request,
+      request.auth.credentials
     )
-    expect(mockedResponse.redirect).toHaveBeenCalledWith(
-      `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout`
+    expect(h.redirect).toHaveBeenCalledWith(
+      'testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout'
     )
   })
 
-  it('uses referer if present', async () => {
+  test('uses referer if present', async () => {
     const mockedUserSession = {
       logoutUrl: 'http://logout.example.com',
       idToken: 'testId'
     }
-
     getUserSession.mockReturnValueOnce(mockedUserSession)
 
     const request = {
       headers: { referer: 'http://example.com/' },
-      server: { info: { uri: 'http://localhost' } },
       auth: { credentials: {} },
       logger: { info: vi.fn(), debug: vi.fn() }
     }
-
     const h = { redirect: vi.fn() }
 
     await signOutController.handler(request, h)
@@ -91,27 +89,42 @@ describe('#signOutController', () => {
     )
   })
 
-  it('uses fallback if referer missing', async () => {
+  test('redirects to fallback URL when referer is missing', async () => {
     const mockedUserSession = {
       logoutUrl: 'http://logout.example.com',
       idToken: 'testId'
     }
-
     getUserSession.mockReturnValueOnce(mockedUserSession)
 
     const request = {
       headers: {},
-      server: { info: { uri: 'http://localhost' } },
       auth: { credentials: {} },
       logger: { info: vi.fn(), debug: vi.fn() }
     }
-
     const h = { redirect: vi.fn() }
 
     await signOutController.handler(request, h)
 
     expect(h.redirect).toHaveBeenCalledWith(
-      expect.stringContaining('http://localhost')
+      expect.stringContaining('http://fallback-url/')
+    )
+  })
+
+  test('handles referrer without trailing slash', async () => {
+    const mockedUserSession = { logoutUrl: 'testLogout', idToken: 'testId' }
+    getUserSession.mockReturnValueOnce(mockedUserSession)
+
+    const request = {
+      headers: { referer: 'http://localhost:3000' }, // no trailing slash
+      auth: { credentials: {} },
+      logger: { info: vi.fn(), debug: vi.fn() }
+    }
+    const h = { redirect: vi.fn() }
+
+    await signOutController.handler(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      'testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout'
     )
   })
 })
