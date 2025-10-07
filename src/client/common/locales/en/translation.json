@@ -21,7 +21,8 @@
   "raise-a-support": "raise a support request",
   "important": "Important",
   "the-nominated-h": "The nominated Head of Finance will need to confirm your local authority's bank details.",
-  "please-confirm-": "Please confirm your local authority's bank details.<br><a class=\"govuk-link\" href=\"#\">Confirm bank details</a>",
+  "please-confirm-": "Please confirm your local authority's bank details.",
+  "please-confirm-link": "Confirm bank details",
   "view-and-confir": "View and confirm bank details",
   "your-local-auth": "Your local authority's bank details have been confirmed.",
   "your-local": "Your local authority's bank details",
@@ -40,7 +41,7 @@
   "telephone": "Telephone",
   "0300-060-0002": "0300 060 0002",
   "monday-to-frida": "Monday to Friday 8am to 6pm (closed on weekends and bank holidays)",
-  "confirm-your-lo": "Confirm your local authority's bank details",
+  "confirm-your-lo": "Confirm your local authority bank details",
   "name-of-account": "Name of account",
   "change-your-loc": "Change your local authority's bank details",
   "please-raise-a-": "please raise a help request via <a class=\"govuk-link\" href=\"#\">Get help and guidance</a> the page",
@@ -73,4 +74,6 @@
   "government-digi": "Government Digital Service",
   "all-content-is-": "All content is available under the <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\">Open Government Licence v3.0</a>, except where otherwise stated",
   "crown-copyright": "© Crown copyright"
+  "back-link": "Back",
+  "continue": "Continue"
 }
