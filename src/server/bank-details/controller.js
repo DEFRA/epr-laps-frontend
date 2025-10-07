@@ -76,7 +76,7 @@ export const bankDetailsConfirmedController = {
       // Call reusable PUT function
       await authUtils.putWithToken(
         request,
-        `bank-details/${encodeURIComponent(localAuthority)}`,
+        `/bank-details/${encodeURIComponent(localAuthority)}`,
         {
           id: bankApiData.id,
           accountName: bankApiData.accountName,
@@ -91,7 +91,7 @@ export const bankDetailsConfirmedController = {
         `/bank-details/bank-details-confirmed?lang=${currentLang}`
       )
     } catch (err) {
-      request.logger.error('Failed to confirm bank details', err)
+      request.logger.error(err, 'Failed to confirm bank details')
       return h
         .response({ error: 'Failed to fetch bank details' })
         .code(statusCodes.internalServerError)
