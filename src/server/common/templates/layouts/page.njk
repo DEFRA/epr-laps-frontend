@@ -85,27 +85,27 @@
     items: [
       {
         href: "https://www.gov.uk/help",
-        text: "Help"
+        text: translations['help']
       },
       {
         href: "https://www.gov.uk/help/privacy-notice",
-        text: "Privacy"
+        text: translations['privacy']
       },
       {
         href: "https://www.gov.uk/help/cookies",
-        text: "Cookies"
+        text: translations['cookies']
       },
       {
         href: "https://www.gov.uk/help/accessibility-statement",
-        text: "Accessibility statement"
+        text: translations['accessibility-s']
       },
       {
         href: "https://www.gov.uk/contact",
-        text: "Contact"
+        text: translations['contact']
       },
       {
         href: "https://www.gov.uk/help/terms-conditions",
-        text: "Terms and conditions"
+        text: translations['terms-and-condi']
       },
       {
         href: "https://www.gov.uk/cymraeg",
@@ -117,9 +117,15 @@
       },
       {
         href: "https://www.gov.uk/government/organisations/government-digital-service",
-        text: "Government Digital Service"
+        text:  translations['government-digi']
       }
     ]
+    },
+    contentLicence: {
+       html: translations['all-content-is-'] | safe
+    },
+    copyright: {
+      text: translations['crown-copyright']
     }
   }) }}
 {% endblock %}
