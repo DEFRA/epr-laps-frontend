@@ -77,6 +77,6 @@
   "contact": "Cysylltwch",
   "terms-and-condi": "Telerau ac amodau",
   "government-digi": "Gwasanaeth Digidol y Llywodraeth",
-  "all-content-is-": "Mae'r holl gynnwys ar gael o dan y Drwydded Llywodraeth Agored v3.0 oni nodir yn wahanol",
-  "crown-copyright": "Hawlfraint y Goron"
+  "all-content-is-": "Mae'r holl gynnwys ar gael o dan y <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\"> Drwydded Llywodraeth Agored v3.0</a>, oni nodir yn wahanol",
+  "crown-copyright": "© Hawlfraint y Goron"
 }

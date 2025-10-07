@@ -71,6 +71,6 @@
   "contact": "Contact",
   "terms-and-condi": "Terms and conditions",
   "government-digi": "Government Digital Service",
-  "all-content-is-": "All content is available under the Open Government Licence v3.0 except where otherwise stated",
-  "crown-copyright": "Crown copyright"
+  "all-content-is-": "All content is available under the <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\">Open Government Licence v3.0</a>, except where otherwise stated",
+  "crown-copyright": "© Crown copyright"
 }
