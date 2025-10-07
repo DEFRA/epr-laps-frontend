@@ -4,7 +4,7 @@
 <div class="govuk-grid-row">
 <div class="govuk-grid-column-two-thirds">
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-  {% if authedUser.currentRole  == 'Chief Executive Officer' and apiData.confirmed === false %}
+  {% if authedUser.currentRole  == 'Chief Executive Officer' and bankApiData.confirmed === false %}
     {% set html %}
       <p class="govuk-notification-banner__heading">
         {{ translations['the-nominated-h'] }}
@@ -17,7 +17,7 @@
     }) }}
   {% endif %}
 
-{% if authedUser.currentRole == 'Head of Finance' and apiData.confirmed === false %}
+{% if authedUser.currentRole == 'Head of Finance' and bankApiData.confirmed === false %}
   {% set htmlHof %}
     <p class="govuk-notification-banner__heading">
       {{ translations['please-confirm-'] }}<br>
@@ -44,7 +44,7 @@
   <h2 class="govuk-heading-s">
     {{ translations['your-local'] }}
   </h2>
- {% if apiData.confirmed %}
+ {% if bankApiData.confirmed %}
   {{ govukTag({
     text: translations['confirmed'],
     classes: "govuk-tag--green"
@@ -67,7 +67,7 @@
         text: translations['account-name'] 
       },
       {
-        text: apiData.accountName 
+        text: bankApiData.accountName 
       }
     ],
     [
@@ -75,7 +75,7 @@
         text: translations['sort-code'] 
       },
       {
-        text: apiData.sortCode
+        text: bankApiData.sortCode
       }
     ],
     [
@@ -83,7 +83,7 @@
         text: translations['account-number']
       },
       {
-        text: apiData.accountNumber
+        text: bankApiData.accountNumber
       }
     ]
   ]

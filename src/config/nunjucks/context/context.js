@@ -34,16 +34,14 @@ async function context(request) {
 
   let bankApiData = null
 
-  if (authedUser?.currentRole === 'Head of Finance') {
-    try {
-      const bankPath = `/bank-details/${encodeURIComponent(organisationName)}`
-      bankApiData = await fetchWithToken(request, bankPath)
-      request.logger.info(
-        `Successfully fetched bank details for ${organisationName}`
-      )
-    } catch (err) {
-      request.logger.error(`Failed to fetch apiData in context:`, err)
-    }
+  try {
+    const bankPath = `/bank-details/${encodeURIComponent(organisationName)}`
+    bankApiData = await fetchWithToken(request, bankPath)
+    request.logger.info(
+      `Successfully fetched bank details for ${organisationName}`
+    )
+  } catch (err) {
+    request.logger.error(`Failed to fetch apiData in context:`, err)
   }
 
   if (!webpackManifest) {
