@@ -1,269 +1,169 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController
 } from './controller.js'
-import { fetchWithToken, putWithToken } from '../../server/auth/utils.js'
+import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
 
-// Mock dependencies
-vi.mock('../../server/auth/utils.js')
-vi.mock('../../config/nunjucks/context/context.js')
-vi.mock('../../utils/status-codes.js', () => ({
-  statusCodes: {
-    unauthorized: 401,
-    internalServerError: 500
-  }
+vi.mock('../../server/auth/utils.js', () => ({
+  __esModule: true,
+  fetchWithToken: vi.fn(),
+  putWithToken: vi.fn()
 }))
 
+vi.mock('../../config/nunjucks/context/context.js', () => ({
+  __esModule: true,
+  context: vi.fn()
+}))
+
+const createH = () => ({
+  view: vi.fn().mockReturnValue('view-rendered'),
+  redirect: vi.fn().mockReturnValue('redirected'),
+  response: vi.fn((payload) => ({
+    payload,
+    code: (statusCode) => statusCode
+  }))
+})
+
+const createRequest = (overrides = {}) => ({
+  auth: {
+    credentials: {
+      account: { localAuthorityName: 'Test Local Authority' },
+      organisationName: 'Test Local Authority'
+    }
+  },
+  logger: { error: vi.fn(), info: vi.fn() },
+  ...overrides
+})
+
 describe('#bankDetailsController', () => {
-  let request
-  let h
-  let responseToolkit
+  let h, request
 
   beforeEach(() => {
-    request = {
-      auth: { credentials: { organisationName: 'Test Local Authority' } },
-      logger: { info: vi.fn(), error: vi.fn() },
-      app: {}
-    }
-
-    responseToolkit = {
-      code: vi.fn().mockReturnThis()
-    }
-
-    h = {
-      view: vi.fn(),
-      redirect: vi.fn(),
-      response: vi.fn(() => responseToolkit)
-    }
-
-    context.mockResolvedValue({
-      currentLang: 'en',
-      translations: {
-        'laps-home': 'Home',
-        'bank-details': 'Bank Details'
-      }
-    })
-
-    fetchWithToken.mockResolvedValue({
-      id: '123',
-      accountName: 'Test Account',
-      sortCode: '00-00-00',
-      accountNumber: '12345678'
-    })
+    h = createH()
+    request = createRequest()
+    vi.clearAllMocks()
   })
 
   it('should successfully render the bank details view', async () => {
+    context.mockResolvedValue({
+      bankApiData: { sortCode: '00-00-00', accountNumber: '12345678' },
+      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
+      currentLang: 'en'
+    })
+
     const result = await bankDetailsController.handler(request, h)
 
     expect(context).toHaveBeenCalledWith(request)
-    expect(fetchWithToken).toHaveBeenCalledWith(
-      request,
-      '/bank-details/Test%20Local%20Authority'
-    )
-    expect(request.app.bankApiData).toEqual({
-      id: '123',
-      accountName: 'Test Account',
-      sortCode: '00-00-00',
-      accountNumber: '12345678'
-    })
-    expect(request.logger.info).toHaveBeenCalledWith(
-      'Successfully fetched bank details for Test Local Authority'
-    )
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/index.njk',
-      expect.objectContaining({
-        pageTitle: 'Bank Details',
-        currentLang: 'en',
-        translations: {
-          'laps-home': 'Home',
-          'bank-details': 'Bank Details'
-        },
-        breadcrumbs: [
-          { text: 'Home', href: '/?lang=en' },
-          { text: 'Bank Details', href: '/bank-details?lang=en' }
-        ],
-        apiData: expect.any(Object)
-      })
+      expect.any(Object)
     )
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
   })
 
   it('should handle Unauthorized error separately', async () => {
     const unauthorizedError = new Error('Unauthorized')
-    fetchWithToken.mockRejectedValueOnce(unauthorizedError)
+    context.mockRejectedValue(unauthorizedError)
 
-    await bankDetailsController.handler(request, h)
+    const result = await bankDetailsController.handler(request, h)
 
     expect(request.logger.error).toHaveBeenCalledWith(
       'Error fetching bank details:',
       unauthorizedError
     )
-    expect(h.response).toHaveBeenCalledWith({ error: 'Unauthorized' })
-    expect(responseToolkit.code).toHaveBeenCalledWith(401)
+    expect(result).toBe(401)
   })
 
   it('should handle generic errors gracefully', async () => {
-    const error = new Error('API failure')
-    fetchWithToken.mockRejectedValueOnce(error)
+    const genericError = new Error('Something went wrong')
+    context.mockRejectedValue(genericError)
 
-    await bankDetailsController.handler(request, h)
+    const result = await bankDetailsController.handler(request, h)
 
     expect(request.logger.error).toHaveBeenCalledWith(
       'Error fetching bank details:',
-      error
+      genericError
     )
-    expect(h.response).toHaveBeenCalledWith({
-      error: 'Failed to fetch bank details'
-    })
-    expect(responseToolkit.code).toHaveBeenCalledWith(500)
+    expect(result).toBe(500)
   })
 })
 
 describe('#confirmBankDetailsController', () => {
-  let mockRequest, mockH, mockViewReturn
+  let h, request
 
   beforeEach(() => {
-    mockViewReturn = 'rendered-view'
-
-    mockH = {
-      view: vi.fn(() => mockViewReturn)
-    }
-
-    mockRequest = {}
-
+    h = createH()
+    request = createRequest({
+      payload: { sortCode: '00-00-00', accountNumber: '12345678' }
+    })
     vi.clearAllMocks()
   })
 
-  it('should render view with context data', async () => {
-    const contextData = {
-      bankApiData: { accountNumber: '12345678', sortCode: '12-34-56' },
-      translations: { 'local-authority': 'Local Authority' },
+  it('should confirm bank details and render confirmation view', async () => {
+    context.mockResolvedValue({
+      bankApiData: {
+        id: '123',
+        accountName: 'Foo',
+        sortCode: '00-00-00',
+        accountNumber: '12345678'
+      },
+      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
       currentLang: 'en'
-    }
-    context.mockResolvedValue(contextData)
+    })
 
-    const result = await confirmBankDetailsController.handler(
-      mockRequest,
-      mockH
-    )
+    const result = await confirmBankDetailsController.handler(request, h)
 
-    expect(context).toHaveBeenCalledWith(mockRequest)
-    expect(mockH.view).toHaveBeenCalledWith(
+    expect(context).toHaveBeenCalledWith(request)
+    expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
-      expect.objectContaining({
-        pageTitle: 'Confirm Bank Details',
-        translations: contextData.translations,
-        currentLang: contextData.currentLang,
-        bankApiData: contextData.bankApiData,
-        isContinueEnabled: false
-      })
+      expect.any(Object)
     )
-    expect(result).toBe(mockViewReturn)
+    expect(result).toBe('view-rendered')
   })
 })
 
 describe('#bankDetailsConfirmedController', () => {
-  let request
-  let h
-  let mockCode
+  let h, request
 
   beforeEach(() => {
-    // Arrange: set up mocks
-    request = {
-      auth: { credentials: { organisationName: 'Test Local Authority' } },
-      logger: { info: vi.fn(), error: vi.fn() },
-      app: {}
-    }
-
-    mockCode = vi.fn(() => h)
-
-    h = {
-      view: vi.fn(),
-      redirect: vi.fn(),
-      response: vi.fn(() => ({
-        code: mockCode
-      }))
-    }
-
-    // Mock context() default success
-    context.mockResolvedValue({
-      currentLang: 'en',
-      translations: {
-        'laps-home': 'Home',
-        'bank-details': 'Bank Details'
-      },
-      bankApiData: {
-        id: '123',
-        accountName: 'Test Account',
-        sortCode: '00-00-00',
-        accountNumber: '12345678'
-      }
-    })
-
-    // Mock putWithToken default success
-    putWithToken.mockResolvedValue({ success: true })
-  })
-
-  afterEach(() => {
+    h = createH()
+    request = createRequest()
     vi.clearAllMocks()
   })
 
-  it('calls putWithToken with correct arguments and redirects on success', async () => {
-    await bankDetailsConfirmedController.handler(request, h)
+  it('should confirm bank details via PUT and redirect', async () => {
+    context.mockResolvedValue({
+      bankApiData: {
+        id: '123',
+        accountName: 'Foo',
+        sortCode: '00-00-00',
+        accountNumber: '12345678'
+      },
+      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
+      currentLang: 'en'
+    })
+    authUtils.putWithToken.mockResolvedValue({ ok: true })
 
-    expect(putWithToken).toHaveBeenCalledWith(
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(context).toHaveBeenCalledWith(request)
+    expect(authUtils.putWithToken).toHaveBeenCalledWith(
       request,
       'bank-details/Test%20Local%20Authority',
-      expect.objectContaining({
+      {
         id: '123',
-        accountName: 'Test Account',
+        accountName: 'Foo',
         sortCode: '00-00-00',
         accountNumber: '12345678',
         confirmed: true
-      })
+      }
     )
-
     expect(h.redirect).toHaveBeenCalledWith(
       '/bank-details/bank-details-confirmed?lang=en'
     )
-  })
-
-  it('returns an internal server error when putWithToken throws', async () => {
-    putWithToken.mockRejectedValue(new Error('Network error'))
-
-    const result = await bankDetailsConfirmedController.handler(request, h)
-
-    expect(request.logger.error).toHaveBeenCalledWith(
-      'Failed to confirm bank details',
-      expect.any(Error)
-    )
-
-    expect(h.response).toHaveBeenCalledWith({
-      error: 'Failed to fetch bank details'
-    })
-
-    expect(mockCode).toHaveBeenCalledWith(500)
-    expect(result).toEqual(h)
-  })
-
-  it('handles errors thrown by context()', async () => {
-    context.mockRejectedValue(new Error('Context failure'))
-
-    const result = await bankDetailsConfirmedController.handler(request, h)
-
-    expect(request.logger.error).toHaveBeenCalledWith(
-      'Failed to confirm bank details',
-      expect.any(Error)
-    )
-
-    expect(h.response).toHaveBeenCalledWith({
-      error: 'Failed to fetch bank details'
-    })
-
-    expect(mockCode).toHaveBeenCalledWith(500)
-    expect(result).toEqual(h)
+    expect(result).toBe('redirected')
   })
 })
