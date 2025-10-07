@@ -152,7 +152,7 @@ describe('#bankDetailsConfirmedController', () => {
     expect(context).toHaveBeenCalledWith(request)
     expect(authUtils.putWithToken).toHaveBeenCalledWith(
       request,
-      'bank-details/Test%20Local%20Authority',
+      '/bank-details/Test%20Local%20Authority',
       {
         id: '123',
         accountName: 'Foo',
