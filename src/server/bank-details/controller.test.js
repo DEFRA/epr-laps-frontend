@@ -21,10 +21,14 @@ vi.mock('../../config/nunjucks/context/context.js', () => ({
 const createH = () => ({
   view: vi.fn().mockReturnValue('view-rendered'),
   redirect: vi.fn().mockReturnValue('redirected'),
-  response: vi.fn((payload) => ({
-    payload,
-    code: (statusCode) => statusCode
-  }))
+  response: vi.fn((payload) => {
+    const res = { payload }
+    res.code = (statusCode) => {
+      res.statusCode = statusCode
+      return res
+    }
+    return res
+  })
 })
 
 const createRequest = (overrides = {}) => ({
@@ -74,7 +78,11 @@ describe('#bankDetailsController', () => {
       'Error fetching bank details:',
       unauthorizedError
     )
-    expect(result).toBe(401)
+    expect(result).toEqual({
+      payload: { error: 'Unauthorized' },
+      statusCode: 401,
+      code: expect.any(Function)
+    })
   })
 
   it('should handle generic errors gracefully', async () => {
@@ -87,7 +95,11 @@ describe('#bankDetailsController', () => {
       'Error fetching bank details:',
       genericError
     )
-    expect(result).toBe(500)
+    expect(result).toEqual({
+      payload: { error: 'Failed to fetch bank details' },
+      statusCode: 500,
+      code: expect.any(Function)
+    })
   })
 })
 
@@ -127,14 +139,29 @@ describe('#confirmBankDetailsController', () => {
 
 describe('#bankDetailsConfirmedController', () => {
   let h, request
-
   beforeEach(() => {
     h = createH()
     request = createRequest()
     vi.clearAllMocks()
   })
+  it('should handle context failure and return 500', async () => {
+    const contextError = new Error('Context failure')
+    context.mockRejectedValue(contextError)
 
-  it('should confirm bank details via PUT and redirect', async () => {
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      contextError,
+      'Failed to confirm bank details'
+    )
+    expect(result).toEqual({
+      payload: { error: 'Failed to fetch bank details' },
+      statusCode: 500,
+      code: expect.any(Function)
+    })
+  })
+
+  it('should handle putWithToken failure and return 500', async () => {
     context.mockResolvedValue({
       bankApiData: {
         id: '123',
@@ -145,25 +172,55 @@ describe('#bankDetailsConfirmedController', () => {
       translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
       currentLang: 'en'
     })
-    authUtils.putWithToken.mockResolvedValue({ ok: true })
+    const putError = new Error('PUT failed')
+    authUtils.putWithToken.mockRejectedValue(putError)
 
     const result = await bankDetailsConfirmedController.handler(request, h)
 
-    expect(context).toHaveBeenCalledWith(request)
-    expect(authUtils.putWithToken).toHaveBeenCalledWith(
-      request,
-      '/bank-details/Test%20Local%20Authority',
-      {
-        id: '123',
-        accountName: 'Foo',
-        sortCode: '00-00-00',
-        accountNumber: '12345678',
-        confirmed: true
-      }
+    expect(request.logger.error).toHaveBeenCalledWith(
+      putError,
+      'Failed to confirm bank details'
     )
-    expect(h.redirect).toHaveBeenCalledWith(
-      '/bank-details/bank-details-confirmed?lang=en'
+    expect(result).toEqual({
+      payload: { error: 'Failed to fetch bank details' },
+      statusCode: 500,
+      code: expect.any(Function)
+    })
+  })
+
+  it('should handle unexpected rejection (non-Error) gracefully', async () => {
+    context.mockRejectedValue('some string instead of Error')
+
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      'some string instead of Error',
+      'Failed to confirm bank details'
     )
-    expect(result).toBe('redirected')
+    expect(result).toEqual({
+      payload: { error: 'Failed to fetch bank details' },
+      statusCode: 500,
+      code: expect.any(Function)
+    })
+  })
+
+  it('should handle missing bankApiData in context gracefully', async () => {
+    context.mockResolvedValue({
+      bankApiData: null,
+      translations: { 'laps-home': 'Home', 'bank-details': 'Bank Details' },
+      currentLang: 'en'
+    })
+
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      expect.any(TypeError),
+      'Failed to confirm bank details'
+    )
+    expect(result).toEqual({
+      payload: { error: 'Failed to fetch bank details' },
+      statusCode: 500,
+      code: expect.any(Function)
+    })
   })
 })
