@@ -3,17 +3,19 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block content %}
-<span class="govuk-caption-xl">Glamshire County Council</span>
-<h1 class="govuk-heading-xl">Payment documents</h1>
+{{ appHeading({
+    text: authedUser.organisationName,
+    caption: translations['payment-documen'] 
+  }) }}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <div class="govuk-warning-text">
+     <div class="govuk-warning-text">
       <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
       <strong class="govuk-warning-text__text">
         <span class="govuk-visually-hidden">Warning</span>
-        For the 2025 to 2026 financial year, there will be a single payment covering quarters 1 and 2.
+       {{ translations['for-the-2025-to'] }}
       </strong>
     </div>
 
@@ -24,17 +26,25 @@
   id: "sort",
   name: "sort",
   label: {
-    text: "Financial year"
+    text: translations['financial-year']
   },
   items: [
     {
       value: "published",
-      text: "2025 to 2026",
+      text: "2025 to 2026"
+    },
+    {
+      value: "updated",
+      text: "2024 to 2025",
       selected: true
     },
     {
       value: "updated",
-      text: "2024 to 2025"
+      text: "2023 to 2024"
+    },
+    {
+      value: "updated",
+      text: "2022 to 2023"      
     }
   ]
 }) }}
@@ -45,10 +55,10 @@
   firstCellIsHeader: false,
   head: [
     {
-      text: "Date"
+      text: translations['date']
     },
     {
-      text: "Document name"
+      text: translations['document-name']
     },
     {
       html: "<span class='govuk-visually-hidden'>Download document</span>"
@@ -60,67 +70,171 @@
   rows: [
     [
       {
-        text: "9 Dec 2025"
+        text: "9 " ~ translations['dec'] ~ " 2025"
       },
       {
-        text: "Grant determination letter Q4"
+        text: translations['remittance-letter-q4']
       },
+       {
+      html: (
+        "<a href='https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
       {
-        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>",
-        classes: "govuk-table__cell--numeric"
-      },
-      {
-        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>",
-        classes: "govuk-table__cell--numeric"
-      }
+      html: (
+        "<a href='https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ],
     [
       {
-        text: "7 Dec 2025"
+        text: "7 " ~ translations['dec'] ~ " 2025"
       },
       {
-        text: "Remittance Advice Q4"
+        text: translations['grant-letter-q4']
       },
+       {
+      html: (
+        "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
       {
-        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>",
-        classes: "govuk-table__cell--numeric"
-      },
-      {
-        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>",
-        classes: "govuk-table__cell--numeric"
-      }
+      html: (
+        "<a href='/public/pdfs/remittance-advice-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ],
     [
       {
-        text: "19 Sep 2025"
+        text: "19 " ~ translations['sep'] ~ " 2025"
       },
       {
-        text: "Grant determination letter Q3"
+        text: translations['remittance-letter-q3']
       },
       {
-        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>9 Sep 2025 Grant determination letter Q3</span></a>",
-        classes: "govuk-table__cell--numeric"
-      },
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>19 Sep 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
       {
-        html: "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>19 Sep 2025 Grant determination letter Q3</span></a>",
-        classes: "govuk-table__cell--numeric"
-      }
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>19 Sep 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ],
     [
       {
-        text: "18 Sep 2025"
+        text: "18 " ~ translations['sep'] ~ " 2025"
       },
       {
-        text: "Remittance Advice Q3"
+        text: translations['grant-letter-q3']
       },
       {
-        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>Download <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>",
-        classes: "govuk-table__cell--numeric"
+      html: (
+        "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "16 " ~ translations['jun'] ~ " 2025"
       },
       {
-        html: "<a href='/public/pdfs/remittance-advice-wip.pdf' target='_blank' class='govuk-link'>View (opens in a new tab) <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>",
-        classes: "govuk-table__cell--numeric"
-      }
+        text: translations['remittance-letter-q1q2']
+      },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>16 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>16 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "15 " ~ translations['jun'] ~ " 2025"
+      },
+      {
+        text: translations['grant-letter-q1q2']
+      },
+       {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>15 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>16 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "14 " ~ translations['jun'] ~ " 2025"
+      },
+      {
+        text: translations['notice-assessment-q1q2']
+      },
+       {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>14 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+     {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>14 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ]
   ]
 }) }}

@@ -17,7 +17,7 @@
     }) }}
   {% endif %}
 
-{% if authedUser.currentRole == 'Head of Finance' and bankApiData.confirmed === false %}
+{% if userPermissions.confirmBankDetails and bankApiData.confirmed === false %}
   {% set htmlHof %}
     <p class="govuk-notification-banner__heading">
       {{ translations['please-confirm-'] }}<br>
