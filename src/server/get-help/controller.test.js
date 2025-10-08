@@ -30,13 +30,13 @@ describe('#getHelpController', () => {
     vi.clearAllMocks()
   })
 
- test('should redirect unauthenticated user to auth-response', async () => {
-  const response = await server.inject({
-    method: 'GET',
-    url: '/get-help'
-  })
+  test('should redirect unauthenticated user to auth-response', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/get-help'
+    })
 
-  expect(response.statusCode).toBe(statusCodes.redirect)
-  expect(response.headers.location).toContain('/auth-response')
-})
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toContain('/auth-response')
+  })
 })
