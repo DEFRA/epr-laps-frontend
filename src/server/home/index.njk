@@ -3,14 +3,16 @@
 {% set language = currentLang %}
 {% block content %}
   {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-   {% if authedUser.currentRole === 'Head of Finance' and apiData.confirmed === false %}
+   {% if authedUser.currentRole === 'Head of Finance' and bankApiData.confirmed === false %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
 
           {% set html %}
-            <p class="govuk-notification-banner__heading">
-              {{ translations['please-confirm-'] }} <br>
-              <a class="govuk-notification-banner__link" href="#">{{ translations['view-and-confir'] }}</a>
+             <p class="govuk-notification-banner__heading">
+              {{ translations['please-confirm-'] | safe }}
+              <a class="govuk-link" href="/bank-details/confirm?lang={{ currentLang }}">
+                {{ translations['please-confirm-link'] }}
+              </a>
             </p>
           {% endset %}
 
