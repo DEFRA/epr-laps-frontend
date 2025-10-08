@@ -126,7 +126,8 @@ describe('context and cache', () => {
             laNames: { [EN_NAME]: CY_NAME },
             'sign-out': 'Sign out',
             'your-defra-acco': 'Your Defra account'
-          }
+          },
+          userPermissions: {}
         })
       })
 
