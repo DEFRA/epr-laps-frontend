@@ -1,10 +1,18 @@
 import { createServer } from '../server.js'
 import { statusCodes } from '../common/constants/status-codes.js'
+import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
+import { defraAccountController } from './controller.js'
 
+vi.mock('../common/helpers/auth/get-oidc-config.js')
 describe('#defraAccountController', () => {
   let server
 
   beforeAll(async () => {
+    vi.mocked(getOidcConfig).mockResolvedValue({
+      authorization_endpoint: 'https://test-idm-endpoint/authorize',
+      token_endpoint: 'https://test-idm-endpoint/token',
+      end_session_endpoint: 'https://test-idm-endpoint/logout'
+    })
     server = await createServer()
     await server.initialize()
   })
@@ -13,13 +21,21 @@ describe('#defraAccountController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should render defra-account page', async () => {
-    const { result, statusCode } = await server.inject({
+  test('should redirect user when user is unauthenticated', async () => {
+    const mockRequest = {
+      app: {
+        translations: { 'local-authority': 'Mocked Local Authority' },
+        currentLang: 'en'
+      }
+    }
+    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
+
+    const { statusCode } = await server.inject({
       method: 'GET',
       url: '/defra-account'
     })
 
-    expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toContain('<!DOCTYPE html>')
+    await defraAccountController.handler(mockRequest, mockedResponse)
+    expect(statusCode).toBe(statusCodes.redirect)
   })
 })

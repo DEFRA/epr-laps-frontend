@@ -5,10 +5,11 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 {% from "language-toggle/macro.njk" import dwpLanguageToggle %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
-
+{% from "loader/macro.njk" import appLoader %}
 {% set mainClasses = "app-main-wrapper" %}
 {% set language = currentLang %}
 
@@ -22,7 +23,6 @@
     homepageUrl: "https://www.gov.uk/",
     classes: "app-header",
     containerClasses: "govuk-width-container",
-    serviceName: serviceName,
     serviceUrl: serviceUrl,
     useTudorCrown: true
   }) }}
@@ -36,24 +36,32 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: "Local Authority Payments account for EPR",
+    serviceName: translations['local-authority'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
- {{ govukPhaseBanner({
+{% if showBetaBanner %}
+  {{ govukPhaseBanner({
     tag: {
-      text: "Beta"
+      text: translations['beta']
     },
-    html: 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback(opens in new tab)</a>.'
+    html: translations['this-is-a-new-s'] | safe
   }) }}
+{% endif %}
   
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
-      <div class="govuk-grid-column-two-thirds">
-        
+    <div class="govuk-grid-column-two-thirds">
+      {% if showBackLink %}
+        {{ govukBackLink({
+          text: translations['back-link'],
+          href: "javascript:history.back()"
+        }) }}
+      {% else %}
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
-        
+              {% endif %}
       </div>
+
       <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
          {{
           dwpLanguageToggle({
@@ -74,20 +82,50 @@
 {% block footer %}
   {{ govukFooter({
     meta: {
-      items: [
-        {
-          href: "https://www.gov.uk/help/privacy-notice",
-          text: "Privacy"
-        },
-        {
-          href: "https://www.gov.uk/help/cookies",
-          text: "Cookies"
-        },
-        {
-          href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility statement"
+    items: [
+      {
+        href: "https://www.gov.uk/help",
+        text: translations['help']
+      },
+      {
+        href: "https://www.gov.uk/help/privacy-notice",
+        text: translations['privacy']
+      },
+      {
+        href: "https://www.gov.uk/help/cookies",
+        text: translations['cookies']
+      },
+      {
+        href: "https://www.gov.uk/help/accessibility-statement",
+        text: translations['accessibility-s']
+      },
+      {
+        href: "https://www.gov.uk/contact",
+        text: translations['contact']
+      },
+      {
+        href: "https://www.gov.uk/help/terms-conditions",
+        text: translations['terms-and-condi']
+      },
+      {
+        href: "https://www.gov.uk/cymraeg",
+        text: "Rhestr o Wasanaethau Cymraeg",
+        attributes: {
+          lang: "cy",
+          hreflang: "cy"
         }
-      ]
+      },
+      {
+        href: "https://www.gov.uk/government/organisations/government-digital-service",
+        text:  translations['government-digi']
+      }
+    ]
+    },
+    contentLicence: {
+       html: translations['all-content-is-'] | safe
+    },
+    copyright: {
+      text: translations['crown-copyright']
     }
   }) }}
 {% endblock %}

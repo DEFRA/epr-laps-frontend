@@ -2,38 +2,61 @@
 {% from "customCard/macro.njk" import appCustomCard %}
 {% set language = currentLang %}
 {% block content %}
+  {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+   {% if authedUser.currentRole === 'Head of Finance' and bankApiData.confirmed === false %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+          {% set html %}
+             <p class="govuk-notification-banner__heading">
+              {{ translations['please-confirm-'] | safe }}
+              <a class="govuk-link" href="/bank-details/confirm?lang={{ currentLang }}">
+                {{ translations['please-confirm-link'] }}
+              </a>
+            </p>
+          {% endset %}
+
+        {{ govukNotificationBanner({
+          titleText: translations['important'],
+          html: html
+        }) }}
+        <br/>
+        </div>
+      </div>
+    {% endif %}
   {{ appHeading({
-    text: heading,
-    caption: "Glamshire County Council"
+   text: translations['local-authority'],
+    caption: authedUser.organisationName
 
   }) }}
 
       <div class="govuk-grid-row">
         {{ appCustomCard({
-          title: "Payment documents",
-          link: "/payment-documents",
-          body: "You can view and download your:",
-          list: [
-            "estimated grant payment amounts for Extended Producer Responsibility (EPR) packaging",
-            "remittance advice with payment details"
+          title: translations['payment-documen'],
+         link: "/payment-documents?lang=" + currentLang,
+         body: translations['you-can-view-an'],
+         list: [
+           translations['estimated-grant'],
+           translations['remittance-advi']
           ]
         }) }}
         {{ appCustomCard({
-          title: "Bank details",
-          link: "/bank-details",
-          body: "You can:",
+          title: translations['bank-details'],
+          link: "/bank-details?lang=" + currentLang,
+          body: translations['you-can:'],
           list: [
-            "view bank details"
+            translations['view-bank-detai']
           ]
         }) }}
         </div>
-        <div class="govuk-grid-row">{{ appCustomCard({
-          title: "Get help",
-          link: "/get-help",
-          body: "You can view and download your:",
+        <div class="govuk-grid-row">
+        {{ appCustomCard({
+          title: translations['get-help'],
+          link: "/get-help?lang=" + currentLang,
+          body: translations['you-can-view-ou'],
           list: [
-            "read Local Authority Payments (LAPs) guidance",
-            "raise a support request"
+            translations['read-local-auth'],
+            translations['raise-a-support']
           ]
         }) }}
       </div>

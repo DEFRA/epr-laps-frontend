@@ -1,7 +1,6 @@
 import inert from '@hapi/inert'
 
 import { home } from './home/index.js'
-import { about } from './about/index.js'
 import { health } from './health/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 import { paymentDocuments } from './payment-documents/index.js'
@@ -9,6 +8,8 @@ import { bankDetails } from './bank-details/index.js'
 import { getHelp } from './get-help/index.js'
 import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
+import { auth } from './auth/index.js'
+
 export const router = {
   plugin: {
     name: 'router',
@@ -21,11 +22,11 @@ export const router = {
       // Application specific routes, add your own routes here
       await server.register([
         home,
-        about,
         paymentDocuments,
         bankDetails,
         getHelp,
         signOut,
+        auth,
         defraAccount
       ])
 

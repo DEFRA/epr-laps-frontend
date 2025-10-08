@@ -1,4 +1,8 @@
-import { bankDetailsController } from './controller.js'
+import {
+  bankDetailsController,
+  confirmBankDetailsController,
+  bankDetailsConfirmedController
+} from './controller.js'
 
 export const bankDetails = {
   plugin: {
@@ -8,6 +12,29 @@ export const bankDetails = {
         method: 'GET',
         path: '/bank-details',
         ...bankDetailsController
+      })
+      server.route({
+        method: 'GET',
+        path: '/bank-details/confirm',
+        ...confirmBankDetailsController
+      })
+      server.route({
+        method: 'POST',
+        path: '/bank-details/bank-details-confirmed',
+        ...bankDetailsConfirmedController
+      })
+      server.route({
+        method: 'GET',
+        path: '/bank-details/bank-details-confirmed',
+        handler: (request, h) => {
+          const translations = request.app.translations || {}
+          const currentLang = request.app.currentLang || 'en'
+          return h.view('bank-details/bank-details-confirmed.njk', {
+            pageTitle: 'Bank Details Confirmed',
+            currentLang,
+            translations
+          })
+        }
       })
     }
   }

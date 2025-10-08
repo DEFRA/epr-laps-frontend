@@ -14,6 +14,7 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
+const oneDay = 1000 * 60 * 60 * 24
 
 export const config = convict({
   serviceVersion: {
@@ -44,7 +45,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: ''
+    default: 'EPR-LAPs'
   },
   root: {
     doc: 'Project root',
@@ -198,6 +199,12 @@ export const config = convict({
       format: Boolean,
       default: isProduction,
       env: 'REDIS_TLS'
+    },
+    ttl: {
+      doc: 'Redis cache global ttl',
+      format: Number,
+      default: oneDay,
+      env: 'REDIS_TTL'
     }
   },
   nunjucks: {
@@ -219,6 +226,65 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  defraId: {
+    oidcConfigurationUrl: {
+      doc: 'Defra ID OIDC Configuration URL',
+      format: String,
+      default:
+        'http://localhost:3200/cdp-defra-id-stub/.well-known/openid-configuration',
+      env: 'DEFRA_ID_OIDC_CONFIGURATION_URL'
+    },
+    clientId: {
+      doc: 'The Defra Identity client ID.',
+      format: String,
+      default: '2fb0d715-affa-4bf1-836e-44a464e3fbea',
+      env: 'DEFRA_ID_CLIENT_ID'
+    },
+    clientSecret: {
+      doc: 'The Defra Identity client secret.',
+      format: String,
+      default: 'test_value',
+      env: 'DEFRA_ID_CLIENT_SECRET'
+    },
+    serviceId: {
+      doc: 'The Defra Identity service ID.',
+      format: String,
+      default: 'service-test',
+      env: 'DEFRA_ID_SERVICE_ID'
+    },
+    scopes: {
+      doc: 'Defra ID Scopes',
+      format: Array,
+      sensitive: true,
+      env: 'AUTH_DEFRA_ID_SCOPES',
+      default: ['openid', 'offline_access']
+    },
+    redirectUrl: {
+      doc: 'The Defra Identity redirect URl.',
+      format: String,
+      default: 'http://localhost:3000',
+      env: 'APP_BASE_URL'
+    },
+    manageAccountUrl: {
+      doc: 'The Defra account management URL.',
+      format: String,
+      default: 'https://your-account.cpdev.cui.defra.gov.uk/management',
+      env: 'DEFRA_ACCOUNT_MANAGEMENT_URL'
+    }
+  },
+  showBetaBanner: {
+    doc: 'Show the beta banner on the site',
+    format: Boolean,
+    default: true,
+    env: 'SHOW_BETA_BANNER'
+  },
+  backendApiUrl: {
+    doc: 'URL to get the bank details',
+    format: String,
+    default: 'http://localhost:3001',
+    env: 'BACKEND_API',
+    sensitive: true
   }
 })
 

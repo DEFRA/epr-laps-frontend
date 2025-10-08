@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 
 import hapi from '@hapi/hapi'
 import { statusCodes } from '../constants/status-codes.js'
+import { getOidcConfig } from './auth/get-oidc-config.js'
 
 const mockLoggerInfo = vi.fn()
 const mockLoggerError = vi.fn()
@@ -28,6 +29,8 @@ vi.mock('./logging/logger.js', () => ({
   })
 }))
 
+vi.mock('./auth/get-oidc-config.js')
+
 describe('#startServer', () => {
   let createServerSpy
   let hapiServerSpy
@@ -42,7 +45,13 @@ describe('#startServer', () => {
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
     hapiServerSpy = vi.spyOn(hapi, 'server')
-  }, 30000)
+
+    vi.mocked(getOidcConfig).mockResolvedValue({
+      authorization_endpoint: 'https://test-idm-endpoint/authorize',
+      token_endpoint: 'https://test-idm-endpoint/token',
+      end_session_endpoint: 'https://test-idm-endpoint/logout'
+    })
+  })
 
   afterAll(() => {
     vi.unstubAllEnvs()

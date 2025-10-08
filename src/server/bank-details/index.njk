@@ -4,28 +4,57 @@
 <div class="govuk-grid-row">
 <div class="govuk-grid-column-two-thirds">
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+  {% if authedUser.currentRole  == 'Chief Executive Officer' and bankApiData.confirmed === false %}
+    {% set html %}
+      <p class="govuk-notification-banner__heading">
+        {{ translations['the-nominated-h'] }}
+      </p>
+    {% endset %}
 
-  {% set html %}
+    {{ govukNotificationBanner({
+      titleText: translations['important'],
+      html: html
+    }) }}
+  {% endif %}
+
+{% if authedUser.currentRole == 'Head of Finance' and bankApiData.confirmed === false %}
+  {% set htmlHof %}
     <p class="govuk-notification-banner__heading">
-      You have 7 days left to send your application.
+      {{ translations['please-confirm-'] }}<br>
+      <a class="govuk-link" href="/bank-details/confirm?lang={{ currentLang }}">
+        {{ translations['please-confirm-link'] }}
+      </a>
     </p>
   {% endset %}
 
   {{ govukNotificationBanner({
-    html: html
+    titleText: translations['important'],
+    html: htmlHof
   }) }}
+{% endif %}
 
   {% from "govuk/components/table/macro.njk" import govukTable %}
   {% from "govuk/components/tag/macro.njk" import govukTag %}
 
+{{ appHeading({
+    text: authedUser.organisationName,
+    caption: translations['bank-details'] 
+  }) }}
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
-  <h2 class="govuk-heading-m">
-    Your local authority's bank details
+  <h2 class="govuk-heading-s">
+    {{ translations['your-local'] }}
   </h2>
+ {% if bankApiData.confirmed %}
   {{ govukTag({
-    text: "UNCONFIRMED",
+    text: translations['confirmed'],
+    classes: "govuk-tag--green"
+  }) }}
+{% else %}
+  {{ govukTag({
+    text: translations['unconfirmed'],
     classes: "govuk-tag--red"
   }) }}
+{% endif %}
 </div>
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
@@ -35,26 +64,26 @@
   rows: [
     [
       {
-        text: "First 6 weeks"
+        text: translations['account-name'] 
       },
       {
-        text: "£109.80 per week"
+        text: bankApiData.accountName 
       }
     ],
     [
       {
-        text: "Next 33 weeks"
+        text: translations['sort-code'] 
       },
       {
-        text: "£109.80 per week"
+        text: bankApiData.sortCode
       }
     ],
     [
       {
-        text: "Total estimated pay"
+        text: translations['account-number']
       },
       {
-        text: "£4,282.20"
+        text: bankApiData.accountNumber
       }
     ]
   ]
@@ -62,10 +91,23 @@
 
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
+{% set detailsHtml %}
+  <p>{{ translations['to-update-your-'] }}, {{ translations["please-raise-a-"] | safe }}</p>
+
+  <p><strong>{{ translations['email'] }}</strong><br>
+    <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
+    {{ translations['we-aim-to-respo'] }}
+  </p>
+
+ <p>
+  <strong>{{ translations['telephone'] }}</strong><br>
+  0300-060-0002<br>
+  {{ translations['monday-to-frida'] }}
+</p>
+{% endset %}
+
 {{ govukDetails({
-  summaryText: "Help with nationality",
-  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
+  summaryText: translations['change-your-loc'],
+  html: detailsHtml
 }) }}
-</div>
-  
 {% endblock %}

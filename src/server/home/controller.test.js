@@ -1,31 +1,114 @@
-import { createServer } from '../server.js'
 import { statusCodes } from '../common/constants/status-codes.js'
+import { homeController } from './controller.js'
+import * as authUtils from '../common/helpers/auth/utils.js'
+import * as contextModule from '../../config/nunjucks/context/context.js'
+
+// Mock fetchWithToken if used in controller
+vi.mock('../../server/auth/utils.js', () => ({
+  fetchWithToken: vi.fn()
+}))
+
+// Mock context module correctly
+vi.mock('../../config/nunjucks/context/context.js', async () => {
+  const originalModule = await vi.importActual(
+    '../../config/nunjucks/context/context.js'
+  )
+  return {
+    ...originalModule,
+    context: vi.fn().mockResolvedValue({
+      currentLang: 'en',
+      translations: { 'local-authority': 'Mocked Local Authority' },
+      apiData: null
+    })
+  }
+})
 
 describe('#homeController', () => {
-  let server
+  let mockRequest
+  let mockedResponse
 
-  beforeAll(async () => {
-    server = await createServer()
+  beforeEach(() => {
+    vi.clearAllMocks()
 
-    server.ext('onRequest', (request, h) => {
-      request.app.translations = { 'local-authority': 'Mocked Local Authority' }
-      return h.continue
+    // Spy on getUserSession if controller uses it
+    vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
+      userName: 'test user',
+      organisationName: 'Mocked Organisation'
     })
 
-    await server.initialize()
+    mockedResponse = {
+      view: vi.fn(),
+      redirect: vi.fn(),
+      response: vi.fn().mockImplementation(() => ({
+        code: vi.fn().mockReturnThis()
+      }))
+    }
+
+    mockRequest = {
+      app: {},
+      auth: { credentials: {} },
+      state: { userSession: { sessionId: 'test-session-id' } },
+      server: {
+        app: {
+          cache: {
+            get: vi.fn().mockResolvedValue({}),
+            set: vi.fn().mockResolvedValue()
+          }
+        }
+      },
+      logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() }
+    }
   })
 
-  afterAll(async () => {
-    await server.stop({ timeout: 0 })
+  test('should render view with translations', async () => {
+    await homeController.handler(mockRequest, mockedResponse)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith(
+      'home/index',
+      expect.objectContaining({
+        pageTitle: 'Home',
+        currentLang: 'en',
+        translations: { 'local-authority': 'Mocked Local Authority' },
+        breadcrumbs: [{ text: 'Mocked Local Authority', href: '/?lang=en' }],
+        apiData: null
+      })
+    )
   })
 
-  test('Should provide expected response', async () => {
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/'
+  test('should handle missing translations and currentLang', async () => {
+    // Override context to simulate missing translations/lang
+    contextModule.context.mockResolvedValueOnce({
+      currentLang: undefined,
+      translations: {},
+      apiData: null
     })
 
-    expect(result).toEqual(expect.stringContaining('Home |'))
-    expect(statusCode).toBe(statusCodes.ok)
+    await homeController.handler(mockRequest, mockedResponse)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith(
+      'home/index',
+      expect.objectContaining({
+        pageTitle: 'Home',
+        currentLang: undefined,
+        translations: {},
+        breadcrumbs: [{ text: undefined, href: '/?lang=undefined' }],
+        apiData: null
+      })
+    )
+  })
+
+  test('should respond with error when context throws', async () => {
+    contextModule.context.mockRejectedValueOnce(new Error('Some error'))
+
+    await homeController.handler(mockRequest, mockedResponse)
+
+    expect(mockedResponse.response).toHaveBeenCalledWith({
+      error: 'Failed to render home page'
+    })
+
+    const responseObj = mockedResponse.response.mock.results[0].value
+    expect(responseObj.code).toHaveBeenCalledWith(
+      statusCodes.internalServerError
+    )
   })
 })
