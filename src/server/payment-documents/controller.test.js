@@ -53,27 +53,50 @@ describe('#paymentDocumentsController', () => {
   test('should provide expected response', async () => {
     const mockRequest = {
       app: {
-        translations: { 'local-authority': 'Mocked Local Authority' },
+        translations: {
+          'laps-home': 'Local Authority Payments (LAPs) home',
+          'payment-documen': 'Payment documents'
+        },
         currentLang: 'en'
       }
     }
     const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
     await paymentDocumentsController.handler(mockRequest, mockedResponse)
+
     expect(mockedResponse.view).toHaveBeenCalledWith(
       'payment-documents/index.njk',
       {
-        pageTitle: 'Glamshire County Council',
-        heading: 'Mocked Local Authority',
-        caption: 'glamshire-count',
+        pageTitle: 'Payment documents',
+        currentLang: 'en',
         breadcrumbs: [
           {
             text: 'Local Authority Payments (LAPs) home',
-            href: '/'
+            href: '/?lang=en'
           },
           {
-            text: 'Payment documents'
+            text: 'Payment documents',
+            href: '/payment-documents?lang=en'
           }
+        ]
+      }
+    )
+  })
+
+  test('should handle missing translations and currentLang', async () => {
+    const mockRequest = { app: {} } // no translations, no currentLang
+    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
+
+    await paymentDocumentsController.handler(mockRequest, mockedResponse)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith(
+      'payment-documents/index.njk',
+      {
+        pageTitle: 'Payment documents',
+        currentLang: 'en', // fallback used
+        breadcrumbs: [
+          { text: undefined, href: '/?lang=en' }, // fallback for translations
+          { text: undefined, href: '/payment-documents?lang=en' }
         ]
       }
     )
