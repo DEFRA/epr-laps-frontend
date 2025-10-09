@@ -48,14 +48,18 @@ describe('paymentDocumentsController', () => {
         creationDate: '2025-01-01',
         documentType: 'grant',
         quarter: 'Q1',
-        fileName: 'file1.pdf'
+        fileName: 'file1.pdf',
+        formattedDate: format(new Date('2025-01-01'), 'd MMM yyyy'),
+        documentName: 'Grant determination letter Q1'
       },
       {
         id: '456',
         creationDate: '2025-02-01',
         documentType: 'remittance',
         quarter: 'Q2',
-        fileName: 'file2.pdf'
+        fileName: 'file2.pdf',
+        formattedDate: format(new Date('2025-02-01'), 'd MMM yyyy'),
+        documentName: 'Remittance advice Q2'
       }
     ]
 
@@ -64,10 +68,7 @@ describe('paymentDocumentsController', () => {
 
     await paymentDocumentsController.handler(request, h)
 
-    expect(fetchWithToken).toHaveBeenCalledWith(
-      request,
-      '/file/metadata/TestOrg'
-    )
+    expect(fetchWithToken).toHaveBeenCalledWith(request, '/documents/TestOrg')
     expect(request.logger.info).toHaveBeenCalledWith(
       'Successfully fetched document metadata for TestOrg'
     )

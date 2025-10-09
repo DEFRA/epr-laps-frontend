@@ -2,7 +2,6 @@
  * A GDS styled Payment documents controller
  */
 import { fetchWithToken } from '../../server/auth/utils.js'
-import { format } from 'date-fns'
 import { context } from '../../config/nunjucks/context/context.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
@@ -15,7 +14,7 @@ export const paymentDocumentsController = {
     let documentApiData = []
     let rows = []
     try {
-      const documentPath = `/file/metadata/${encodeURIComponent(organisationName)}`
+      const documentPath = `/documents/${encodeURIComponent(organisationName)}`
       documentApiData = await fetchWithToken(request, documentPath)
 
       request.logger.info(
@@ -23,27 +22,21 @@ export const paymentDocumentsController = {
       )
 
       rows = documentApiData.map((doc) => {
-        const formattedDate = format(new Date(doc.creationDate), 'd MMM yyyy')
-        const displayName = `${
-          doc.documentType === 'grant'
-            ? 'Grant determination letter'
-            : 'Remittance Advice'
-        } ${doc.quarter}`
-
-        const viewLink = `/public/pdfs/${encodeURIComponent(doc.fileName)}`
+        const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
+        const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
         return [
-          { text: formattedDate },
-          { text: displayName },
+          { text: doc.formattedDate },
+          { text: doc.documentName },
           {
-            html: `<a href="/file/${encodeURIComponent(doc.id)}?filename=${encodeURIComponent(doc.fileName)}" class="govuk-link">
-                    Download <span class="govuk-visually-hidden">${formattedDate} ${displayName}</span>
+            html: `<a href="${downloadLink}" class="govuk-link">
+                    Download <span class="govuk-visually-hidden">${doc.formattedDate} ${doc.documentName}</span>
                    </a>`,
             classes: 'govuk-table__cell--numeric'
           },
           {
             html: `<a href="${viewLink}" target="_blank" class="govuk-link">
-                    View (opens in a new tab) <span class="govuk-visually-hidden">${formattedDate} ${displayName}</span>
+                    View (opens in a new tab) <span class="govuk-visually-hidden">${doc.formattedDate} ${doc.documentName}</span>
                    </a>`,
             classes: 'govuk-table__cell--numeric'
           }
@@ -79,27 +72,29 @@ export const paymentDocumentsController = {
 export const fileDownloadController = {
   async handler(request, h) {
     const { fileId } = request.params
-    const filename = request.query.filename || `${fileId}.pdf`
+    const filename = request.query.docName || `${fileId}.pdf`
+    const isView = request.query.view === 'true'
 
     try {
       const documentPath = `/file/${encodeURIComponent(fileId)}`
       const apiResponse = await fetchWithToken(request, documentPath)
       request.logger.info(`Fetched file metadata for ID: ${fileId}`)
 
-      if (apiResponse?.url) {
-        return h.redirect(apiResponse.url)
-      }
-
       if (Buffer.isBuffer(apiResponse)) {
+        const dispositionType = isView ? 'inline' : 'attachment'
+
         return h
           .response(apiResponse)
           .header('Content-Type', 'application/pdf')
-          .header('Content-Disposition', `attachment; filename="${filename}"`)
+          .header(
+            'Content-Disposition',
+            `${dispositionType}; filename="${filename}"`
+          )
       }
 
       return h.response('File not found').code(statusCodes.notFound)
     } catch (err) {
-      request.logger.error(`Failed to download file ${fileId}:`, err)
+      request.logger.error(`Failed to download/view file ${fileId}:`, err)
       return h.response('Internal server error').code(500)
     }
   }

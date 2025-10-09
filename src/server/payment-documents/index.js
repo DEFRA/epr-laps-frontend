@@ -15,7 +15,20 @@ export const paymentDocuments = {
         },
         {
           method: 'GET',
-          path: '/file/{fileId}',
+          path: '/document/{docId}',
+          ...fileDownloadController
+        },
+        {
+          method: 'GET',
+          path: '/document/view/{fileId}',
+          options: {
+            pre: [
+              (request, h) => {
+                request.query.view = 'true'
+                return h.continue
+              }
+            ]
+          },
           ...fileDownloadController
         }
       ])
