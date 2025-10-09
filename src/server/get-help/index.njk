@@ -1,53 +1,54 @@
 {% extends 'layouts/page.njk' %}
 
+{% set language = currentLang %}
 {% block content %}
 <div class="govuk-grid-row">
 <div class="govuk-grid-column-two-thirds">
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {{ appHeading({
-  text: heading,
-    caption: "Get help"
+  text: authedUser.organisationName,
+  caption: translations['get-help']
 
   }) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-      <h3 class="govuk-heading-s">Guidance</h3>
+      <h3 class="govuk-heading-s">{{ translations['guidance'] }}</h3>
       <p class="govuk-body">
-        <a href="#" class="govuk-link" rel="noreferrer noopener" target="_blank">
-          Understanding LAPs (opens in new tab)
+        <a href="/service-unavailable" class="govuk-link" rel="noreferrer noopener" target="_blank">
+          {{ translations['understanding-l'] }}
         </a><br>
-        Access guidance on LAPs, including how it works and how payments are made
+         {{ translations['access-guidance'] }}
       </p>
 
-      <h3 class="govuk-heading-s">support</h3>
+      <h3 class="govuk-heading-s">{{ translations['support'] }}</h3>
       <p class="govuk-body">
-        <a href="#" class="govuk-link" rel="noreferrer noopener" target="_blank">
-          Request support (opens in new tab)
+        <a href="/service-unavailable" class="govuk-link" rel="noreferrer noopener" target="_blank">
+          {{ translations['request-support'] }}   
         </a><br>
-        Raise a help request or view open requests
+        {{ translations['raise-a-help-re'] }}
       </p>
 
-      <h3 class="govuk-heading-s">Contact us</h3>
+      <h3 class="govuk-heading-s">{{ translations['contact-us'] }}</h3>
 
       <p class="govuk-body">
-        Raise a quesry, make a complaint, or request communication in alternative formats
+       {{ translations['raise-a-query'] }}
       </p>
 
-      <h4 class="govuk-heading-s">Email</h4>
+      <h4 class="govuk-heading-s">{{ translations['email'] }}</h4>
       <p class="govuk-body">
         <a href="mailto:EPRCustomerService@defra.gov.uk" class="govuk-link">
-          EPRCustomerService@defra.gov.uk
+          {{ translations['eprcustomerserv'] }}
         </a><br>
-        We aim to respond within 20 working days
+     {{ translations['we-aim-to-respo'] }}
       </p>
 
-      <h4 class="govuk-heading-s">Telephone</h4>
+      <h4 class="govuk-heading-s">{{ translations['telephone'] }}</h4>
       <p class="govuk-body">
         0300 060 0002<br>
-        Monday to Friday 8am to 6pm (closed on weekends and bank holidays)
+        {{ translations['monday-to-frida'] }}
       </p>
 
     </div>
