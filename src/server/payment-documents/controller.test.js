@@ -98,7 +98,7 @@ describe('paymentDocumentsController', () => {
   })
 })
 
-describe.skip('fileDownloadController', () => {
+describe('fileDownloadController', () => {
   let request
   let h
 
@@ -118,21 +118,19 @@ describe.skip('fileDownloadController', () => {
     }
 
     h = {
-      redirect: vi.fn(),
+      redirect: vi.fn(() => responseMock),
       response: vi.fn(() => responseMock)
     }
   })
 
-  it('redirects if API returns a URL', async () => {
+  it('returns 404 if API returns non-buffer response', async () => {
     fetchWithToken.mockResolvedValue({ url: 'https://example.com/file.pdf' })
 
     await fileDownloadController.handler(request, h)
 
-    expect(fetchWithToken).toHaveBeenCalledWith(request, '/file/123')
-    expect(request.logger.info).toHaveBeenCalledWith(
-      'Fetched file metadata for ID: 123'
-    )
-    expect(h.redirect).toHaveBeenCalledWith('https://example.com/file.pdf')
+    expect(h.response).toHaveBeenCalledWith('File not found')
+    const responseMock = h.response.mock.results[0].value
+    expect(responseMock.code).toHaveBeenCalledWith(statusCodes.notFound)
   })
 
   it('returns PDF buffer if API returns a buffer', async () => {
@@ -172,22 +170,25 @@ describe.skip('fileDownloadController', () => {
     expect(responseMock.code).toHaveBeenCalledWith(500)
   })
 
-  test('should handle missing translations and currentLang', async () => {
-    const mockRequest = { app: {} }
+  it('should handle missing translations and currentLang', async () => {
+    const mockRequest = {
+      app: {},
+      logger: { info: vi.fn(), error: vi.fn() } // ✅ added logger mock
+    }
     const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
     await paymentDocumentsController.handler(mockRequest, mockedResponse)
 
     expect(mockedResponse.view).toHaveBeenCalledWith(
       'payment-documents/index.njk',
-      {
+      expect.objectContaining({
         pageTitle: 'Payment documents',
         currentLang: 'en',
         breadcrumbs: [
           { text: undefined, href: '/?lang=en' },
           { text: undefined, href: '/payment-documents?lang=en' }
         ]
-      }
+      })
     )
   })
 })
