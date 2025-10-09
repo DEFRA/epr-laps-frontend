@@ -285,6 +285,11 @@ export const config = convict({
     default: 'http://localhost:3001',
     env: 'BACKEND_API',
     sensitive: true
+  },
+  externalLink: {
+    doc: 'External link used in the service',
+    format: 'url',
+    default: 'https://google.com'
   }
 })
 
