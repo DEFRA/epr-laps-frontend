@@ -1,62 +1,242 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block content %}
-  {{ appHeading({
-    text: heading,
-    caption: caption
+{{ appHeading({
+    text: authedUser.organisationName,
+    caption: translations['payment-documen'] 
   }) }}
+
 <div class="govuk-grid-row">
-<div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-two-thirds">
 
-  {% from "govuk/components/table/macro.njk" import govukTable %}
-  {% from "govuk/components/tag/macro.njk" import govukTag %}
+     <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-visually-hidden">Warning</span>
+       {{ translations['for-the-2025-to'] }}
+      </strong>
+    </div>
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
-  <h2 class="govuk-heading-m">
-    Your local authority's bank details
-  </h2>
-  {{ govukTag({
-    text: "UNCONFIRMED",
-    classes: "govuk-tag--red"
-  }) }}
+  </div>
 </div>
+  
+{{ govukSelect({
+  id: "sort",
+  name: "sort",
+  label: {
+    text: translations['financial-year']
+  },
+  items: [
+    {
+      value: "published",
+      text: "2025 to 2026"
+    },
+    {
+      value: "updated",
+      text: "2024 to 2025",
+      selected: true
+    },
+    {
+      value: "updated",
+      text: "2023 to 2024"
+    },
+    {
+      value: "updated",
+      text: "2022 to 2023"      
+    }
+  ]
+}) }}
 
 {{ govukTable({
-  firstCellIsHeader: true,
+  caption: "Financial documents",
+  captionClasses: "govuk-visually-hidden",
+  firstCellIsHeader: false,
+  head: [
+    {
+      text: translations['date']
+    },
+    {
+      text: translations['document-name']
+    },
+    {
+      html: "<span class='govuk-visually-hidden'>Download document</span>"
+    },
+    {
+      html: "<span class='govuk-visually-hidden'>View document</span>"
+    }
+  ],
   rows: [
     [
       {
-        text: "First 6 weeks"
+        text: "9 " ~ translations['dec'] ~ " 2025"
       },
       {
-        text: "£109.80 per week"
-      }
+        text: translations['remittance-letter-q4']
+      },
+       {
+      html: (
+        "<a href='https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>9 Dec 2025 Grant determination letter Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ],
     [
       {
-        text: "Next 33 weeks"
+        text: "7 " ~ translations['dec'] ~ " 2025"
       },
       {
-        text: "£109.80 per week"
-      }
+        text: translations['grant-letter-q4']
+      },
+       {
+      html: (
+        "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/remittance-advice-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>7 Dec 2025 Remittance Advice Q4</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ],
     [
       {
-        text: "Total estimated pay"
+        text: "19 " ~ translations['sep'] ~ " 2025"
       },
       {
-        text: "£4,282.20"
-      }
+        text: translations['remittance-letter-q3']
+      },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>19 Sep 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>19 Sep 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "18 " ~ translations['sep'] ~ " 2025"
+      },
+      {
+        text: translations['grant-letter-q3']
+      },
+      {
+      html: (
+        "<a href='/public/pdfs/remittance-advice-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>18 Sep 2025 Remittance Advice Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "16 " ~ translations['jun'] ~ " 2025"
+      },
+      {
+        text: translations['remittance-letter-q1q2']
+      },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>16 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>16 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "15 " ~ translations['jun'] ~ " 2025"
+      },
+      {
+        text: translations['grant-letter-q1q2']
+      },
+       {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>15 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+      {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>16 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
+    ],
+    [
+      {
+        text: "14 " ~ translations['jun'] ~ " 2025"
+      },
+      {
+        text: translations['notice-assessment-q1q2']
+      },
+       {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' download class='govuk-link'>"
+        ~ (translations['download'])
+        ~ " <span class='govuk-visually-hidden'>14 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    },
+     {
+      html: (
+        "<a href='/public/pdfs/grant-determination-letter-wip.pdf' target='_blank' rel='noopener' class='govuk-link'>"
+        ~ (translations['view-(opens-in-'])
+        ~ " <span class='govuk-visually-hidden'>14 Jun 2025 Grant determination letter Q3</span></a>"
+      ) | safe,
+      classes: "govuk-table__cell--numeric"
+    }
     ]
   ]
 }) }}
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-
-{{ govukDetails({
-  summaryText: "Help with nationality",
-  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
-}) }}
-</div>
-  
 {% endblock %}

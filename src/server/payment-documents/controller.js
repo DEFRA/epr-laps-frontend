@@ -5,18 +5,19 @@
 export const paymentDocumentsController = {
   handler(_request, h) {
     const translations = _request.app.translations || {}
-    // const currentLang = _request.app.currentLang || 'en'
+    const currentLang = _request.app.currentLang || 'en'
+
     return h.view('payment-documents/index.njk', {
-      pageTitle: 'Glamshire County Council',
-      heading: translations['local-authority'] || 'local-authority',
-      caption: translations['glamshire-count'] || 'glamshire-count',
+      pageTitle: 'Payment documents',
+      currentLang,
       breadcrumbs: [
         {
-          text: 'Local Authority Payments (LAPs) home',
-          href: '/'
+          text: translations['laps-home'],
+          href: `/?lang=${currentLang}`
         },
         {
-          text: 'Payment documents'
+          text: translations['payment-documen'],
+          href: `/payment-documents?lang=${currentLang}`
         }
       ]
     })
