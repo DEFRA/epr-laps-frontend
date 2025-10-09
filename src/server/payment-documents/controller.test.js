@@ -5,7 +5,6 @@ import {
 } from './controller.js'
 import { fetchWithToken } from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
-import { format } from 'date-fns'
 import { statusCodes } from '../common/constants/status-codes.js'
 
 vi.mock('../../server/auth/utils.js')
@@ -49,7 +48,7 @@ describe('paymentDocumentsController', () => {
         documentType: 'grant',
         quarter: 'Q1',
         fileName: 'file1.pdf',
-        formattedDate: format(new Date('2025-01-01'), 'd MMM yyyy'),
+        formattedDate: '1 Jan 2025',
         documentName: 'Grant determination letter Q1'
       },
       {
@@ -58,7 +57,7 @@ describe('paymentDocumentsController', () => {
         documentType: 'remittance',
         quarter: 'Q2',
         fileName: 'file2.pdf',
-        formattedDate: format(new Date('2025-02-01'), 'd MMM yyyy'),
+        formattedDate: '2 Jan 2025',
         documentName: 'Remittance advice Q2'
       }
     ]
@@ -79,7 +78,7 @@ describe('paymentDocumentsController', () => {
     expect(viewArg.breadcrumbs).toHaveLength(2)
 
     const firstRow = viewArg.rows[0]
-    expect(firstRow[0].text).toBe(format(new Date('2025-01-01'), 'd MMM yyyy'))
+    expect(firstRow[0].text).toBe('1 Jan 2025')
     expect(firstRow[1].text).toBe('Grant determination letter Q1')
   })
 
