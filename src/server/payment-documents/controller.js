@@ -95,7 +95,9 @@ export const fileDownloadController = {
       return h.response('File not found').code(statusCodes.notFound)
     } catch (err) {
       request.logger.error(`Failed to download/view file ${fileId}:`, err)
-      return h.response('Internal server error').code(500)
+      return h
+        .response('Internal server error')
+        .code(statusCodes.internalServerError)
     }
   }
 }
