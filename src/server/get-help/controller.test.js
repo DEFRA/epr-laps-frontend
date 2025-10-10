@@ -1,10 +1,12 @@
+import { vi } from 'vitest'
 import { createServer } from '../server.js'
-import { statusCodes } from '../common/constants/status-codes.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
 import { getHelpController } from './controller.js'
+import { config } from '../../config/config.js'
 
 vi.mock('../common/helpers/auth/get-oidc-config.js')
+
 describe('#getHelpController', () => {
   let server
 
@@ -20,32 +22,49 @@ describe('#getHelpController', () => {
 
   afterAll(async () => {
     getOidcConfig.mockReset()
-
     await server.stop({ timeout: 0 })
   })
 
   beforeEach(() => {
+    vi.clearAllMocks()
     vi.spyOn(authUtils, 'getUserSession').mockReturnValue({
       userName: 'test user'
     })
-    vi.clearAllMocks()
   })
 
-  test('should redirect user when user is unauthenticated', async () => {
+  test('should render the get help view with correct context including getHelpUrl and customerServiceEmail', async () => {
     const mockRequest = {
       app: {
-        translations: { 'local-authority': 'Mocked Local Authority' },
+        translations: { 'laps-home': 'LAPs home', 'get-help': 'Get Help' },
         currentLang: 'en'
       }
     }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/get-help'
-    })
+    const h = {
+      view: vi.fn().mockReturnValue({ code: vi.fn() })
+    }
 
-    await getHelpController.handler(mockRequest, mockedResponse)
-    expect(statusCode).toBe(statusCodes.redirect)
+    await getHelpController.handler(mockRequest, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'get-help/index.njk',
+      expect.objectContaining({
+        pageTitle: 'Get Help',
+        currentLang: 'en',
+        translations: expect.objectContaining({
+          'laps-home': 'LAPs home',
+          'get-help': 'Get Help'
+        }),
+        getHelpUrl: config.get('getHelpUrl'),
+        customerServiceEmail: config.get('customerServiceEmail'),
+        breadcrumbs: expect.arrayContaining([
+          expect.objectContaining({ text: 'LAPs home', href: '/?lang=en' }),
+          expect.objectContaining({
+            text: 'Get Help',
+            href: '/get-help?lang=en'
+          })
+        ])
+      })
+    )
   })
 })
