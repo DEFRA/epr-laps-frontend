@@ -49,7 +49,7 @@ describe('#signOutController', () => {
 
     const mockedRequest = {
       auth: { credentials: { sessionId: 'testSessionId' } },
-      headers: { referer: 'http://localhost:3000' },
+      headers: { referer: 'http://localhost:3000/' },
       logger: { info: vi.fn(), debug: vi.fn() }
     }
 
@@ -63,7 +63,7 @@ describe('#signOutController', () => {
       mockedRequest.auth.credentials
     )
     expect(mockedResponse.redirect).toHaveBeenCalledWith(
-      `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000`
+      `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout`
     )
   })
 })

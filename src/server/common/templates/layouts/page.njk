@@ -5,10 +5,11 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 {% from "language-toggle/macro.njk" import dwpLanguageToggle %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
-
+{% from "loader/macro.njk" import appLoader %}
 {% set mainClasses = "app-main-wrapper" %}
 {% set language = currentLang %}
 
@@ -35,7 +36,7 @@
 
 {% block beforeContent %}
  {{ govukServiceNavigation({
-    serviceName: translations['local-authority'],
+    serviceName: translations['service-title'],
     serviceUrl: "#",
     navigation: navigation
   }) }}
@@ -50,12 +51,18 @@
   
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
-      <div class="govuk-grid-column-two-thirds">
-        
+    <div class="govuk-grid-column-two-thirds">
+      {% if showBackLink %}
+        {{ govukBackLink({
+          text: translations['back-link'],
+          href: "javascript:history.back()"
+        }) }}
+      {% else %}
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}
-        
+              {% endif %}
       </div>
-    <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
+
+      <div class="govuk-grid-column-one-third" style="display: flex; justify-content: flex-end; align-items: center;">
          {{
           dwpLanguageToggle({
             selectedLang: currentLang,
@@ -78,27 +85,27 @@
     items: [
       {
         href: "https://www.gov.uk/help",
-        text: "Help"
+        text: translations['help']
       },
       {
         href: "https://www.gov.uk/help/privacy-notice",
-        text: "Privacy"
+        text: translations['privacy']
       },
       {
         href: "https://www.gov.uk/help/cookies",
-        text: "Cookies"
+        text: translations['cookies']
       },
       {
         href: "https://www.gov.uk/help/accessibility-statement",
-        text: "Accessibility statement"
+        text: translations['accessibility-s']
       },
       {
         href: "https://www.gov.uk/contact",
-        text: "Contact"
+        text: translations['contact']
       },
       {
         href: "https://www.gov.uk/help/terms-conditions",
-        text: "Terms and conditions"
+        text: translations['terms-and-condi']
       },
       {
         href: "https://www.gov.uk/cymraeg",
@@ -110,9 +117,15 @@
       },
       {
         href: "https://www.gov.uk/government/organisations/government-digital-service",
-        text: "Government Digital Service"
+        text:  translations['government-digi']
       }
     ]
+    },
+    contentLicence: {
+       html: translations['all-content-is-'] | safe
+    },
+    copyright: {
+      text: translations['crown-copyright']
     }
   }) }}
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ govukPanel({
+      titleText: translations['bank-details-co']
+    }) }}
+
+    <p class="govuk-body">{{ translations['your-local-auth'] }}</p>
+
+    {% if data['confirm-bank-details-referrer'] == 'bank-details' %}
+      <a href='/laps/bank-details' class='govuk-link'>Go back to Bank details</a>
+    {% elif data['confirm-bank-details-referrer'] == 'home-page' %}
+      <a href="/?lang={{ currentLang }}" class='govuk-link'>{{ translations['go-back-to-laps'] }}</a>
+    {% else %}
+      <a href="/?lang={{ currentLang }}" class='govuk-link'>{{ translations['go-back-to-laps'] }}</a>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

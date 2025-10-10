@@ -1,0 +1,102 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% set showBackLink = true %}
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-form-group">
+      <form method="post" action="/bank-details/bank-details-confirmed">
+        <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+
+            <span class="govuk-caption-xl"> {{ authedUser.organisationName }}</span>
+            <h1 class="govuk-fieldset__heading">
+              {{ translations['confirm-your-lo'] }}
+            </h1>
+          </legend>
+
+          {{ govukSummaryList({
+            rows: [
+              {
+                key: {
+                  text: translations['account-name'] 
+                },
+                value: {
+                  text: bankApiData.accountName
+                }
+              },
+              {
+                key: {
+                  text: translations['sort-code'] 
+                },
+                value: {
+                  text: bankApiData.sortCode
+                }
+              },
+              {
+                key: {
+                  text: translations['account-number']
+                },
+                value: {
+                  text: bankApiData.accountNumber
+                }
+              }
+            ]
+          }) }}
+      
+          <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="confirm-bank-details" name="confirm-bank-details" type="checkbox" value="confirmed">
+              <label class="govuk-label govuk-checkboxes__label" for="confirm-bank-details">
+                {{ translations['i-confirm-these'] }}
+              </label>
+            </div>
+          </div>
+
+        </fieldset>
+
+        {% set detailsHtml %}
+          <p>{{ translations['to-update-your-'] }}, {{ translations["please-raise-a-"] | safe }}</p>
+
+          <p><strong>{{ translations['email'] }}</strong><br>
+            <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
+            {{ translations['we-aim-to-respo'] }}
+          </p>
+
+          <p>
+            <strong>{{ translations['telephone'] }}</strong><br>
+            0300-060-0002<br>
+            {{ translations['monday-to-frida'] }}
+          </p>
+        {% endset %}
+
+        {{ govukDetails({
+          summaryText: translations['these-details-a'],
+          html: detailsHtml
+        }) }}
+        <button class="govuk-button" data-module="govuk-button" type="submit"
+        {% if not isContinueEnabled %} disabled {% endif %}>
+          {{ translations['continue'] }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const checkbox = document.getElementById('confirm-bank-details');
+    const continueButton = document.querySelector('button[type="submit"]');
+
+    checkbox.addEventListener('change', function () {
+      continueButton.disabled = !checkbox.checked;
+    });
+  });
+</script>
+
+{% endblock %}
+
