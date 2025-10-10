@@ -291,6 +291,12 @@ export const config = convict({
     format: String,
     default: 'https://google.com',
     env: 'GET_HELP_URL'
+  },
+  customerServiceEmail: {
+    doc: 'Customer service email',
+    format: String,
+    default: 'mailto:EPRCustomerService@defra.gov.uk',
+    env: 'CUSTOMER_SERVICE_EMAIL'
   }
 })
 
