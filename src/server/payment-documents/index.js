@@ -9,7 +9,7 @@ export const paymentDocuments = {
     register(server) {
       server.route([
         {
-          method: 'GET',
+          method: ['GET', 'POST'],
           path: '/payment-documents',
           ...paymentDocumentsController
         },

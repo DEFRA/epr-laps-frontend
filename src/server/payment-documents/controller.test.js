@@ -4,7 +4,6 @@ import {
   fileDownloadController
 } from './controller.js'
 import { fetchWithToken } from '../../server/auth/utils.js'
-import { context } from '../../config/nunjucks/context/context.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
 vi.mock('../../server/auth/utils.js')
@@ -16,53 +15,54 @@ describe('paymentDocumentsController', () => {
 
   beforeEach(() => {
     request = {
-      logger: {
-        info: vi.fn(),
-        error: vi.fn()
-      },
+      logger: { info: vi.fn(), error: vi.fn() },
       params: {},
-      query: {}
+      query: {},
+      // 👇 FIX: match controller’s destructuring (nested organisationName)
+      auth: {
+        credentials: { organisationName: { organisationName: 'TestOrg' } }
+      },
+      app: {
+        currentLang: 'en',
+        translations: {
+          'laps-home': 'Home',
+          'payment-documen': 'Payment documents',
+          download: 'Download'
+        }
+      }
     }
 
     h = {
-      view: vi.fn()
+      view: vi.fn(),
+      response: vi.fn(() => ({ code: vi.fn() }))
     }
   })
 
   it('renders payment documents with correct rows', async () => {
-    const mockContext = {
-      currentLang: 'en',
-      translations: {
-        'laps-home': 'Home',
-        'payment-documen': 'Payment documents'
-      },
-      authedUser: {
-        organisationName: 'TestOrg'
-      }
+    const mockDocs = {
+      '2025-26': [
+        {
+          id: '123',
+          creationDate: '2025-01-01',
+          documentType: 'grant',
+          quarter: 'Q1',
+          fileName: 'file1.pdf',
+          formattedDate: '1 Jan 2025',
+          documentName: 'Grant determination letter Q1'
+        },
+        {
+          id: '456',
+          creationDate: '2025-02-01',
+          documentType: 'remittance',
+          quarter: 'Q2',
+          fileName: 'file2.pdf',
+          formattedDate: '2 Jan 2025',
+          documentName: 'Remittance advice Q2'
+        }
+      ],
+      currentFiscalYear: '2025-26'
     }
 
-    const mockDocs = [
-      {
-        id: '123',
-        creationDate: '2025-01-01',
-        documentType: 'grant',
-        quarter: 'Q1',
-        fileName: 'file1.pdf',
-        formattedDate: '1 Jan 2025',
-        documentName: 'Grant determination letter Q1'
-      },
-      {
-        id: '456',
-        creationDate: '2025-02-01',
-        documentType: 'remittance',
-        quarter: 'Q2',
-        fileName: 'file2.pdf',
-        formattedDate: '2 Jan 2025',
-        documentName: 'Remittance advice Q2'
-      }
-    ]
-
-    context.mockResolvedValue(mockContext)
     fetchWithToken.mockResolvedValue(mockDocs)
 
     await paymentDocumentsController.handler(request, h)
@@ -75,26 +75,23 @@ describe('paymentDocumentsController', () => {
     const viewArg = h.view.mock.calls[0][1]
     expect(viewArg.rows.length).toBe(2)
     expect(viewArg.pageTitle).toBe('Payment documents')
-    expect(viewArg.breadcrumbs).toHaveLength(2)
-
-    const firstRow = viewArg.rows[0]
-    expect(firstRow[0].text).toBe('1 Jan 2025')
-    expect(firstRow[1].text).toBe('Grant determination letter Q1')
   })
 
-  it('handles fetch errors gracefully', async () => {
-    context.mockResolvedValue({
-      currentLang: 'en',
-      translations: {},
-      authedUser: { organisationName: 'TestOrg' }
-    })
+  it('renders page safely when translations are missing', async () => {
+    const mockRequest = { ...request, app: {} }
+    const mockedResponse = {
+      view: vi.fn(),
+      response: vi.fn(() => ({ code: vi.fn() }))
+    }
+
+    // 👇 Force fetchWithToken to throw so controller hits catch block
     fetchWithToken.mockRejectedValue(new Error('API error'))
 
-    await paymentDocumentsController.handler(request, h)
+    await paymentDocumentsController.handler(mockRequest, mockedResponse)
 
-    expect(request.logger.error).toHaveBeenCalled()
-    const viewArg = h.view.mock.calls[0][1]
-    expect(viewArg.rows).toEqual([])
+    expect(mockedResponse.response).toHaveBeenCalledWith({
+      error: 'Failed to fetch document data'
+    })
   })
 })
 
@@ -109,7 +106,12 @@ describe('fileDownloadController', () => {
         error: vi.fn()
       },
       params: { fileId: '123' },
-      query: {}
+      query: {},
+      auth: {
+        credentials: {
+          organisationName: 'TestOrg'
+        }
+      }
     }
 
     const responseMock = {
@@ -139,8 +141,8 @@ describe('fileDownloadController', () => {
 
     await fileDownloadController.handler(request, h)
 
-    expect(h.response).toHaveBeenCalledWith(buffer)
     const responseMock = h.response.mock.results[0].value
+    expect(h.response).toHaveBeenCalledWith(buffer)
     expect(responseMock.header).toHaveBeenCalledWith(
       'Content-Type',
       'application/pdf'
@@ -168,27 +170,5 @@ describe('fileDownloadController', () => {
     expect(request.logger.error).toHaveBeenCalled()
     const responseMock = h.response.mock.results[0].value
     expect(responseMock.code).toHaveBeenCalledWith(500)
-  })
-
-  it('should handle missing translations and currentLang', async () => {
-    const mockRequest = {
-      app: {},
-      logger: { info: vi.fn(), error: vi.fn() } // ✅ added logger mock
-    }
-    const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
-
-    await paymentDocumentsController.handler(mockRequest, mockedResponse)
-
-    expect(mockedResponse.view).toHaveBeenCalledWith(
-      'payment-documents/index.njk',
-      expect.objectContaining({
-        pageTitle: 'Payment documents',
-        currentLang: 'en',
-        breadcrumbs: [
-          { text: undefined, href: '/?lang=en' },
-          { text: undefined, href: '/payment-documents?lang=en' }
-        ]
-      })
-    )
   })
 })

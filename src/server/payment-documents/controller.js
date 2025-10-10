@@ -2,17 +2,20 @@
  * A GDS styled Payment documents controller
  */
 import { fetchWithToken } from '../../server/auth/utils.js'
-import { context } from '../../config/nunjucks/context/context.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
 export const paymentDocumentsController = {
   async handler(request, h) {
-    const viewContext = await context(request)
-    const { currentLang, translations } = viewContext
-    const { organisationName } = viewContext.authedUser
+    const { currentLang, translations } = request.app
+    const { organisationName } = request.auth.credentials.organisationName
 
-    let documentApiData = []
-    let rows = []
+    const isPost = request.method === 'post'
+    const selectedYear = isPost ? request.payload.sort : null
+
+    let documentApiData = {}
+    const rows = []
+    const financialYearOptions = []
+    let currentFY = ''
     try {
       const documentPath = `/documents/${encodeURIComponent(organisationName)}`
       documentApiData = await fetchWithToken(request, documentPath)
@@ -21,29 +24,50 @@ export const paymentDocumentsController = {
         `Successfully fetched document metadata for ${organisationName}`
       )
 
-      rows = documentApiData.map((doc) => {
+      // Build financial year dropdown
+      currentFY = documentApiData.currentFiscalYear
+      const financialYearEnteries = Object.entries(documentApiData).slice(0, -1)
+      financialYearEnteries.forEach(([financialYear, docs]) => {
+        financialYearOptions.push({
+          value: financialYear,
+          text: financialYear,
+          selected: financialYear === selectedYear
+        })
+      })
+
+      // Determine which year to show
+      const yearToShow =
+        selectedYear && documentApiData[selectedYear]
+          ? selectedYear
+          : Object.keys(documentApiData)[0]
+
+      const docsToShow = documentApiData[yearToShow] || []
+
+      // Build table rows
+      docsToShow.forEach((doc) => {
         const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
         const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
-        return [
-          { text: doc.formattedDate },
+        rows.push([
+          { text: doc.creationDate },
           { text: doc.documentName },
           {
-            html: `<a href="${downloadLink}" class="govuk-link">
-                    Download <span class="govuk-visually-hidden">${doc.formattedDate} ${doc.documentName}</span>
-                   </a>`,
+            html: `<a href='${downloadLink}' download class='govuk-link'>
+                    ${translations.download} <span class='govuk-visually-hidden'>${doc.creationDate} ${doc.documentName}</span></a>`,
             classes: 'govuk-table__cell--numeric'
           },
           {
-            html: `<a href="${viewLink}" target="_blank" class="govuk-link">
-                    View (opens in a new tab) <span class="govuk-visually-hidden">${doc.formattedDate} ${doc.documentName}</span>
-                   </a>`,
+            html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
+                    ${translations['view-(opens-in-']} <span class='govuk-visually-hidden'>${doc.creationDate} ${doc.documentName}</span></a>`,
             classes: 'govuk-table__cell--numeric'
           }
-        ]
+        ])
       })
     } catch (err) {
       request.logger.error(`Failed to fetch document api data:`, err)
+      return h
+        .response({ error: 'Failed to fetch document data' })
+        .code(statusCodes.internalServerError)
     }
 
     return h.view('payment-documents/index.njk', {
@@ -60,7 +84,9 @@ export const paymentDocumentsController = {
           href: `/payment-documents?lang=${currentLang}`
         }
       ],
-      rows
+      rows,
+      financialYearOptions,
+      currentFY
     })
   }
 }
