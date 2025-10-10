@@ -32,7 +32,7 @@ describe('#getHelpController', () => {
     })
   })
 
-  test('should render the get help view with correct context including externalLink', async () => {
+  test('should render the get help view with correct context including getHelpUrl', async () => {
     const mockRequest = {
       app: {
         translations: { 'laps-home': 'LAPs home', 'get-help': 'Get Help' },
@@ -55,7 +55,7 @@ describe('#getHelpController', () => {
           'laps-home': 'LAPs home',
           'get-help': 'Get Help'
         }),
-        externalLink: config.get('externalLink'), // verify external link is passed
+        getHelpUrl: config.get('getHelpUrl'),
         breadcrumbs: expect.arrayContaining([
           expect.objectContaining({ text: 'LAPs home', href: '/?lang=en' }),
           expect.objectContaining({

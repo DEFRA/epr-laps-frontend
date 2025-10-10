@@ -286,7 +286,7 @@ export const config = convict({
     env: 'BACKEND_API',
     sensitive: true
   },
-  externalLink: {
+  getHelpUrl: {
     doc: 'External link used in the service',
     format: 'url',
     default: 'https://google.com'
