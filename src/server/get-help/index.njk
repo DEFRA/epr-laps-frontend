@@ -1,71 +1,58 @@
 {% extends 'layouts/page.njk' %}
 
+{% set language = currentLang %}
 {% block content %}
 <div class="govuk-grid-row">
 <div class="govuk-grid-column-two-thirds">
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
-  {% set html %}
-    <p class="govuk-notification-banner__heading">
-      You have 7 days left to send your application.
-    </p>
-  {% endset %}
+{{ appHeading({
+  text: authedUser.organisationName,
+  caption: translations['get-help']
 
-  {{ govukNotificationBanner({
-    html: html
   }) }}
 
-  {% from "govuk/components/table/macro.njk" import govukTable %}
-  {% from "govuk/components/tag/macro.njk" import govukTag %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
-  <h2 class="govuk-heading-m">
-    Your local authority's bank details
-  </h2>
-  {{ govukTag({
-    text: "UNCONFIRMED",
-    classes: "govuk-tag--red"
-  }) }}
-</div>
+      <h3 class="govuk-heading-s">{{ translations['guidance'] }}</h3>
+      <p class="govuk-body">
+        <a href="{{ getHelpUrl }}" class="govuk-link" rel="noreferrer noopener" target="_blank">
+          {{ translations['understanding-l'] }}
+        </a><br>
+         {{ translations['access-guidance'] }}
+      </p>
 
-{% from "govuk/components/table/macro.njk" import govukTable %}
+      <h3 class="govuk-heading-s">{{ translations['support'] }}</h3>
+      <p class="govuk-body">
+        <a href="{{ getHelpUrl }}" class="govuk-link" rel="noreferrer noopener" target="_blank">
+          {{ translations['request-support'] }}   
+        </a><br>
+        {{ translations['raise-a-help-re'] }}
+      </p>
 
-{{ govukTable({
-  firstCellIsHeader: true,
-  rows: [
-    [
-      {
-        text: "First 6 weeks"
-      },
-      {
-        text: "£109.80 per week"
-      }
-    ],
-    [
-      {
-        text: "Next 33 weeks"
-      },
-      {
-        text: "£109.80 per week"
-      }
-    ],
-    [
-      {
-        text: "Total estimated pay"
-      },
-      {
-        text: "£4,282.20"
-      }
-    ]
-  ]
-}) }}
+      <h3 class="govuk-heading-s">{{ translations['contact-us'] }}</h3>
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
+      <p class="govuk-body">
+       {{ translations['raise-a-query'] }}
+      </p>
 
-{{ govukDetails({
-  summaryText: "Help with nationality",
-  text: "We need to know your nationality so we can work out which elections you’re entitled to vote in. If you cannot provide your nationality, you’ll have to send copies of identity documents through the post."
-}) }}
-</div>
+      <h4 class="govuk-heading-s">{{ translations['email'] }}</h4>
+      <p class="govuk-body">
+        <a href="mailto:{{ customerServiceEmail }}" class="govuk-link">
+          {{ translations['eprcustomerserv'] }}
+        </a><br>
+     {{ translations['we-aim-to-respo'] }}
+      </p>
+
+      <h4 class="govuk-heading-s">{{ translations['telephone'] }}</h4>
+      <p class="govuk-body">
+        0300 060 0002<br>
+        {{ translations['monday-to-frida'] }}
+      </p>
+
+    </div>
+  </div>
+   
   
 {% endblock %}
