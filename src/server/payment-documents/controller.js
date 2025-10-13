@@ -75,7 +75,7 @@ function getTranslationKey(documentName) {
   return documentName
     .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/q(\d)-q(\d)/gi, (match, p1, p2) => `q${p1}q${p2}`)
+    .replace(/q(\d)-q(\d)/gi, (p1, p2) => `q${p1}q${p2}`)
     .replace(/q(\d)/gi, 'q$1')
 }
 
