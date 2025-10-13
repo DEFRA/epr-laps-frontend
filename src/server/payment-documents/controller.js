@@ -24,13 +24,21 @@ export const paymentDocumentsController = {
         `Successfully fetched document metadata for ${organisationName}`
       )
 
+      function getTranslationKey(documentName) {
+        return documentName
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/q(\d)-q(\d)/gi, (match, p1, p2) => `q${p1}q${p2}`)
+          .replace(/q(\d)/gi, 'q$1')
+      }
+
       // Build financial year dropdown
       currentFY = documentApiData.currentFiscalYear
       const financialYearEnteries = Object.entries(documentApiData).slice(0, -1)
       financialYearEnteries.forEach(([financialYear, docs]) => {
         financialYearOptions.push({
           value: financialYear,
-          text: financialYear,
+          text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
           selected: financialYear === selectedYear
         })
       })
@@ -48,9 +56,19 @@ export const paymentDocumentsController = {
         const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
         const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
+        // Translate month
+        const [day, month, year] = doc.creationDate.split(' ')
+        const monthTranslated = translations[month] || month
+        const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
+
+        // Translate document name
+        const translationKey = getTranslationKey(doc.documentName)
+        const docNameTranslated =
+          translations[translationKey] || doc.documentName
+
         rows.push([
-          { text: doc.creationDate },
-          { text: doc.documentName },
+          { text: formattedDateTranslated },
+          { text: docNameTranslated },
           {
             html: `<a href='${downloadLink}' download class='govuk-link'>
                     ${translations.download} <span class='govuk-visually-hidden'>${doc.creationDate} ${doc.documentName}</span></a>`,
