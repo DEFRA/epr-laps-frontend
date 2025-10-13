@@ -17,7 +17,7 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { registerLanguageExtension } from './common/helpers/request-language.js'
 import { getUserSession } from './common/helpers/auth/utils.js'
 import { defraId } from './common/helpers/auth/defra-id.js'
-import Jwt from '@hapi/jwt'
+import { noServiceRole } from './common/helpers/no-service-role.js'
 
 export async function createServer() {
   setupProxy()
@@ -82,37 +82,7 @@ export async function createServer() {
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
-  server.ext('onPreHandler', (request, h) => {
-    // Skip public paths
-    const publicPaths = [
-      '/login',
-      '/logout',
-      '/sign-out',
-      '/no-service-role',
-      '/public',
-      '/assets'
-    ]
-    if (publicPaths.some((path) => request.path.startsWith(path))) {
-      return h.continue
-    }
-
-    const credentials = request.auth?.credentials
-    const token = credentials?.token
-
-    if (!token) {
-      return h.continue
-    }
-
-    const payload = Jwt.token.decode(token)?.decoded?.payload
-    const roles = payload?.roles || []
-
-    if (!Array.isArray(roles) || roles.length === 0) {
-      console.log('User has no service role. Redirecting to /no-service-role')
-      return h.redirect('/no-service-role').takeover()
-    }
-
-    return h.continue
-  })
+  server.ext(noServiceRole)
 
   server.ext('onPreResponse', catchAll)
 
