@@ -285,6 +285,18 @@ export const config = convict({
     default: 'http://localhost:3001',
     env: 'BACKEND_API',
     sensitive: true
+  },
+  getHelpUrl: {
+    doc: 'External link used in the service',
+    format: String,
+    default: 'https://google.com',
+    env: 'GET_HELP_URL'
+  },
+  customerServiceEmail: {
+    doc: 'Customer service email',
+    format: String,
+    default: 'EPRCustomerService@defra.gov.uk',
+    env: 'CUSTOMER_SERVICE_EMAIL'
   }
 })
 
