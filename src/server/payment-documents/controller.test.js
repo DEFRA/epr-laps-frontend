@@ -149,7 +149,7 @@ describe('fileDownloadController', () => {
     )
     expect(responseMock.header).toHaveBeenCalledWith(
       'Content-Disposition',
-      'attachment; filename="123.pdf"'
+      'inline; filename="123.pdf"'
     )
   })
 

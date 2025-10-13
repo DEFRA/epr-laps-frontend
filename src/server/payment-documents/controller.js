@@ -128,28 +128,22 @@ export const fileDownloadController = {
   async handler(request, h) {
     const { fileId } = request.params
     const filename = request.query.docName || `${fileId}.pdf`
-    const isView = request.query.view === 'true'
 
     try {
-      const documentPath = `/file/${encodeURIComponent(fileId)}`
+      const documentPath = `/document/${encodeURIComponent(fileId)}`
       const apiResponse = await fetchWithToken(request, documentPath)
       request.logger.info(`Fetched file metadata for ID: ${fileId}`)
 
       if (Buffer.isBuffer(apiResponse)) {
-        const dispositionType = isView ? 'inline' : 'attachment'
-
         return h
           .response(apiResponse)
           .header('Content-Type', 'application/pdf')
-          .header(
-            'Content-Disposition',
-            `${dispositionType}; filename="${filename}"`
-          )
+          .header('Content-Disposition', `inline; filename="${filename}"`)
       }
 
       return h.response('File not found').code(statusCodes.notFound)
     } catch (err) {
-      request.logger.error(`Failed to download/view file ${fileId}:`, err)
+      request.logger.error(`Failed to fetch file ${fileId}:`, err)
       return h
         .response('Internal server error')
         .code(statusCodes.internalServerError)
