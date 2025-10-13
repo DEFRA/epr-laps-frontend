@@ -17,7 +17,7 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { registerLanguageExtension } from './common/helpers/request-language.js'
 import { getUserSession } from './common/helpers/auth/utils.js'
 import { defraId } from './common/helpers/auth/defra-id.js'
-import { noServiceRole } from './common/helpers/no-service-role.js'
+import { handlePostAuth } from './common/helpers/no-service-role.js'
 
 export async function createServer() {
   setupProxy()
@@ -82,7 +82,7 @@ export async function createServer() {
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
-  server.ext(noServiceRole)
+  server.ext('onPostAuth', handlePostAuth)
 
   server.ext('onPreResponse', catchAll)
 
