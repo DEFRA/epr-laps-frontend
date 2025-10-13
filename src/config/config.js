@@ -295,7 +295,7 @@ export const config = convict({
   customerServiceEmail: {
     doc: 'Customer service email',
     format: String,
-    default: 'mailto:EPRCustomerService@defra.gov.uk',
+    default: 'EPRCustomerService@defra.gov.uk',
     env: 'CUSTOMER_SERVICE_EMAIL'
   }
 })
