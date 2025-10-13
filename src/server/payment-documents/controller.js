@@ -16,6 +16,7 @@ export const paymentDocumentsController = {
     let rows = []
     const financialYearOptions = []
     let currentFY = ''
+    let warningText = ''
     try {
       const documentPath = `/documents/${encodeURIComponent(organisationName)}`
       documentApiData = await fetchWithToken(request, documentPath)
@@ -26,12 +27,15 @@ export const paymentDocumentsController = {
 
       // Build financial year dropdown
       currentFY = documentApiData.currentFiscalYear
+      warningText = translations['fy-warning-text']
+        ? translations['fy-warning-text'].replace('{year}', currentFY)
+        : `For the ${currentFY} financial year, there will be a single payment covering quarters 1 and 2.`
       const financialYearEnteries = Object.entries(documentApiData).slice(0, -1)
       financialYearEnteries.forEach(([financialYear, _docs]) => {
         financialYearOptions.push({
           value: financialYear,
           text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
-          selected: financialYear === selectedYear
+          selected: financialYear === (selectedYear || currentFY)
         })
       })
 
@@ -66,7 +70,8 @@ export const paymentDocumentsController = {
       ],
       rows,
       financialYearOptions,
-      currentFY
+      currentFY,
+      warningText
     })
   }
 }
