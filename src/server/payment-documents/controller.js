@@ -13,7 +13,7 @@ export const paymentDocumentsController = {
     const selectedYear = isPost ? request.payload.sort : null
 
     let documentApiData = {}
-    const rows = []
+    let rows = []
     const financialYearOptions = []
     let currentFY = ''
     try {
@@ -24,18 +24,10 @@ export const paymentDocumentsController = {
         `Successfully fetched document metadata for ${organisationName}`
       )
 
-      function getTranslationKey(documentName) {
-        return documentName
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/q(\d)-q(\d)/gi, (match, p1, p2) => `q${p1}q${p2}`)
-          .replace(/q(\d)/gi, 'q$1')
-      }
-
       // Build financial year dropdown
       currentFY = documentApiData.currentFiscalYear
       const financialYearEnteries = Object.entries(documentApiData).slice(0, -1)
-      financialYearEnteries.forEach(([financialYear, docs]) => {
+      financialYearEnteries.forEach(([financialYear, _docs]) => {
         financialYearOptions.push({
           value: financialYear,
           text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
@@ -50,37 +42,7 @@ export const paymentDocumentsController = {
           : Object.keys(documentApiData)[0]
 
       const docsToShow = documentApiData[yearToShow] || []
-
-      // Build table rows
-      docsToShow.forEach((doc) => {
-        const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
-        const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
-
-        // Translate month
-        const [day, month, year] = doc.creationDate.split(' ')
-        const monthTranslated = translations[month] || month
-        const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
-
-        // Translate document name
-        const translationKey = getTranslationKey(doc.documentName)
-        const docNameTranslated =
-          translations[translationKey] || doc.documentName
-
-        rows.push([
-          { text: formattedDateTranslated },
-          { text: docNameTranslated },
-          {
-            html: `<a href='${downloadLink}' download class='govuk-link'>
-                    ${translations.download} <span class='govuk-visually-hidden'>${doc.creationDate} ${doc.documentName}</span></a>`,
-            classes: 'govuk-table__cell--numeric'
-          },
-          {
-            html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
-                    ${translations['view-(opens-in-']} <span class='govuk-visually-hidden'>${doc.creationDate} ${doc.documentName}</span></a>`,
-            classes: 'govuk-table__cell--numeric'
-          }
-        ])
-      })
+      rows = buildTableRows(docsToShow, translations)
     } catch (err) {
       request.logger.error(`Failed to fetch document api data:`, err)
       return h
@@ -107,6 +69,50 @@ export const paymentDocumentsController = {
       currentFY
     })
   }
+}
+
+function getTranslationKey(documentName) {
+  return documentName
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/q(\d)-q(\d)/gi, (match, p1, p2) => `q${p1}q${p2}`)
+    .replace(/q(\d)/gi, 'q$1')
+}
+
+function buildTableRows(docsToShow, translations) {
+  return docsToShow.map((doc) => {
+    const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
+    const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
+
+    // Translate month and document name
+    const [day, month, year] = doc.creationDate.split(' ')
+    const monthTranslated = translations[month] || month
+    const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
+
+    const translationKey = getTranslationKey(doc.documentName)
+    const docNameTranslated = translations[translationKey] || doc.documentName
+
+    return [
+      { text: formattedDateTranslated },
+      { text: docNameTranslated },
+      {
+        html: `<a href='${downloadLink}' download class='govuk-link'>
+                ${translations.download}
+                <span class='govuk-visually-hidden'>
+                  ${doc.creationDate} ${doc.documentName}
+                </span></a>`,
+        classes: 'govuk-table__cell--numeric'
+      },
+      {
+        html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
+                ${translations['view-(opens-in-']}
+                <span class='govuk-visually-hidden'>
+                  ${doc.creationDate} ${doc.documentName}
+                </span></a>`,
+        classes: 'govuk-table__cell--numeric'
+      }
+    ]
+  })
 }
 
 /**
