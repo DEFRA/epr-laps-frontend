@@ -1,8 +1,4 @@
 export function handlePostAuth(request, h) {
-  console.log('Request path:', request.path)
-  console.log('Is Authenticated:', request.auth?.isAuthenticated)
-  console.log('Roles:', request.auth?.credentials?.roles)
-
   // Skip paths that should never trigger this check
   const publicPaths = [
     '/logout',
@@ -22,7 +18,6 @@ export function handlePostAuth(request, h) {
     const roles = request.auth.credentials?.roles || []
 
     if (roles.length === 0) {
-      console.log('User has no service role – redirecting to /no-service-role')
       return h.redirect('/no-service-role').takeover()
     }
   }
