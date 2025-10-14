@@ -56,7 +56,6 @@ export const paymentDocumentsController = {
     return h.view('payment-documents/index.njk', {
       pageTitle: 'Payment documents',
       currentLang,
-      translations,
       breadcrumbs: [
         {
           text: translations['laps-home'],
