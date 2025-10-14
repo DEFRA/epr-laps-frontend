@@ -88,7 +88,9 @@ function buildFinancialYearOptions(
   selectedYear,
   currentFY
 ) {
-  if (!documentApiData || typeof documentApiData !== 'object') return []
+  if (!documentApiData || typeof documentApiData !== 'object') {
+    return []
+  }
 
   const entries = Object.entries(documentApiData).slice(0, -1)
   return entries.map(([financialYear, _docs]) => ({
