@@ -105,5 +105,7 @@
   "back-link": "Back",
   "continue": "Continue",
   "service-title": "Local Authority Payments account for EPR",
-  "to": "to"
+  "to": "to",
+  "you-do-not": "You do not have a service role",
+  "to-access-this": "To access this content, your Defra account administrator must assign you a service role within the Local Authority Payments (LAPs) service."
 }

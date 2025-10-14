@@ -1,0 +1,30 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">{{ translations['you-do-not'] }}</h1>
+    <p class="govuk-body">
+      {{ translations['to-access-this'] }}
+
+    <h2 class="govuk-heading-l">{{ translations['contact-us'] }}</h2>
+
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ translations['email'] }}</h3>
+    <ul class="govuk-list">
+      <li><a href="mailto:#">{{ translations['eprcustomerserv'] }}</a></li>
+     
+      <li>{{ translations['we-aim-to-respo'] }}</li>  
+    </ul>
+
+
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ translations['telephone'] }}</h3>
+    <ul class="govuk-list">
+      <li>{{ translations['telephone'] }}: 0300 060 0002</li>
+      <li>{{ translations['monday-to-frida'] }}</li>
+    </ul>
+
+  </div>
+</div>
+
+{% endblock %}
