@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeAll, afterAll, vi } from 'vitest'
 import { initializeTestServer } from '../test-helpers/test-server.js'
-import { handlePostAuth } from './no-service-role.js'
+import { handlePostAuth } from './handle-post-auth.js'
 
-describe('#noServiceRole', () => {
+describe('#handlePostAuth', () => {
   let server
   let h
 
