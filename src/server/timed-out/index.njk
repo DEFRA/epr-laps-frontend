@@ -1,0 +1,21 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+
+<div class="govuk-body">
+  <h2 class="govuk-heading-xl">
+    {{ translations['session-timeout'] }}
+  </h2>
+  <p>
+  {{ translations['for-security-reas'] }}<br><br>
+  {{ translations['sign-in-again'] | safe }}<br><br>
+  </p>
+  {% from "govuk/components/button/macro.njk" import govukButton %}
+
+{{ govukButton({
+  text: translations['sign-in'],
+  href: "/"
+}) }}
+</div>
+
+{% endblock %}
