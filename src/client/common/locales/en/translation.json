@@ -86,5 +86,8 @@
   "crown-copyright": "© Crown copyright",
   "back-link": "Back",
   "continue": "Continue",
-  "service-title": "Local Authority Payments account for EPR"
+  "service-title": "Local Authority Payments account for EPR",
+  "session-timeout": "Your session has been timed out",
+  "for-security-reas": "For security reasons, you have been signed out.",
+  "sign-in-again": "Sign in again or return to the <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a> website."
 }
