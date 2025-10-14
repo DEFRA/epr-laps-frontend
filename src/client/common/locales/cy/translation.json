@@ -92,5 +92,7 @@
   "crown-copyright": "© Hawlfraint y Goron",
   "back-link": "Yn ol",
   "continue": "Parhau",
-  "service-title": "Cyfrif Taliadau Awdurdod Lleol ar gyfer EPR"
+  "service-title": "Cyfrif Taliadau Awdurdod Lleol ar gyfer EPR",
+  "you-do-not": "Nid oes gennych rôl gwasanaeth",
+  "to-access-this": "I gael mynediad at y cynnwys hwn, rhaid i weinyddwr eich cyfrif Defra aseinio rôl gwasanaeth i chi o fewn y gwasanaeth Taliadau Awdurdod Lleol (LAPs)."
 }
