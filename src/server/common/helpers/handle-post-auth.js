@@ -1,13 +1,6 @@
 export function handlePostAuth(request, h) {
   // Skip paths that should never trigger this check
-  const publicPaths = [
-    '/logout',
-    '/sign-out',
-    '/no-service-role',
-    '/auth-response',
-    '/public',
-    '/assets'
-  ]
+  const publicPaths = ['/sign-out', '/no-service-role', '/auth-response']
 
   if (publicPaths.some((path) => request.path.startsWith(path))) {
     return h.continue
