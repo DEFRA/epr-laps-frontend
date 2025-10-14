@@ -14,7 +14,7 @@ export const paymentDocumentsController = {
 
     let documentApiData = {}
     let rows = []
-    const financialYearOptions = []
+    let financialYearOptions = []
     let currentFY = ''
     let warningText = ''
     try {
@@ -30,14 +30,13 @@ export const paymentDocumentsController = {
       warningText = translations['fy-warning-text']
         ? translations['fy-warning-text'].replace('{year}', currentFY)
         : `For the ${currentFY} financial year, there will be a single payment covering quarters 1 and 2.`
-      const financialYearEnteries = Object.entries(documentApiData).slice(0, -1)
-      financialYearEnteries.forEach(([financialYear, _docs]) => {
-        financialYearOptions.push({
-          value: financialYear,
-          text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
-          selected: financialYear === (selectedYear || currentFY)
-        })
-      })
+
+      financialYearOptions = buildFinancialYearOptions(
+        documentApiData,
+        translations,
+        selectedYear,
+        currentFY
+      )
 
       // Determine which year to show
       const yearToShow =
@@ -82,6 +81,22 @@ function getTranslationKey(documentName) {
     .replace(/\s+/g, '-')
     .replace(/q(\d)-q(\d)/gi, (p1, p2) => `q${p1}q${p2}`)
     .replace(/q(\d)/gi, 'q$1')
+}
+
+function buildFinancialYearOptions(
+  documentApiData,
+  translations,
+  selectedYear,
+  currentFY
+) {
+  if (!documentApiData || typeof documentApiData !== 'object') return []
+
+  const entries = Object.entries(documentApiData).slice(0, -1)
+  return entries.map(([financialYear, _docs]) => ({
+    value: financialYear,
+    text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
+    selected: financialYear === (selectedYear || currentFY)
+  }))
 }
 
 function buildTableRows(docsToShow, translations) {
