@@ -4,13 +4,8 @@ export const timedOutController = {
   handler: (request, h) => {
     // If user session exists, remove it
     if (request?.state?.userSession) {
-      // Since auth is false for this route, we need to handle session removal differently
-      try {
-        const credentials = request.state?.userSession
-        removeUserSession(request, credentials)
-      } catch (error) {
-        request.logger?.warn('Could not remove user session on timeout:', error)
-      }
+      const credentials = request.auth?.credentials
+      removeUserSession(request, credentials)
     }
 
     return h.view('timed-out/index.njk', {

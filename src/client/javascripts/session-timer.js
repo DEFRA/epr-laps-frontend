@@ -1,5 +1,5 @@
 let sessionTimer
-const timerDuration = 30 * 60 * 1000 // 30 minutes in milliseconds
+const timerDuration = 30 * 60 * 1000 // 30 minutes
 
 function startSessionTimer() {
   if (sessionTimer) {
