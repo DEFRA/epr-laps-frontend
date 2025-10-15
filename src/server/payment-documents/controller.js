@@ -101,36 +101,45 @@ function buildFinancialYearOptions(
 }
 
 function buildTableRows(docsToShow, translations) {
+  const today = new Date()
+
   return docsToShow.map((doc) => {
     const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
     const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
-    // Translate month and document name
+    // Parse date in "DD Mon YYYY" format
     const [day, month, year] = doc.creationDate.split(' ')
-    const monthTranslated = translations[month] || month
-    const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
+    const formattedDate = new Date(`${month} ${day}, ${year}`)
+
+    // Check if document is within the last 30 days
+    const diffDays = (today - formattedDate) / (1000 * 60 * 60 * 24)
+    const isRecent = diffDays <= 30
+
+    const boldClass = isRecent ? 'bold-row' : ''
 
     const translationKey = getTranslationKey(doc.documentName)
     const docNameTranslated = translations[translationKey] || doc.documentName
+    const monthTranslated = translations[month] || month
+    const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
 
     return [
-      { text: formattedDateTranslated },
-      { text: docNameTranslated },
+      { text: formattedDateTranslated, classes: boldClass },
+      { text: docNameTranslated, classes: boldClass },
       {
         html: `<a href='${downloadLink}' download class='govuk-link'>
                 ${translations.download}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
                 </span></a>`,
-        classes: 'govuk-table__cell--numeric'
+        classes: `govuk-table__cell--numeric`
       },
       {
         html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
-                ${translations['view-(opens-in-']}
+                ${translations['view-(opens-in-'] || 'View (opens in new tab)'}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
                 </span></a>`,
-        classes: 'govuk-table__cell--numeric'
+        classes: `govuk-table__cell--numeric`
       }
     ]
   })
