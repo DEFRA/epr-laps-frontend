@@ -110,7 +110,7 @@
   "service-unavailable": "Sorry, the service is currently unavailable",
   "you-will-be": "You will be able to use the service soon.",
   "page-not found": "Page not found",
-  "you-can-return": "You can return to the <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a> website."
+  "you-can-return": "You can return to the <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a> website.",
   "to": "to",
   "you-do-not": "You do not have a service role",
   "to-access-this": "To access this content, your Defra account administrator must assign you a service role within the Local Authority Payments (LAPs) service."
