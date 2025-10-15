@@ -102,6 +102,7 @@ function buildFinancialYearOptions(
 
 function buildTableRows(docsToShow, translations) {
   const today = new Date()
+  const RECENT_DOC_DAYS_LIMIT = 30
 
   return docsToShow.map((doc) => {
     const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
@@ -113,7 +114,7 @@ function buildTableRows(docsToShow, translations) {
 
     // Check if document is within the last 30 days
     const diffDays = (today - formattedDate) / (1000 * 60 * 60 * 24)
-    const isRecent = diffDays <= 30
+    const isRecent = diffDays <= RECENT_DOC_DAYS_LIMIT
 
     const boldClass = isRecent ? 'bold-row' : ''
 
