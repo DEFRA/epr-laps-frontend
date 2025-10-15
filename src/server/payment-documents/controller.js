@@ -132,15 +132,15 @@ function buildTableRows(docsToShow, translations) {
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
                 </span></a>`,
-        classes: `govuk-table__cell--numeric`
+        classes: 'govuk-table__cell--numeric'
       },
       {
         html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
-                ${translations['view-(opens-in-'] || 'View (opens in new tab)'}
+                ${translations['view-(opens-in-']}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
                 </span></a>`,
-        classes: `govuk-table__cell--numeric`
+        classes: 'govuk-table__cell--numeric'
       }
     ]
   })
