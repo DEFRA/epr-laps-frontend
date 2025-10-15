@@ -3,15 +3,30 @@ import { statusCodes } from '../constants/status-codes.js'
 function statusCodeMessage(statusCode) {
   switch (statusCode) {
     case statusCodes.notFound:
-      return 'Page not found'
+      return {
+        heading: 'Page not found',
+        message: 'You can return to the GOV.UK website.'
+      }
+    case statusCodes.serviceUnavailable:
+      return {
+        heading: 'Sorry, the service is currently unavailable',
+        message: 'You will be able to use the service soon.'
+      }
     case statusCodes.forbidden:
-      return 'Forbidden'
+      return {
+        heading: 'Forbidden',
+        message: 'You do not have permission to access this page.'
+      }
     case statusCodes.unauthorized:
-      return 'Unauthorized'
-    case statusCodes.badRequest:
-      return 'Bad Request'
+      return {
+        heading: 'Unauthorized',
+        message: 'You need to sign in to view this page.'
+      }
     default:
-      return 'Something went wrong'
+      return {
+        heading: 'Sorry, there is a problem with the service',
+        message: 'Try again later.'
+      }
   }
 }
 
@@ -21,9 +36,9 @@ export function catchAll(request, h) {
   if (!('isBoom' in response)) {
     return h.continue
   }
-
+  console.log('Error handler invoked', response)
   const statusCode = response.output.statusCode
-  const errorMessage = statusCodeMessage(statusCode)
+  const { heading, message } = statusCodeMessage(statusCode)
 
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error(response?.stack)
@@ -31,9 +46,9 @@ export function catchAll(request, h) {
 
   return h
     .view('error/index', {
-      pageTitle: errorMessage,
-      heading: statusCode,
-      message: errorMessage
+      pageTitle: heading,
+      heading,
+      message
     })
     .code(statusCode)
 }

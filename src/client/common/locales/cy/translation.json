@@ -36,11 +36,11 @@
   "to-update-your-": "I ddiweddaru manylion banc eich awdurdod lleol",
   "we'll-let-you-k": "Rwy'n cadarnhau bod y manylion hyn yn gywir",
   "email": "Ebost",
-  "eprcustomerserv": "GwasanaethCwsmeriaidEPRC@defra.gov.uk",
-  "we-aim-to-respo": "Ein nod yw ymateb o fewn 20 diwrnod gwaith",
+  "eprcustomerserv": "gwasanaethcustomerepr@defra.gov.uk",
+  "we-aim-to-respo": "Ein nod yw ymateb o fewn 20 diwrnod gwaith.",
   "telephone": "Ffon",
-  "0300-060-0002": "EPRCustomerService@defra.gov.uk",
-  "monday-to-frida": "Dydd Llun i ddydd Gwener 8am i 6pm (ar gau ar benwythnosau a gwyliau banc)",
+  "0300-060-0002": "eprcustomerservice@defra.gov.uk",
+  "monday-to-frida": "Dydd Llun i ddydd Gwener 8am i 4.30pm (ar gau ar benwythnosau a gwyliau banc)",
   "confirm-your-lo": "Cadarnhewch fanylion banc eich awdurdod lleol",
   "name-of-account": "0300 060 0002",
   "change-your-loc": "Newid manylion banc eich awdurdod lleol",
@@ -92,5 +92,11 @@
   "crown-copyright": "© Hawlfraint y Goron",
   "back-link": "Yn ol",
   "continue": "Parhau",
-  "service-title": "Cyfrif Taliadau Awdurdod Lleol ar gyfer EPR"
+  "service-title": "Cyfrif Taliadau Awdurdod Lleol ar gyfer EPR",
+  "service-problem": "Mae'n ddrwg gennym, mae problem gyda'r gwasanaeth",
+  "try-again": "Ceisiwch eto yn nes ymlaen.",
+  "service-unavailable": "Mae'n ddrwg gennym, nid yw'r gwasanaeth ar gael ar hyn o bryd",
+  "you-will-be": "Byddwch yn gallu defnyddio'r gwasanaeth yn fuan.",
+  "page-not found": "Tudalen heb ei chanfod",
+  "you-can-return": "Gallwch chi ddychwelyd i'r <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a> gwefan."
 }
