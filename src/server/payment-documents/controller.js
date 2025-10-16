@@ -101,22 +101,14 @@ function buildFinancialYearOptions(
 }
 
 function buildTableRows(docsToShow, translations) {
-  const today = new Date()
-  const RECENT_DOC_DAYS_LIMIT = 30
-
   return docsToShow.map((doc) => {
     const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
     const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
     // Parse date in "DD Mon YYYY" format
     const [day, month, year] = doc.creationDate.split(' ')
-    const formattedDate = new Date(`${month} ${day}, ${year}`)
 
-    // Check if document is within the last 30 days
-    const diffDays = (today - formattedDate) / (1000 * 60 * 60 * 24)
-    const isRecent = diffDays <= RECENT_DOC_DAYS_LIMIT
-
-    const boldClass = isRecent ? 'bold-row' : ''
+    const boldClass = doc.isLatest ? 'bold-row' : ''
 
     const translationKey = getTranslationKey(doc.documentName)
     const docNameTranslated = translations[translationKey] || doc.documentName

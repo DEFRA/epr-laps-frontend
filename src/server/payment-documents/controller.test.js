@@ -104,7 +104,8 @@ describe('paymentDocumentsController', () => {
           documentType: 'grant',
           quarter: 'Q1',
           fileName: 'recent.pdf',
-          documentName: 'Recent Payment Document'
+          documentName: 'Recent Payment Document',
+          isLatest: true
         },
         {
           id: 'old-doc',
@@ -112,7 +113,8 @@ describe('paymentDocumentsController', () => {
           documentType: 'grant',
           quarter: 'Q2',
           fileName: 'old.pdf',
-          documentName: 'Old Payment Document'
+          documentName: 'Old Payment Document',
+          isLatest: false
         }
       ],
       currentFiscalYear: '2025-26'
