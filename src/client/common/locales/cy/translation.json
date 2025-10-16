@@ -119,5 +119,9 @@
   "you-can-return": "Gallwch chi ddychwelyd i'r <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a> gwefan.",
   "to": "i",
   "you-do-not": "Nid oes gennych rôl gwasanaeth",
-  "to-access-this": "I gael mynediad at y cynnwys hwn, rhaid i weinyddwr eich cyfrif Defra aseinio rôl gwasanaeth i chi o fewn y gwasanaeth Taliadau Awdurdod Lleol (LAPs)."
+  "to-access-this": "I gael mynediad at y cynnwys hwn, rhaid i weinyddwr eich cyfrif Defra aseinio rôl gwasanaeth i chi o fewn y gwasanaeth Taliadau Awdurdod Lleol (LAPs).",
+  "forbidden": "Gwaherddir",
+  "you-do": "Nid oes gennych ganiatâd i gael mynediad i'r dudalen hon.",
+  "unauthorized": "Unauthorized",
+  "you-need-to": "Mae angen i chi fewngofnodi i weld y dudalen hon."
 }

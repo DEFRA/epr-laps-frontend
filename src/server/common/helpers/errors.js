@@ -1,31 +1,31 @@
 import { statusCodes } from '../constants/status-codes.js'
 
-function statusCodeMessage(statusCode) {
+function statusCodeMessage(statusCode, translations) {
   switch (statusCode) {
     case statusCodes.notFound:
       return {
-        heading: 'Page not found',
-        message: 'You can return to the GOV.UK website.'
+        heading: translations['page-not found'],
+        message: translations['you-can-return']
       }
     case statusCodes.serviceUnavailable:
       return {
-        heading: 'Sorry, the service is currently unavailable',
-        message: 'You will be able to use the service soon.'
+        heading: translations['service-unavailable'],
+        message: translations['you-will-be']
       }
     case statusCodes.forbidden:
       return {
-        heading: 'Forbidden',
-        message: 'You do not have permission to access this page.'
+        heading: translations['forbidden'],
+        message: translations['you-do']
       }
     case statusCodes.unauthorized:
       return {
-        heading: 'Unauthorized',
-        message: 'You need to sign in to view this page.'
+        heading: translations['unauthorized'],
+        message: translations['you-need-to']
       }
     default:
       return {
-        heading: 'Sorry, there is a problem with the service',
-        message: 'Try again later.'
+        heading: translations['service-problem'],
+        message: translations['try-again']
       }
   }
 }
@@ -36,9 +36,11 @@ export function catchAll(request, h) {
   if (!('isBoom' in response)) {
     return h.continue
   }
-  console.log('Error handler invoked', response)
+
+  const translations = request.app?.translations || {}
+
   const statusCode = response.output.statusCode
-  const { heading, message } = statusCodeMessage(statusCode)
+  const { heading, message } = statusCodeMessage(statusCode, translations)
 
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error(response?.stack)
@@ -48,7 +50,8 @@ export function catchAll(request, h) {
     .view('error/index', {
       pageTitle: heading,
       heading,
-      message
+      message,
+      translations
     })
     .code(statusCode)
 }
