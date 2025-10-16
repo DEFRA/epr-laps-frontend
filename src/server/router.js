@@ -10,6 +10,8 @@ import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
 import { noServiceRole } from './no-service-role/index.js'
+import { catchAll } from './common/helpers/errors.js'
+import { statusCodes } from './common/constants/status-codes.js'
 
 export const router = {
   plugin: {
@@ -34,6 +36,22 @@ export const router = {
 
       // Static assets
       await server.register([serveStaticFiles])
+
+      //Global catch-all route for unknown URLs (404)
+      server.route({
+        method: '*',
+        path: '/{any*}',
+        handler: (request, h) => catchAll(request, h, statusCodes.notFound)
+      })
+
+      //Global error handler for Boom errors (500, 403, etc.)
+      server.ext('onPreResponse', (request, h) => {
+        const { response } = request
+        if (response?.isBoom) {
+          return catchAll(request, h)
+        }
+        return h.continue
+      })
     }
   }
 }

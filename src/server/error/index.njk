@@ -8,7 +8,7 @@
     <h1 class="govuk-heading-l">{{ heading }}</h1>
 
     <!-- Dynamic message -->
-    <p class="govuk-body">{{ message }}</p>
+    <p class="govuk-body">{{ message | safe}}</p>
     <h2 class="govuk-heading-l">{{ translations['contact-us'] }}</h2>
 
     <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ translations['email'] }}</h3>

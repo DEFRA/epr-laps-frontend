@@ -88,8 +88,7 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: req.app.translations['page-not found'],
       heading: req.app.translations['page-not found'],
-      message: req.app.translations['you-can-return'],
-      translations: req.app.translations
+      message: req.app.translations['you-can-return']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
@@ -102,8 +101,7 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: req.app.translations['service-unavailable'],
       heading: req.app.translations['service-unavailable'],
-      message: req.app.translations['you-will-be'],
-      translations: req.app.translations
+      message: req.app.translations['you-will-be']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
   })
@@ -116,8 +114,7 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: req.app.translations['forbidden'],
       heading: req.app.translations['forbidden'],
-      message: req.app.translations['you-do'],
-      translations: req.app.translations
+      message: req.app.translations['you-do']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
@@ -130,8 +127,7 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: req.app.translations['unauthorized'],
       heading: req.app.translations['unauthorized'],
-      message: req.app.translations['you-need-to'],
-      translations: req.app.translations
+      message: req.app.translations['you-need-to']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
@@ -144,8 +140,7 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: req.app.translations['service-problem'],
       heading: req.app.translations['service-problem'],
-      message: req.app.translations['try-again'],
-      translations: req.app.translations
+      message: req.app.translations['try-again']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
@@ -158,8 +153,7 @@ describe('#catchAll', () => {
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: req.app.translations['service-problem'],
       heading: req.app.translations['service-problem'],
-      message: req.app.translations['try-again'],
-      translations: req.app.translations
+      message: req.app.translations['try-again']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
@@ -176,5 +170,23 @@ describe('#catchAll', () => {
     const result = catchAll(req, h)
 
     expect(result).toBe('continue')
+  })
+
+  test('Should handle request with no translations', () => {
+    const req = {
+      response: {
+        isBoom: true,
+        output: { statusCode: statusCodes.notFound }
+      },
+      logger: { error: mockErrorLogger }
+    }
+
+    catchAll(req, mockToolkit)
+
+    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+      pageTitle: undefined,
+      heading: undefined,
+      message: undefined
+    })
   })
 })

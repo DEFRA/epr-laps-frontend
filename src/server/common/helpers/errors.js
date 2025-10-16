@@ -30,16 +30,18 @@ function statusCodeMessage(statusCode, translations) {
   }
 }
 
-export function catchAll(request, h) {
+export function catchAll(request, h, fallbackStatusCode = undefined) {
   const { response } = request
 
-  if (!('isBoom' in response)) {
+  // If not a Boom error and no fallback, continue
+  if (!response?.isBoom && !fallbackStatusCode) {
     return h.continue
   }
 
   const translations = request.app?.translations || {}
 
-  const statusCode = response.output.statusCode
+  // Determine status code: use Boom's or fallback
+  const statusCode = response?.output?.statusCode || fallbackStatusCode
   const { heading, message } = statusCodeMessage(statusCode, translations)
 
   if (statusCode >= statusCodes.internalServerError) {
@@ -50,8 +52,7 @@ export function catchAll(request, h) {
     .view('error/index', {
       pageTitle: heading,
       heading,
-      message,
-      translations
+      message
     })
     .code(statusCode)
 }
