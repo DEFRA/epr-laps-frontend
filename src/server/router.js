@@ -10,7 +10,6 @@ import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
 import { noServiceRole } from './no-service-role/index.js'
-import { catchAll } from './common/helpers/errors.js'
 import Boom from '@hapi/boom'
 
 export const router = {
@@ -41,20 +40,7 @@ export const router = {
       server.route({
         method: '*',
         path: '/{any*}',
-        handler: (request, h) => {
-          const response = Boom.notFound()
-          request.response = response
-          return catchAll(request, h)
-        }
-      })
-
-      //Global error handler for Boom errors (500, 403, etc.)
-      server.ext('onPreResponse', (request, h) => {
-        const { response } = request
-        if (response?.isBoom) {
-          return catchAll(request, h)
-        }
-        return h.continue
+        handler: (_request, _h) => Boom.notFound()
       })
     }
   }
