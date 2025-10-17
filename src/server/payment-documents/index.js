@@ -1,6 +1,7 @@
 import {
   paymentDocumentsController,
-  fileDownloadController
+  fileDownloadController,
+  fileViewController
 } from './controller.js'
 
 export const paymentDocuments = {
@@ -29,7 +30,7 @@ export const paymentDocuments = {
               }
             ]
           },
-          ...fileDownloadController
+          ...fileViewController
         }
       ])
     }

@@ -4,6 +4,7 @@
 import { fetchWithToken } from '../../server/auth/utils.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
+// const $ = cheerio.load(htmlString);
 export const paymentDocumentsController = {
   async handler(request, h) {
     const { currentLang, translations } = request.app
@@ -165,6 +166,28 @@ export const fileDownloadController = {
       return h
         .response('Internal server error')
         .code(statusCodes.internalServerError)
+    }
+  }
+}
+
+export const fileViewController = {
+  async handler(request, h) {
+    const { fileId } = request.params
+
+    try {
+      const documentPath = `/document/${encodeURIComponent(fileId)}`
+      const html = await fetchWithToken(request, documentPath)
+      request.logger.info(`Fetched HTML for ID: ${fileId}`)
+
+      if (!html) {
+        return h.response('Document not found').code(404)
+      }
+
+      // If backend is already styled, just return as is
+      return h.response(html).type('text/html').code(200)
+    } catch (err) {
+      request.logger.error(`Failed to fetch HTML for file ${fileId}:`, err)
+      return h.response('Internal server error').code(500)
     }
   }
 }
