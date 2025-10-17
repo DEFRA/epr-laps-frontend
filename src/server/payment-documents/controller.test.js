@@ -83,8 +83,6 @@ describe('paymentDocumentsController', () => {
       view: vi.fn(),
       response: vi.fn(() => ({ code: vi.fn() }))
     }
-
-    // 👇 Force fetchWithToken to throw so controller hits catch block
     fetchWithToken.mockRejectedValue(new Error('API error'))
 
     await paymentDocumentsController.handler(mockRequest, mockedResponse)
@@ -92,6 +90,54 @@ describe('paymentDocumentsController', () => {
     expect(mockedResponse.response).toHaveBeenCalledWith({
       error: 'Failed to fetch document data'
     })
+  })
+
+  it('applies bold-row class only to documents within the last 30 days', async () => {
+    const mockToday = new Date('2025-10-15')
+    vi.setSystemTime(mockToday)
+
+    const mockDocs = {
+      '2025-26': [
+        {
+          id: 'recent-doc',
+          creationDate: '10 Oct 2025',
+          documentType: 'grant',
+          quarter: 'Q1',
+          fileName: 'recent.pdf',
+          documentName: 'Recent Payment Document',
+          isLatest: true
+        },
+        {
+          id: 'old-doc',
+          creationDate: '01 Sep 2025',
+          documentType: 'grant',
+          quarter: 'Q2',
+          fileName: 'old.pdf',
+          documentName: 'Old Payment Document',
+          isLatest: false
+        }
+      ],
+      currentFiscalYear: '2025-26'
+    }
+
+    fetchWithToken.mockResolvedValue(mockDocs)
+
+    await paymentDocumentsController.handler(request, h)
+
+    const viewArg = h.view.mock.calls[0][1]
+    const [recentRow, oldRow] = viewArg.rows
+
+    expect(recentRow[0].classes).toContain('bold-row')
+    expect(recentRow[1].classes).toContain('bold-row')
+
+    expect(recentRow[2].classes).not.toContain('bold-row')
+    expect(recentRow[3].classes).not.toContain('bold-row')
+
+    oldRow.forEach((cell) => {
+      expect(cell.classes || '').not.toContain('bold-row')
+    })
+
+    vi.useRealTimers()
   })
 })
 
