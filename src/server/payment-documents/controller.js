@@ -105,17 +105,19 @@ function buildTableRows(docsToShow, translations) {
     const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
     const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
-    // Translate month and document name
+    // Parse date in "DD Mon YYYY" format
     const [day, month, year] = doc.creationDate.split(' ')
-    const monthTranslated = translations[month] || month
-    const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
+
+    const boldClass = doc.isLatest ? 'bold-row' : ''
 
     const translationKey = getTranslationKey(doc.documentName)
     const docNameTranslated = translations[translationKey] || doc.documentName
+    const monthTranslated = translations[month] || month
+    const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
 
     return [
-      { text: formattedDateTranslated },
-      { text: docNameTranslated },
+      { text: formattedDateTranslated, classes: boldClass },
+      { text: docNameTranslated, classes: boldClass },
       {
         html: `<a href='${downloadLink}' download class='govuk-link'>
                 ${translations.download}

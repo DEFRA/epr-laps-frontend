@@ -50,6 +50,20 @@ describe('#catchAll', () => {
   const mockStack = 'Mock error stack'
   const errorPage = 'error/index'
   const mockRequest = (statusCode) => ({
+    app: {
+      translations: {
+        'page-not found': 'Page not found',
+        'you-can-return': 'You can return to the GOV.UK website.',
+        'service-unavailable': 'Sorry, the service is currently unavailable',
+        'you-will-be': 'You will be able to use the service soon.',
+        forbidden: 'Forbidden',
+        'you-do': 'You do not have permission to access this page.',
+        unauthorized: 'Unauthorized',
+        'you-need-to': 'You need to sign in to view this page.',
+        'service-problem': 'Sorry, there is a problem with the service',
+        'try-again': 'Try again later.'
+      }
+    },
     response: {
       isBoom: true,
       stack: mockStack,
@@ -67,76 +81,112 @@ describe('#catchAll', () => {
   }
 
   test('Should provide expected "Not Found" page', () => {
-    catchAll(mockRequest(statusCodes.notFound), mockToolkit)
+    const req = mockRequest(statusCodes.notFound)
+    catchAll(req, mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Page not found',
-      heading: statusCodes.notFound,
-      message: 'Page not found'
+      pageTitle: req.app.translations['page-not found'],
+      heading: req.app.translations['page-not found'],
+      message: req.app.translations['you-can-return']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
 
+  test('Should provide expected "Service Unavailable" page', () => {
+    const req = mockRequest(statusCodes.serviceUnavailable)
+    catchAll(req, mockToolkit)
+
+    expect(mockErrorLogger).not.toHaveBeenCalled()
+    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+      pageTitle: req.app.translations['service-unavailable'],
+      heading: req.app.translations['service-unavailable'],
+      message: req.app.translations['you-will-be']
+    })
+    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
+  })
+
   test('Should provide expected "Forbidden" page', () => {
-    catchAll(mockRequest(statusCodes.forbidden), mockToolkit)
+    const req = mockRequest(statusCodes.forbidden)
+    catchAll(req, mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Forbidden',
-      heading: statusCodes.forbidden,
-      message: 'Forbidden'
+      pageTitle: req.app.translations['forbidden'],
+      heading: req.app.translations['forbidden'],
+      message: req.app.translations['you-do']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
   test('Should provide expected "Unauthorized" page', () => {
-    catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
+    const req = mockRequest(statusCodes.unauthorized)
+    catchAll(req, mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Unauthorized',
-      heading: statusCodes.unauthorized,
-      message: 'Unauthorized'
+      pageTitle: req.app.translations['unauthorized'],
+      heading: req.app.translations['unauthorized'],
+      message: req.app.translations['you-need-to']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
-  test('Should provide expected "Bad Request" page', () => {
-    catchAll(mockRequest(statusCodes.badRequest), mockToolkit)
+  test('Should provide expected default page for unknown errors', () => {
+    const req = mockRequest(statusCodes.imATeapot)
+    catchAll(req, mockToolkit)
 
-    expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
+    expect(mockErrorLogger).not.toHaveBeenCalled()
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Bad Request',
-      heading: statusCodes.badRequest,
-      message: 'Bad Request'
-    })
-    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.badRequest)
-  })
-
-  test('Should provide expected default page', () => {
-    catchAll(mockRequest(statusCodes.imATeapot), mockToolkit)
-
-    expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.imATeapot,
-      message: 'Something went wrong'
+      pageTitle: req.app.translations['service-problem'],
+      heading: req.app.translations['service-problem'],
+      message: req.app.translations['try-again']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
-  test('Should provide expected "Something went wrong" page and log error for internalServerError', () => {
-    catchAll(mockRequest(statusCodes.internalServerError), mockToolkit)
+  test('Should log error and render page for internal server error', () => {
+    const req = mockRequest(statusCodes.internalServerError)
+    catchAll(req, mockToolkit)
 
     expect(mockErrorLogger).toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Something went wrong',
-      heading: statusCodes.internalServerError,
-      message: 'Something went wrong'
+      pageTitle: req.app.translations['service-problem'],
+      heading: req.app.translations['service-problem'],
+      message: req.app.translations['try-again']
     })
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )
+  })
+
+  test('Should continue when response is not Boom', () => {
+    const req = {
+      response: {} // missing 'isBoom'
+    }
+
+    const h = { continue: 'continue' }
+
+    const result = catchAll(req, h)
+
+    expect(result).toBe('continue')
+  })
+
+  test('Should handle request with no translations', () => {
+    const req = {
+      response: {
+        isBoom: true,
+        output: { statusCode: statusCodes.notFound }
+      },
+      logger: { error: mockErrorLogger }
+    }
+
+    catchAll(req, mockToolkit)
+
+    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
+      pageTitle: undefined,
+      heading: undefined,
+      message: undefined
+    })
   })
 })
