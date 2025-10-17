@@ -37,7 +37,7 @@
   "we'll-let-you-k": "We'll let you know once the update is complete",
   "email": "Email",
   "eprcustomerserv": "eprcustomerservice@defra.gov.uk",
-  "we-aim-to-respo": "We aim to respond within 20 working days",
+  "we-aim-to-respo": "We aim to respond within 20 working days.",
   "telephone": "Telephone",
   "0300-060-0002": "0300 060 0002",
   "monday-to-frida": "Monday to Friday 8am to 4.30pm (closed on weekends and bank holidays)",
@@ -105,6 +105,12 @@
   "back-link": "Back",
   "continue": "Continue",
   "service-title": "Local Authority Payments account for EPR",
+  "service-problem": "Sorry, there is a problem with the service",
+  "try-again": "Try again later.",
+  "service-unavailable": "Sorry, the service is currently unavailable",
+  "you-will-be": "You will be able to use the service soon.",
+  "page-not found": "Page not found",
+  "you-can-return": "You can return to the <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a> website.",
   "to": "to",
   "you-do-not": "You do not have a service role",
   "to-access-this": "To access this content, your Defra account administrator must assign you a service role within the Local Authority Payments (LAPs) service.",
@@ -123,4 +129,8 @@
   "ask-question": "ask a question about your payments",
   "make-complaint": "make a complaint",
   "get-help-account": "get help with your account"
+  "forbidden": "Forbidden",
+  "you-do": "You do not have permission to access this page.",
+  "unauthorized": "Unauthorized",
+  "you-need-to": "You need to sign in to view this page."
 }
