@@ -289,8 +289,7 @@ export const config = convict({
   getHelpUrl: {
     doc: 'External link used in the service',
     format: String,
-    default:
-      'https://www.gov.uk/government/collections/extended-producer-responsibility-for-packaging-local-authorities',
+    default: 'https://google.com',
     env: 'GET_HELP_URL'
   },
   customerServiceEmail: {

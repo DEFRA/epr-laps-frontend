@@ -125,7 +125,9 @@
   "need-more-info": "angen mwy o wybodaeth",
   "think-it-is": "rwy'n credu y bydd yn cymryd mwy o amser i ni ymateb i'ch cais",
   "raise-a-customer": "Codi tocyn gwasanaeth cwsmeriaid",
-  "you-can-raise": "Gallwch chi <a class=\"govuk-link\" href=\"https://google.com\" target=\"_blank\" rel=\"noreferrer noopener\">codi tocyn gwasanaeth cwsmeriaid</a> i:",
+  "you-can": "Gallwch chi",
+  "raise-a-": "codi tocyn gwasanaeth cwsmeriaid",
+  "to:": "i:",
   "ask-question": "gofyn cwestiwn am eich taliadau",
   "make-complaint": "gwneud cwyn",
   "get-help-account": "cael cymorth gyda'ch cyfrif"
