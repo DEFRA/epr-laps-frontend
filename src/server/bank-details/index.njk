@@ -7,7 +7,7 @@
   {% if authedUser.currentRole  == 'Chief Executive Officer' and bankApiData.confirmed === false %}
     {% set html %}
       <p class="govuk-notification-banner__heading">
-        {{ translations['the-nominated-h'] }}
+        {{ translations['your-nominated'] }}
       </p>
     {% endset %}
 
@@ -92,7 +92,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% set detailsHtml %}
-  <p>{{ translations['to-update-your-'] }}, {{ translations["please-raise-a-"] | safe }}</p>
+  <p>{{ translations['request-to-update-bank-details'] | safe }}</p>
 
   <p><strong>{{ translations['email'] }}</strong><br>
     <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
