@@ -9,9 +9,11 @@ import {
   putWithToken
 } from './utils.js'
 import Wreck from '@hapi/wreck'
+import Boom from '@hapi/boom'
 import { config } from './../../config/config.js'
 
 vi.mock('@hapi/wreck')
+vi.mock('@hapi/boom')
 vi.mock('./../../config/config.js', () => ({
   config: {
     get: vi.fn((key) => {
@@ -161,6 +163,18 @@ describe('#utils', () => {
       expect(Wreck.get).toHaveBeenCalledWith(url, { headers, json: true })
       expect(result).toEqual(payload)
     })
+
+    it('calls Boom.boomify with correct params and returns payload', async () => {
+      Wreck.get.mockRejectedValue(new Error('Network failure'))
+      const url = 'http://example.com'
+      const headers = { Authorization: 'Bearer token123' }
+
+      try {
+        await getRequest(url, headers)
+      } catch (error) {
+        expect(Boom.boomify).toHaveBeenCalled()
+      }
+    })
   })
 
   describe('fetchWithToken', () => {
@@ -215,6 +229,20 @@ describe('#utils', () => {
         json: true
       })
       expect(result).toEqual(responsePayload)
+    })
+
+    it('calls Boom.boomify with correct params and returns payload', async () => {
+      Wreck.put.mockRejectedValue(new Error('Network failure'))
+
+      const url = 'http://example.com/resource'
+      const payload = { foo: 'bar' }
+      const headers = { 'X-Custom': '123' }
+
+      try {
+        await putRequest(url, payload, headers)
+      } catch (error) {
+        expect(Boom.boomify).toHaveBeenCalled()
+      }
     })
   })
 
