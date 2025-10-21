@@ -15,7 +15,7 @@ export const paymentDocuments = {
         },
         {
           method: 'GET',
-          path: '/document/{docId}',
+          path: '/document/{fileId}',
           ...fileDownloadController
         },
         {

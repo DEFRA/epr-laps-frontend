@@ -18,9 +18,8 @@ describe('paymentDocumentsController', () => {
       logger: { info: vi.fn(), error: vi.fn() },
       params: {},
       query: {},
-      // 👇 FIX: match controller’s destructuring (nested organisationName)
       auth: {
-        credentials: { organisationName: { organisationName: 'TestOrg' } }
+        credentials: { organisationName: 'TestOrg' }
       },
       app: {
         currentLang: 'en',

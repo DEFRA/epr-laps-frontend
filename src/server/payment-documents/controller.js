@@ -7,7 +7,7 @@ import { statusCodes } from '../common/constants/status-codes.js'
 export const paymentDocumentsController = {
   async handler(request, h) {
     const { currentLang, translations } = request.app
-    const { organisationName } = request.auth.credentials.organisationName
+    const organisationName = request.auth.credentials.organisationName
 
     const isPost = request.method === 'post'
     const selectedYear = isPost ? request.payload.sort : null
