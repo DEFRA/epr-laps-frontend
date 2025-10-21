@@ -10,6 +10,8 @@ import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
 import { timedOut } from './timed-out/index.js'
+import { noServiceRole } from './no-service-role/index.js'
+import Boom from '@hapi/boom'
 
 export const router = {
   plugin: {
@@ -29,11 +31,19 @@ export const router = {
         signOut,
         timedOut,
         auth,
-        defraAccount
+        defraAccount,
+        noServiceRole
       ])
 
       // Static assets
       await server.register([serveStaticFiles])
+
+      //Global catch-all route for unknown URLs (404)
+      server.route({
+        method: '*',
+        path: '/{any*}',
+        handler: (_request, _h) => Boom.notFound()
+      })
     }
   }
 }

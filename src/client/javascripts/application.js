@@ -5,7 +5,8 @@ import {
   ErrorSummary,
   Header,
   Radios,
-  SkipLink
+  SkipLink,
+  ServiceNavigation
 } from 'govuk-frontend'
 
 createAll(Button)
@@ -14,3 +15,4 @@ createAll(ErrorSummary)
 createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
+createAll(ServiceNavigation)

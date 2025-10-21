@@ -12,6 +12,7 @@ import Wreck from '@hapi/wreck'
 import { config } from './../../config/config.js'
 
 vi.mock('@hapi/wreck')
+
 vi.mock('./../../config/config.js', () => ({
   config: {
     get: vi.fn((key) => {
@@ -161,6 +162,28 @@ describe('#utils', () => {
       expect(Wreck.get).toHaveBeenCalledWith(url, { headers, json: true })
       expect(result).toEqual(payload)
     })
+
+    it('calls Boom.boomify with correct params and returns payload', async () => {
+      const originalError = new Error('Bad Gateway')
+      originalError.output = { statusCode: 502 }
+      Wreck.get.mockRejectedValue(originalError)
+
+      await expect(getRequest('http://example.com', {})).rejects.toMatchObject({
+        isBoom: true,
+        output: { statusCode: 502 }
+      })
+    })
+
+    it('throws a Boom error with default 500 statusCode if error.output is missing', async () => {
+      const originalError = new Error('Unknown error')
+      // no output property here
+      Wreck.get.mockRejectedValue(originalError)
+
+      await expect(getRequest('http://example.com', {})).rejects.toMatchObject({
+        isBoom: true,
+        output: { statusCode: 500 }
+      })
+    })
   })
 
   describe('fetchWithToken', () => {
@@ -215,6 +238,33 @@ describe('#utils', () => {
         json: true
       })
       expect(result).toEqual(responsePayload)
+    })
+
+    it('calls Boom.boomify with correct params and returns payload', async () => {
+      const originalError = new Error('Bad Gateway')
+      originalError.output = { statusCode: 502 }
+      Wreck.put.mockRejectedValue(originalError)
+      const payload = { foo: 'bar' }
+      const headers = { 'X-Custom': '123' }
+      await expect(
+        putRequest('http://example.com/resource', payload, headers)
+      ).rejects.toMatchObject({
+        isBoom: true,
+        output: { statusCode: 502 }
+      })
+    })
+
+    it('throws a Boom error with default 500 statusCode if error.output is missing', async () => {
+      // no output property here
+      Wreck.put.mockRejectedValue(new Error('Unknown error'))
+      const payload = { foo: 'bar' }
+      const headers = { 'X-Custom': '123' }
+      await expect(
+        putRequest('http://example.com/resource', payload, headers)
+      ).rejects.toMatchObject({
+        isBoom: true,
+        output: { statusCode: 500 }
+      })
     })
   })
 
