@@ -17,41 +17,34 @@ export const paymentDocumentsController = {
     let financialYearOptions = []
     let currentFY = ''
     let warningText = ''
-    try {
-      const documentPath = `/documents/${encodeURIComponent(organisationName)}`
-      documentApiData = await fetchWithToken(request, documentPath)
+    const documentPath = `/documents/${encodeURIComponent(organisationName)}`
+    documentApiData = await fetchWithToken(request, documentPath)
 
-      request.logger.info(
-        `Successfully fetched document metadata for ${organisationName}`
-      )
+    request.logger.info(
+      `Successfully fetched document metadata for ${organisationName}`
+    )
 
-      // Build financial year dropdown
-      currentFY = documentApiData.currentFiscalYear
-      warningText = translations['fy-warning-text']
-        ? translations['fy-warning-text'].replace('{year}', currentFY)
-        : `For the ${currentFY} financial year, there will be a single payment covering quarters 1 and 2.`
+    // Build financial year dropdown
+    currentFY = documentApiData.currentFiscalYear
+    warningText = translations['fy-warning-text']
+      ? translations['fy-warning-text'].replace('{year}', currentFY)
+      : `For the ${currentFY} financial year, there will be a single payment covering quarters 1 and 2.`
 
-      financialYearOptions = buildFinancialYearOptions(
-        documentApiData,
-        translations,
-        selectedYear,
-        currentFY
-      )
+    financialYearOptions = buildFinancialYearOptions(
+      documentApiData,
+      translations,
+      selectedYear,
+      currentFY
+    )
 
-      // Determine which year to show
-      const yearToShow =
-        selectedYear && documentApiData[selectedYear]
-          ? selectedYear
-          : Object.keys(documentApiData)[0]
+    // Determine which year to show
+    const yearToShow =
+      selectedYear && documentApiData[selectedYear]
+        ? selectedYear
+        : Object.keys(documentApiData)[0]
 
-      const docsToShow = documentApiData[yearToShow] || []
-      rows = buildTableRows(docsToShow, translations)
-    } catch (err) {
-      request.logger.error(`Failed to fetch document api data:`, err)
-      return h
-        .response({ error: 'Failed to fetch document data' })
-        .code(statusCodes.internalServerError)
-    }
+    const docsToShow = documentApiData[yearToShow] || []
+    rows = buildTableRows(docsToShow, translations)
 
     return h.view('payment-documents/index.njk', {
       pageTitle: 'Payment documents',
@@ -147,24 +140,16 @@ export const fileDownloadController = {
     const { fileId } = request.params
     const filename = request.query.docName || `${fileId}.pdf`
 
-    try {
-      const documentPath = `/document/${encodeURIComponent(fileId)}`
-      const apiResponse = await fetchWithToken(request, documentPath)
-      request.logger.info(`Fetched file metadata for ID: ${fileId}`)
+    const documentPath = `/document/${encodeURIComponent(fileId)}`
+    const apiResponse = await fetchWithToken(request, documentPath)
+    request.logger.info(`Fetched file metadata for ID: ${fileId}`)
 
-      if (Buffer.isBuffer(apiResponse)) {
-        return h
-          .response(apiResponse)
-          .header('Content-Type', 'application/pdf')
-          .header('Content-Disposition', `inline; filename="${filename}"`)
-      }
-
-      return h.response('File not found').code(statusCodes.notFound)
-    } catch (err) {
-      request.logger.error(`Failed to fetch file ${fileId}:`, err)
+    if (Buffer.isBuffer(apiResponse)) {
       return h
-        .response('Internal server error')
-        .code(statusCodes.internalServerError)
+        .response(apiResponse)
+        .header('Content-Type', 'application/pdf')
+        .header('Content-Disposition', `inline; filename="${filename}"`)
     }
+    return h.response('File not found').code(statusCodes.notFound)
   }
 }
