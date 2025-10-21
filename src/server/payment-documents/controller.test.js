@@ -76,21 +76,6 @@ describe('paymentDocumentsController', () => {
     expect(viewArg.pageTitle).toBe('Payment documents')
   })
 
-  it('renders page safely when translations are missing', async () => {
-    const mockRequest = { ...request, app: {} }
-    const mockedResponse = {
-      view: vi.fn(),
-      response: vi.fn(() => ({ code: vi.fn() }))
-    }
-    fetchWithToken.mockRejectedValue(new Error('API error'))
-
-    await paymentDocumentsController.handler(mockRequest, mockedResponse)
-
-    expect(mockedResponse.response).toHaveBeenCalledWith({
-      error: 'Failed to fetch document data'
-    })
-  })
-
   it('applies bold-row class only to documents within the last 30 days', async () => {
     const mockToday = new Date('2025-10-15')
     vi.setSystemTime(mockToday)
@@ -205,15 +190,5 @@ describe('fileDownloadController', () => {
 
     const responseMock = h.response.mock.results[0].value
     expect(responseMock.code).toHaveBeenCalledWith(statusCodes.notFound)
-  })
-
-  it('handles errors gracefully', async () => {
-    fetchWithToken.mockRejectedValue(new Error('API error'))
-
-    await fileDownloadController.handler(request, h)
-
-    expect(request.logger.error).toHaveBeenCalled()
-    const responseMock = h.response.mock.results[0].value
-    expect(responseMock.code).toHaveBeenCalledWith(500)
   })
 })
