@@ -60,7 +60,7 @@
         </fieldset>
 
         {% set detailsHtml %}
-          <p>{{ translations['to-update-your-'] }}, {{ translations["please-raise-a-"] | safe }}</p>
+          <p>{{ translations['request-to-update-bank-details']  | safe }}</p>
 
           <p><strong>{{ translations['email'] }}</strong><br>
             <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
@@ -75,7 +75,7 @@
         {% endset %}
 
         {{ govukDetails({
-          summaryText: translations['these-details-a'],
+          summaryText: translations['change-bank-details'],
           html: detailsHtml
         }) }}
         <button class="govuk-button" data-module="govuk-button" type="submit"
