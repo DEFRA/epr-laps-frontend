@@ -1,6 +1,8 @@
 import { addSeconds } from 'date-fns'
 import Wreck from '@hapi/wreck'
 import { config } from '../../config/config.js'
+import Boom from '@hapi/boom'
+import { statusCodes } from '../common/constants/status-codes.js'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
@@ -47,23 +49,35 @@ export const setHeaders = (token) => {
 
 // Make GET request
 export const getRequest = async (url, headers) => {
-  const { payload } = await Wreck.get(url, {
-    headers,
-    json: true
-  })
-  return payload
+  try {
+    const { payload } = await Wreck.get(url, {
+      headers,
+      json: true
+    })
+    return payload
+  } catch (error) {
+    throw Boom.boomify(error, {
+      statusCode: error.output?.statusCode || statusCodes.internalServerError
+    })
+  }
 }
 
 export const putRequest = async (url, payload, headers = {}) => {
-  const { payload: responsePayload } = await Wreck.put(url, {
-    payload: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
-    json: true
-  })
-  return responsePayload
+  try {
+    const { payload: responsePayload } = await Wreck.put(url, {
+      payload: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      json: true
+    })
+    return responsePayload
+  } catch (error) {
+    throw Boom.boomify(error, {
+      statusCode: error.output?.statusCode || statusCodes.internalServerError
+    })
+  }
 }
 
 export const fetchWithToken = async (request, path) => {
