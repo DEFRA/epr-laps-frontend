@@ -2,6 +2,7 @@ import { addSeconds } from 'date-fns'
 import Wreck from '@hapi/wreck'
 import { config } from '../../config/config.js'
 import Boom from '@hapi/boom'
+import { statusCodes } from '../common/constants/status-codes.js'
 
 export const setUserSession = async (request) => {
   const { profile } = request.auth.credentials
@@ -55,7 +56,9 @@ export const getRequest = async (url, headers) => {
     })
     return payload
   } catch (error) {
-    throw Boom.boomify(error, { statusCode: error.output?.statusCode || 500 })
+    throw Boom.boomify(error, {
+      statusCode: error.output?.statusCode || statusCodes.internalServerError
+    })
   }
 }
 
@@ -71,7 +74,9 @@ export const putRequest = async (url, payload, headers = {}) => {
     })
     return responsePayload
   } catch (error) {
-    throw Boom.boomify(error, { statusCode: error.output?.statusCode || 500 })
+    throw Boom.boomify(error, {
+      statusCode: error.output?.statusCode || statusCodes.internalServerError
+    })
   }
 }
 
