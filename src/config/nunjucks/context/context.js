@@ -67,6 +67,7 @@ async function context(request) {
   }
 
   const navigation = await buildNavigation(request)
+  const sessionTimer = config.get('sessionTimer') * 60 * 1000
   return {
     authedUser,
     bankApiData,
@@ -78,6 +79,7 @@ async function context(request) {
     translations,
     userPermissions,
     navigation,
+    sessionTimer,
     showBetaBanner: config.get('showBetaBanner'),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]

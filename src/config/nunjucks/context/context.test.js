@@ -58,7 +58,8 @@ describe('context and cache', () => {
         assetPath: '/public',
         serviceName: 'EPR-LAPs',
         showBetaBanner: true,
-        'defraId.manageAccountUrl': manageDefraAccountUrl
+        'defraId.manageAccountUrl': manageDefraAccountUrl,
+        sessionTimer: 2
       }
       return configValues[key]
     })
@@ -121,6 +122,7 @@ describe('context and cache', () => {
           ],
           serviceName: 'EPR-LAPs',
           serviceUrl: '/',
+          sessionTimer: 120000,
           showBetaBanner: true,
           translations: {
             laNames: { [EN_NAME]: CY_NAME },

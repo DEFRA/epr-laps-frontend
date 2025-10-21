@@ -8,6 +8,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
+const thirtyMinutes = 30
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
@@ -161,6 +162,12 @@ export const config = convict({
         env: 'SESSION_COOKIE_SECURE'
       }
     }
+  },
+  sessionTimer: {
+    doc: 'Client side session timer duration',
+    format: Number,
+    default: thirtyMinutes,
+    env: 'SESSION_TIMER_DURATION_IN_MINUTES'
   },
   redis: {
     host: {

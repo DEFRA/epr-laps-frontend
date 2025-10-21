@@ -1,37 +1,48 @@
-let sessionTimer
-const timerDuration = 30 * 60 * 1000 // 30 minutes
+class SessionTimer {
+  constructor(options = {}) {
+    this.timerDuration = options.timerDuration || window.inactivityTimeout
+    this.redirectUrl = options.redirectUrl || '/timed-out'
+    this.sessionTimer = null
+    this.activityEvents = options.activityEvents || [
+      'keypress',
+      'click',
+      'scroll',
+      'touchstart',
+      'mousedown',
+      'mousemove'
+    ]
 
-function startSessionTimer() {
-  if (sessionTimer) {
-    clearTimeout(sessionTimer)
+    this.restartSessionTimer = this.restartSessionTimer.bind(this)
   }
 
-  // Start the session timer
-  sessionTimer = setTimeout(() => {
-    document.location.href = '/timed-out'
-  }, timerDuration)
+  startSessionTimer() {
+    if (this.sessionTimer) {
+      clearTimeout(this.sessionTimer)
+    }
+
+    // Start the session timer
+    this.sessionTimer = setTimeout(() => {
+      document.location.href = this.redirectUrl
+    }, this.timerDuration)
+  }
+
+  restartSessionTimer() {
+    // Clear the existing timer and start a new one
+    clearTimeout(this.sessionTimer)
+    this.startSessionTimer()
+  }
+
+  setupActivityListeners() {
+    // Listen for various user activities
+    this.activityEvents.forEach((eventType) => {
+      document.addEventListener(eventType, this.restartSessionTimer, {
+        passive: true
+      })
+    })
+  }
 }
 
-function restartSessionTimer() {
-  // Clear the existing timer and start a new one
-  clearTimeout(sessionTimer)
-  startSessionTimer()
-}
-
-function setupActivityListeners() {
-  // Listen for various user activities
-  const events = [
-    'keypress',
-    'click',
-    'scroll',
-    'touchstart',
-    'mousedown',
-    'mousemove'
-  ]
-  events.forEach((eventType) => {
-    document.addEventListener(eventType, restartSessionTimer, { passive: true })
-  })
-}
-
-startSessionTimer()
-setupActivityListeners()
+// Create and start the session timer instance
+const sessionTimer = new SessionTimer()
+sessionTimer.startSessionTimer()
+sessionTimer.setupActivityListeners()

@@ -131,6 +131,7 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  <script> window.inactivityTimeout = {{ sessionTimer }}</script>
   <script type="module" src="{{ getAssetPath('application.js') }}"></script>
   <script src="{{ getAssetPath('session-timer.js') }}"></script>
 {% endblock %}
