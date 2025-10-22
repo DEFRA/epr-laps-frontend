@@ -10,8 +10,8 @@ export async function buildNavigation(request) {
     request.state?.userSession
   )
 
-  // If on sign-out page, return empty navigation
-  if (request.path === '/logout') {
+  // If on sign-out or timed-out page, return empty navigation
+  if (request.path === '/logout' || request.path === '/timed-out') {
     return []
   }
 

@@ -8,6 +8,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
+const thirtyMinutes = 30
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
@@ -162,6 +163,12 @@ export const config = convict({
       }
     }
   },
+  sessionTimer: {
+    doc: 'Client side session timer duration',
+    format: Number,
+    default: thirtyMinutes,
+    env: 'SESSION_TIMER_DURATION_IN_MINUTES'
+  },
   redis: {
     host: {
       doc: 'Redis cache host',
@@ -238,7 +245,7 @@ export const config = convict({
     clientId: {
       doc: 'The Defra Identity client ID.',
       format: String,
-      default: '2fb0d715-affa-4bf1-836e-44a464e3fbea',
+      default: ' ',
       env: 'DEFRA_ID_CLIENT_ID'
     },
     clientSecret: {

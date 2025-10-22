@@ -9,6 +9,7 @@ import { getHelp } from './get-help/index.js'
 import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
+import { timedOut } from './timed-out/index.js'
 import { noServiceRole } from './no-service-role/index.js'
 import Boom from '@hapi/boom'
 
@@ -28,6 +29,7 @@ export const router = {
         bankDetails,
         getHelp,
         signOut,
+        timedOut,
         auth,
         defraAccount,
         noServiceRole
