@@ -142,4 +142,59 @@ describe('request-language registerLanguageExtension', () => {
     expect(result2).toBe(h.continue)
     expect(request.app.currentLang).toBe('en')
   })
+
+  it('creates request.app when missing and sets language and translations', async () => {
+    registerLanguageExtension(server)
+
+    fsReadSpy.mockImplementation((filePath) => {
+      if (filePath.includes(`${path.sep}en${path.sep}translation.json`)) {
+        return JSON.stringify({ hi: 'there' })
+      }
+      throw new Error('file not found')
+    })
+
+    const request = {
+      query: {},
+      url: { pathname: '/no-app' },
+      state: {}
+    }
+
+    const h = { continue: Symbol('continue') }
+
+    const result = handler(request, h)
+
+    expect(result).toBe(h.continue)
+    expect(request.app).toBeDefined()
+    expect(request.app.currentLang).toBe('en')
+    expect(request.query.lang).toBe('en')
+    expect(request.app.translations).toEqual({ hi: 'there' })
+  })
+
+  it('logs a warning and falls back when translations JSON is invalid', async () => {
+    registerLanguageExtension(server)
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    fsReadSpy.mockImplementation((filePath) => {
+      if (filePath.includes(`${path.sep}en${path.sep}translation.json`)) {
+        return 'not valid json'
+      }
+      throw new Error('file not found')
+    })
+
+    const request = {
+      query: {},
+      url: { pathname: '/bad-json' },
+      app: {},
+      state: {}
+    }
+
+    const h = { continue: Symbol('continue') }
+
+    const result = handler(request, h)
+
+    expect(result).toBe(h.continue)
+    expect(warnSpy).toHaveBeenCalled()
+    expect(request.app.translations).toEqual({})
+  })
 })
