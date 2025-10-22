@@ -69,8 +69,7 @@ describe('#timedOutController', () => {
     await timedOutController.handler(mockRequest, mockedResponse)
 
     expect(mockedResponse.view).toHaveBeenCalledWith('timed-out/index.njk', {
-      pageTitle: 'Timed out'
-      //heading: 'Glamshire County Council'
+      pageTitle: 'Session timed out'
     })
   })
 
@@ -87,7 +86,7 @@ describe('#timedOutController', () => {
       request.auth.credentials
     )
     expect(mockedResponse.view).toHaveBeenCalledWith('timed-out/index.njk', {
-      pageTitle: 'Timed out'
+      pageTitle: 'Session timed out'
     })
   })
 
@@ -98,7 +97,7 @@ describe('#timedOutController', () => {
 
     expect(removeUserSession).not.toHaveBeenCalled()
     expect(mockedResponse.view).toHaveBeenCalledWith('timed-out/index.njk', {
-      pageTitle: 'Timed out'
+      pageTitle: 'Session timed out'
     })
   })
 })
