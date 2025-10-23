@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   paymentDocumentsController,
-  fileDownloadController
+  fileDownloadController,
+  buildFinancialYearOptions
 } from './controller.js'
 import { fetchWithToken } from '../../server/auth/utils.js'
 import { statusCodes } from '../common/constants/status-codes.js'
@@ -104,6 +105,21 @@ describe('paymentDocumentsController', () => {
 
     const viewArg = h.view.mock.calls[0][1]
     expect(viewArg.rows).toEqual([])
+  })
+
+  it('returns empty array if documentApiData is null', () => {
+    const result = buildFinancialYearOptions(null, {}, null, '2023-to-2024')
+    expect(result).toEqual([])
+  })
+
+  it('returns empty array if documentApiData is not an object', () => {
+    const result = buildFinancialYearOptions(
+      'not-an-object',
+      {},
+      null,
+      '2023-to-2024'
+    )
+    expect(result).toEqual([])
   })
 })
 

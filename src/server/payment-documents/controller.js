@@ -80,7 +80,7 @@ function getTranslationKey(documentName) {
     .replace(/q(\d)/gi, 'q$1')
 }
 
-function buildFinancialYearOptions(
+export function buildFinancialYearOptions(
   documentApiData,
   translations,
   selectedYear,
