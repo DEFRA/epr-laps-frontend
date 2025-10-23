@@ -1,7 +1,8 @@
 import {
   bankDetailsController,
   confirmBankDetailsController,
-  bankDetailsConfirmedController
+  bankDetailsConfirmedController,
+  updateBankDetailsController
 } from './controller.js'
 
 export const bankDetails = {
@@ -17,6 +18,11 @@ export const bankDetails = {
         method: 'GET',
         path: '/bank-details/confirm',
         ...confirmBankDetailsController
+      })
+      server.route({
+        method: 'GET',
+        path: '/update-bank-details',
+        ...updateBankDetailsController
       })
       server.route({
         method: 'POST',
