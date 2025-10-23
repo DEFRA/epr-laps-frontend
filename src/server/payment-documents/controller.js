@@ -41,9 +41,14 @@ export const paymentDocumentsController = {
     const yearToShow =
       selectedYear && documentApiData[selectedYear]
         ? selectedYear
-        : Object.keys(documentApiData)[0]
+        : Object.keys(documentApiData).find((key) => key.includes('to'))
 
-    const docsToShow = documentApiData[yearToShow] || []
+    // Determine language to show based on URL param
+    const langKey = currentLang.toUpperCase()
+
+    const docsByYear = documentApiData[yearToShow] || {}
+    const docsToShow = docsByYear[langKey] || []
+
     rows = buildTableRows(docsToShow, translations)
 
     return h.view('payment-documents/index.njk', {
@@ -75,7 +80,7 @@ function getTranslationKey(documentName) {
     .replace(/q(\d)/gi, 'q$1')
 }
 
-function buildFinancialYearOptions(
+export function buildFinancialYearOptions(
   documentApiData,
   translations,
   selectedYear,
