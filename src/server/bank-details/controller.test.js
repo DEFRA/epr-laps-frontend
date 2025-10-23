@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   bankDetailsController,
   confirmBankDetailsController,
-  bankDetailsConfirmedController
+  bankDetailsConfirmedController,
+  updateBankDetailsController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
@@ -221,6 +222,26 @@ describe('#bankDetailsConfirmedController', () => {
       payload: { error: 'Failed to fetch bank details' },
       statusCode: 500,
       code: expect.any(Function)
+    })
+  })
+
+  describe('#updateBankDetailsController', () => {
+    let h, request
+
+    beforeEach(() => {
+      h = createH()
+      request = createRequest()
+      vi.clearAllMocks()
+    })
+
+    it('should render the update bank details view', () => {
+      const result = updateBankDetailsController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        'bank-details/update-bank-details.njk',
+        { pageTitle: 'Update Bank Details' }
+      )
+      expect(result).toBe('view-rendered')
     })
   })
 })
