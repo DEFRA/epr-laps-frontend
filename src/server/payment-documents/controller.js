@@ -24,7 +24,7 @@ export const paymentDocumentsController = {
       `Successfully fetched document metadata for ${organisationName}`
     )
 
-    // --- Build dropdown
+    // Build financial year dropdown
     currentFY = documentApiData.currentFiscalYear
     warningText = translations['fy-warning-text']
       ? translations['fy-warning-text'].replace('{year}', currentFY)
@@ -37,13 +37,13 @@ export const paymentDocumentsController = {
       currentFY
     )
 
-    // --- Determine which year to show ---
+    // Determine which year to show
     const yearToShow =
       selectedYear && documentApiData[selectedYear]
         ? selectedYear
         : Object.keys(documentApiData).find((key) => key.includes('to'))
 
-    // --- Determine language to show based on URL param ---
+    // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
 
     const docsByYear = documentApiData[yearToShow] || {}

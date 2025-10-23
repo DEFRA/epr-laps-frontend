@@ -91,6 +91,20 @@ describe('paymentDocumentsController', () => {
     expect(recentRow2[0].classes).toContain('bold-row')
     expect(recentRow2[1].classes).toContain('bold-row')
   })
+
+  it('handles missing docs for year/lang gracefully', async () => {
+    fetchWithToken.mockResolvedValue({
+      currentFiscalYear: '2023-to-2024',
+      '2023-to-2024': { EN: [] }
+    })
+    request.method = 'get'
+    request.app.currentLang = 'es'
+
+    await paymentDocumentsController.handler(request, h)
+
+    const viewArg = h.view.mock.calls[0][1]
+    expect(viewArg.rows).toEqual([])
+  })
 })
 
 describe('fileDownloadController', () => {
