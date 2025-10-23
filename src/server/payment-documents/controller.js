@@ -4,6 +4,69 @@
 import { fetchWithToken } from '../../server/auth/utils.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
+// export const paymentDocumentsController = {
+//   async handler(request, h) {
+//     const { currentLang, translations } = request.app
+//     const organisationName = request.auth.credentials.organisationName
+
+//     const isPost = request.method === 'post'
+//     const selectedYear = isPost ? request.payload.sort : null
+
+//     let documentApiData = {}
+//     let rows = []
+//     let financialYearOptions = []
+//     let currentFY = ''
+//     let warningText = ''
+//     const documentPath = `/documents/${encodeURIComponent(organisationName)}`
+//     documentApiData = await fetchWithToken(request, documentPath)
+
+//     request.logger.info(
+//       `Successfully fetched document metadata for ${organisationName}`
+//     )
+
+//     // Build financial year dropdown
+//     currentFY = documentApiData.currentFiscalYear
+//     warningText = translations['fy-warning-text']
+//       ? translations['fy-warning-text'].replace('{year}', currentFY)
+//       : `For the ${currentFY} financial year, there will be a single payment covering quarters 1 and 2.`
+
+//     financialYearOptions = buildFinancialYearOptions(
+//       documentApiData,
+//       translations,
+//       selectedYear,
+//       currentFY
+//     )
+
+//     // Determine which year to show
+//     const yearToShow =
+//       selectedYear && documentApiData[selectedYear]
+//         ? selectedYear
+//         : Object.keys(documentApiData)[0]
+
+//     const docsToShow = documentApiData[yearToShow] || []
+//     rows = buildTableRows(docsToShow, translations)
+
+//     return h.view('payment-documents/index.njk', {
+//       pageTitle: 'Payment documents',
+//       currentLang,
+//       breadcrumbs: [
+//         {
+//           text: translations['laps-home'],
+//           href: `/?lang=${currentLang}`
+//         },
+//         {
+//           text: translations['payment-documen'],
+//           href: `/payment-documents?lang=${currentLang}`
+//         }
+//       ],
+//       rows,
+//       financialYearOptions,
+//       currentFY,
+//       warningText
+//     })
+//   }
+// }
+
 export const paymentDocumentsController = {
   async handler(request, h) {
     const { currentLang, translations } = request.app
@@ -24,7 +87,7 @@ export const paymentDocumentsController = {
       `Successfully fetched document metadata for ${organisationName}`
     )
 
-    // Build financial year dropdown
+    // --- Build dropdown as before ---
     currentFY = documentApiData.currentFiscalYear
     warningText = translations['fy-warning-text']
       ? translations['fy-warning-text'].replace('{year}', currentFY)
@@ -37,13 +100,19 @@ export const paymentDocumentsController = {
       currentFY
     )
 
-    // Determine which year to show
+    // --- Determine which year to show ---
     const yearToShow =
       selectedYear && documentApiData[selectedYear]
         ? selectedYear
-        : Object.keys(documentApiData)[0]
+        : Object.keys(documentApiData).find((key) => key.includes('to')) // skip currentFiscalYear
 
-    const docsToShow = documentApiData[yearToShow] || []
+    // --- Determine language to show based on URL param ---
+    // your URL query param is something like ?lang=en or ?lang=cy
+    const langKey = currentLang.toUpperCase() // 'EN' or 'CY'
+
+    const docsByYear = documentApiData[yearToShow] || {}
+    const docsToShow = docsByYear[langKey] || [] // get the right language array
+
     rows = buildTableRows(docsToShow, translations)
 
     return h.view('payment-documents/index.njk', {
