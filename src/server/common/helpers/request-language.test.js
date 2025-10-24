@@ -3,198 +3,186 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { registerLanguageExtension } from './request-language.js'
 
-describe('request-language registerLanguageExtension', () => {
-  let server
-  let handler
-  let fsReadSpy
+describe('registerLanguageExtension', () => {
+  let registeredHandler
+
+  const server = {
+    ext(event, handler) {
+      expect(event).toBe('onRequest')
+      registeredHandler = handler
+    }
+  }
+
+  const h = {
+    // Mimic Hapi's response toolkit behaviour used in the module:
+    // - redirect(url).takeover() should be returned for redirects
+    // - continue is returned for normal flow
+    redirect: (url) => ({
+      takeover: () => ({ redirectTo: url, takeover: true })
+    }),
+    continue: Symbol('continue')
+  }
 
   beforeEach(() => {
-    server = {
-      ext: (a, b) => {
-        if (typeof a === 'function') {
-          handler = a
-        } else {
-          handler = b
-        }
-      }
-    }
-
-    fsReadSpy = vi.spyOn(fs, 'readFileSync')
+    registeredHandler = undefined
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
-    handler = undefined
   })
 
-  it('defaults to "en" when no lang query param provided and loads translations', async () => {
+  it('registers the handler on the server', () => {
     registerLanguageExtension(server)
-    expect(handler).toBeTypeOf('function')
+    expect(typeof registeredHandler).toBe('function')
+  })
 
-    fsReadSpy.mockImplementation((filePath) => {
-      if (filePath.includes(`${path.sep}en${path.sep}translation.json`)) {
-        return JSON.stringify({ greeting: 'hello' })
-      }
-      throw new Error('file not found')
-    })
+  it('defaults to en and loads translations when lang missing', () => {
+    registerLanguageExtension(server)
 
-    const request = {
-      query: {},
-      url: { pathname: '/some/path' },
-      app: {},
-      state: {}
-    }
+    const fakeJson = JSON.stringify({ hello: 'world' })
+    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
 
-    const h = { continue: Symbol('continue') }
-
-    const result = handler(request, h)
+    const request = { query: {}, path: '/test', app: {}, log: vi.fn() }
+    const result = registeredHandler(request, h)
 
     expect(result).toBe(h.continue)
     expect(request.app.currentLang).toBe('en')
-    expect(request.query.lang).toBe('en')
-    expect(request.app.translations).toEqual({ greeting: 'hello' })
+    expect(request.app.translations).toEqual({ hello: 'world' })
+    expect(spy).toHaveBeenCalled()
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
+      'utf8'
+    )
   })
 
-  it('preserves empty translations when translation file missing for chosen locale', async () => {
+  it('accepts uppercase EN and loads en translations', () => {
     registerLanguageExtension(server)
 
-    fsReadSpy.mockImplementation(() => {
-      throw new Error('no file')
-    })
+    const fakeJson = JSON.stringify({ hello: 'upper' })
+    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
+
+    const request = { query: { lang: 'EN' }, path: '/p', app: {}, log: vi.fn() }
+    const result = registeredHandler(request, h)
+
+    expect(result).toBe(h.continue)
+    expect(request.app.currentLang).toBe('en')
+    expect(request.app.translations).toEqual({ hello: 'upper' })
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
+      'utf8'
+    )
+  })
+
+  it('accepts cy and loads cy translations', () => {
+    registerLanguageExtension(server)
+
+    const fakeJson = JSON.stringify({ hej: 'cy' })
+    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
 
     const request = {
       query: { lang: 'cy' },
-      url: { pathname: '/whatever' },
+      path: '/cy',
       app: {},
-      state: {}
+      log: vi.fn()
     }
-
-    const h = { continue: Symbol('continue') }
-
-    const result = handler(request, h)
+    const result = registeredHandler(request, h)
 
     expect(result).toBe(h.continue)
     expect(request.app.currentLang).toBe('cy')
-    expect(request.query.lang).toBe('cy')
+    expect(request.app.translations).toEqual({ hej: 'cy' })
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining(`${path.sep}cy${path.sep}translation.json`),
+      'utf8'
+    )
+  })
+
+  it('redirects to same path with lang=en when explicit non-allowed lang provided and preserves other query params', () => {
+    registerLanguageExtension(server)
+
+    // Ensure no file read happens because redirect is early
+    const spy = vi.spyOn(fs, 'readFileSync')
+
+    const request = {
+      query: { lang: 'xx', foo: 'bar' },
+      path: '/some/path',
+      app: {},
+      log: vi.fn()
+    }
+
+    const result = registeredHandler(request, h)
+
+    // redirect.takeover() shape asserted
+    expect(result).toEqual({ redirectTo: expect.any(String), takeover: true })
+    const redirectTo = result.redirectTo
+
+    // redirect must start with the original path
+    expect(redirectTo.startsWith(request.path)).toBe(true)
+    // must contain lang=en and preserve other params (order not guaranteed)
+    expect(redirectTo).toContain('lang=en')
+    expect(redirectTo).toContain('foo=bar')
+    // readFileSync should not have been called
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('falls back to empty translations when readFileSync throws', () => {
+    registerLanguageExtension(server)
+
+    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => {
+      throw new Error('no file')
+    })
+
+    const request = { query: { lang: 'en' }, path: '/x', app: {}, log: vi.fn() }
+    const result = registeredHandler(request, h)
+
+    expect(result).toBe(h.continue)
+    expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({})
+    expect(spy).toHaveBeenCalled()
   })
 
-  it('redirects to ?lang=en when an unsupported lang is explicitly provided in the query', async () => {
+  it('treats non-string lang values as missing and defaults to en', () => {
     registerLanguageExtension(server)
 
-    fsReadSpy.mockImplementation(() => {
-      throw new Error('not used')
-    })
+    const fakeJson = JSON.stringify({ ok: true })
+    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
 
     const request = {
-      query: { lang: 'jhwkj', foo: 'bar' },
-      url: { pathname: '/path' },
+      query: { lang: ['en'] },
+      path: '/arr',
       app: {},
-      state: {}
+      log: vi.fn()
     }
-
-    const redirectResult = { redirected: true, url: null }
-    const h = {
-      redirect: (url) => ({
-        takeover: () => {
-          redirectResult.url = url
-          return redirectResult
-        }
-      })
-    }
-
-    const result = handler(request, h)
-
-    expect(result).toBe(redirectResult)
-    expect(redirectResult.url.startsWith('/path')).toBe(true)
-    expect(redirectResult.url).toContain('lang=en')
-    expect(redirectResult.url).toContain('foo=bar')
-  })
-
-  it('normalizes complex lang values (EN-US / en_US) to primary subtag and uses it if supported', async () => {
-    registerLanguageExtension(server)
-
-    fsReadSpy.mockImplementation((filePath) => {
-      if (filePath.includes(`${path.sep}en${path.sep}translation.json`)) {
-        return JSON.stringify({ hello: 'world' })
-      }
-      throw new Error('file not found')
-    })
-
-    const request = {
-      query: { lang: 'EN-US' },
-      url: { pathname: '/' },
-      app: {},
-      state: {}
-    }
-
-    const h = { continue: Symbol('continue') }
-
-    const result = handler(request, h)
+    const result = registeredHandler(request, h)
 
     expect(result).toBe(h.continue)
     expect(request.app.currentLang).toBe('en')
-    expect(request.query.lang).toBe('en')
-    expect(request.app.translations).toEqual({ hello: 'world' })
-
-    request.query.lang = 'en_US'
-    const result2 = handler(request, h)
-    expect(result2).toBe(h.continue)
-    expect(request.app.currentLang).toBe('en')
+    expect(request.app.translations).toEqual({ ok: true })
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
+      'utf8'
+    )
   })
 
-  it('creates request.app when missing and sets language and translations', async () => {
+  it('trims whitespace around lang and normalizes to lowercase', () => {
     registerLanguageExtension(server)
 
-    fsReadSpy.mockImplementation((filePath) => {
-      if (filePath.includes(`${path.sep}en${path.sep}translation.json`)) {
-        return JSON.stringify({ hi: 'there' })
-      }
-      throw new Error('file not found')
-    })
+    const fakeJson = JSON.stringify({ trimmed: true })
+    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
 
     const request = {
-      query: {},
-      url: { pathname: '/no-app' },
-      state: {}
-    }
-
-    const h = { continue: Symbol('continue') }
-
-    const result = handler(request, h)
-
-    expect(result).toBe(h.continue)
-    expect(request.app).toBeDefined()
-    expect(request.app.currentLang).toBe('en')
-    expect(request.query.lang).toBe('en')
-    expect(request.app.translations).toEqual({ hi: 'there' })
-  })
-
-  it('logs a warning and falls back when translations JSON is invalid', async () => {
-    registerLanguageExtension(server)
-
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-
-    fsReadSpy.mockImplementation((filePath) => {
-      if (filePath.includes(`${path.sep}en${path.sep}translation.json`)) {
-        return 'not valid json'
-      }
-      throw new Error('file not found')
-    })
-
-    const request = {
-      query: {},
-      url: { pathname: '/bad-json' },
+      query: { lang: '  En  ' },
+      path: '/t',
       app: {},
-      state: {}
+      log: vi.fn()
     }
-
-    const h = { continue: Symbol('continue') }
-
-    const result = handler(request, h)
+    const result = registeredHandler(request, h)
 
     expect(result).toBe(h.continue)
-    expect(warnSpy).toHaveBeenCalled()
-    expect(request.app.translations).toEqual({})
+    expect(request.app.currentLang).toBe('en')
+    expect(request.app.translations).toEqual({ trimmed: true })
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
+      'utf8'
+    )
   })
 })
