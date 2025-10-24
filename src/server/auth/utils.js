@@ -80,6 +80,24 @@ export const putRequest = async (url, payload, headers = {}) => {
   }
 }
 
+export const postRequest = async (url, payload, headers = {}) => {
+  try {
+    const { payload: responsePayload } = await Wreck.post(url, {
+      payload: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      json: true
+    })
+    return responsePayload
+  } catch (error) {
+    throw Boom.boomify(error, {
+      statusCode: error.output?.statusCode || statusCodes.internalServerError
+    })
+  }
+}
+
 export const fetchWithToken = async (request, path) => {
   const { token } = getToken(request)
 
@@ -100,4 +118,18 @@ export const putWithToken = async (request, path, payload) => {
   const headers = setHeaders(token)
 
   return putRequest(url, payload, headers)
+}
+
+export const postWithToken = async (request, path, payload) => {
+  const { token } = getToken(request)
+
+  console.log('THE REQUEST', request)
+  console.log('THE PATH', path)
+  console.log('THE PAYLOAD', payload)
+  const apiBaseUrl = config.get('backendApiUrl')
+  const url = `${apiBaseUrl}${path}`
+
+  const headers = setHeaders(token)
+
+  return postRequest(url, payload, headers)
 }

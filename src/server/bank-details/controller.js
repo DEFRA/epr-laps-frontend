@@ -106,3 +106,55 @@ export const updateBankDetailsController = {
     })
   }
 }
+
+export const newBankDetailsConfirmedController = {
+  handler: (_request, h) => {
+    // TODO: Get this from where previous page saved it
+    const newBankDetails = {
+      id: '12345-abcde-67890-fghij',
+      accountNumber: '094785923',
+      accountName: 'Defra Test',
+      sortCode: '09-03-023',
+      requestedBy: 'Juhi'
+    }
+    return h.view('bank-details/confirm-new-bank-details.njk', {
+      pageTitle: 'Confirm new bank account details',
+      newBankDetails
+    })
+  }
+}
+
+export const postBankDetailsController = {
+  handler: async (request, h) => {
+    // const localAuthority = request.auth.credentials.organisationName
+    let viewContext
+    let currentLang
+
+    try {
+      viewContext = await context(request)
+      const { currentLang: ctxCurrentLang } = viewContext
+      currentLang = ctxCurrentLang
+
+      // const { id, accountName, sortCode, accountNumber, requestedBy } = request.payload
+
+      // Make your API call
+      await authUtils.postWithToken(request, '/bank-details', {
+        accountNumber: '094785923',
+        accountName: 'Defra Test',
+        sortCode: '09-03-023',
+        requesterName: 'Juhi',
+        localAuthority: 'Defra Test'
+      })
+
+      // Redirect on success
+      return h.redirect(
+        `/bank-details/bank-details-created?lang=${currentLang}`
+      )
+    } catch (err) {
+      request.logger.error(err, 'Failed to create bank details')
+      return h
+        .response({ error: 'Failed to create bank details' })
+        .code(statusCodes.internalServerError)
+    }
+  }
+}

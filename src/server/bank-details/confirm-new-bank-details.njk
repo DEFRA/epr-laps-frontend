@@ -1,0 +1,103 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set showBackLink = true %}
+
+{% block pageTitle %}
+  Update your local authority's bank details
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-xl">Request to update local authority bank details</span>
+    <h1 class="govuk-heading-xl">Confirm new bank account details</h1>
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: {
+            text: "Requested by"
+          },
+          value: {
+            text: newBankDetails.requestedBy
+          }
+        },
+        {
+          key: {
+            text: "Local authority"
+          },
+          value: {
+            text: test
+          }
+        },
+        {
+          key: {
+            text: "Account name"
+          },
+          value: {
+            text: newBankDetails.accountName
+          },
+          actions: {
+            items: [
+              {
+                href: "/laps/update-bank-details/update-bank-details",
+                text: "Change",
+                visuallyHiddenText: "accountName"
+              }
+            ]
+          }
+        },
+        {
+          key: {
+            text: "Sort Code"
+          },
+          value: {
+            text: newBankDetails.sortCode
+          },
+          actions: {
+            items: [
+              {
+                href: "/laps/update-bank-details/update-bank-details",
+                text: "Change",
+                visuallyHiddenText: "sortCode"
+              }
+            ]
+          }
+        },
+        {
+          key: {
+            text: "Account number"
+          },
+          value: {
+            text: newBankDetails.accountNumber
+          },
+          actions: {
+            items: [
+              {
+                href: "/laps/update-bank-details/update-bank-details",
+                text: "Change",
+                visuallyHiddenText: "accountNumber"
+              }
+            ]
+          }
+        }
+      ]
+    }) }}
+
+    <form id="update-bank-details-form" method="post" action="/bank-details">
+    <input type="hidden" name="id" value="{{ newBankDetails.id }}">
+  <input type="hidden" name="accountNumber" value="{{ newBankDetails.accountNumber }}">
+  <input type="hidden" name="accountName" value="{{ newBankDetails.accountName }}">
+  <input type="hidden" name="sortCode" value="{{ newBankDetails.sortCode }}">
+  <input type="hidden" name="requestedBy" value="{{ newBankDetails.requestedBy }}">
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+        Confirm and submit
+      </button>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}
