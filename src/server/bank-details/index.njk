@@ -91,23 +91,28 @@
 
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
-{% set detailsHtml %}
-  <p>{{ translations['request-to-update-bank-details'] | safe }}</p>
+{# Only show bank details change option for specific roles #}
+{% if userPermissions.createBankDetails %}
 
-  <p><strong>{{ translations['email'] }}</strong><br>
-    <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
-    {{ translations['we-aim-to-respo'] }}
+  {% set detailsHtml %}
+    <p>{{ translations['request-to-update-bank-details'] | safe }}</p>
+
+    <p><strong>{{ translations['email'] }}</strong><br>
+      <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
+      {{ translations['we-aim-to-respo'] }}
+    </p>
+
+   <p>
+    <strong>{{ translations['telephone'] }}</strong><br>
+    0300 060 0002<br>
+    {{ translations['monday-to-frida'] }}
   </p>
+  {% endset %}
 
- <p>
-  <strong>{{ translations['telephone'] }}</strong><br>
-  0300 060 0002<br>
-  {{ translations['monday-to-frida'] }}
-</p>
-{% endset %}
+  {{ govukDetails({
+    summaryText: translations['change-your-loc'],
+    html: detailsHtml
+  }) }}
 
-{{ govukDetails({
-  summaryText: translations['change-your-loc'],
-  html: detailsHtml
-}) }}
+{% endif %}
 {% endblock %}
