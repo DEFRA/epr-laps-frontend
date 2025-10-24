@@ -6,9 +6,11 @@ const logger = createLogger()
 
 const RELATIONSHIP_PARTS_MIN = 3 // minimum number of parts in a relationship string
 const ORG_NAME_INDEX = 2 // index of organisation name in the relationship string
+const ORG_ID_INDEX = 1 // index of organisation id in the relationship string
 
-export function extractOrgName(payload) {
+export function extractUserOrgDetails(payload) {
   let organisationName = 'Local Authority'
+  let organisationId
 
   if (Array.isArray(payload.relationships) && payload.currentRelationshipId) {
     const matched = payload.relationships.find((rel) => {
@@ -20,6 +22,7 @@ export function extractOrgName(payload) {
       const parts = matched.split(':')
       if (parts.length >= RELATIONSHIP_PARTS_MIN) {
         organisationName = parts[ORG_NAME_INDEX]
+        organisationId = parts[ORG_ID_INDEX]
       }
     }
   } else {
@@ -33,7 +36,7 @@ export function extractOrgName(payload) {
     .filter(Boolean)
     .join(' ')
 
-  return { organisationName, displayName }
+  return { organisationName, displayName, organisationId }
 }
 
 export const extractRoleName = (payload) => {
@@ -77,12 +80,14 @@ export const openIdProvider = (name, oidcConf) => {
 
       const payload = Jwt.token.decode(credentials.token).decoded.payload
 
-      const { organisationName, displayName } = extractOrgName(payload)
+      const { organisationName, displayName, organisationId } =
+        extractUserOrgDetails(payload)
       const { currentRole } = extractRoleName(payload)
 
       credentials.profile = {
         id: payload.sub,
         correlationId: payload.correlationId,
+        organisationId,
         sessionId: payload.sessionId,
         contactId: payload.contactId,
         serviceId: payload.serviceId,
