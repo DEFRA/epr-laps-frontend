@@ -1,4 +1,5 @@
 import { statusCodes } from '../constants/status-codes.js'
+import { Action, Outcome, writeAuditLog } from './audit-logging.js'
 
 function statusCodeMessage(statusCode, translations) {
   switch (statusCode) {
@@ -36,6 +37,12 @@ export function catchAll(request, h) {
   if (!('isBoom' in response)) {
     return h.continue
   }
+
+  writeAuditLog(
+    request,
+    Action[request.path]?.[request.method]?.kind,
+    Outcome.Failure
+  )
 
   const translations = request.app?.translations || {}
 

@@ -2,8 +2,11 @@ import { catchAll } from './errors.js'
 import { statusCodes } from '../constants/status-codes.js'
 import { getOidcConfig } from './auth/get-oidc-config.js'
 import { initializeTestServer } from '../test-helpers/test-server.js'
+import { writeAuditLog } from './audit-logging.js'
+import { expect } from 'vitest'
 
 vi.mock('./auth/get-oidc-config.js')
+vi.mock('./audit-logging.js')
 describe('#errors', () => {
   let server
 
@@ -90,6 +93,7 @@ describe('#catchAll', () => {
       heading: req.app.translations['page-not found'],
       message: req.app.translations['you-can-return']
     })
+    expect(writeAuditLog).toHaveBeenCalled()
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.notFound)
   })
 
@@ -103,6 +107,7 @@ describe('#catchAll', () => {
       heading: req.app.translations['service-unavailable'],
       message: req.app.translations['you-will-be']
     })
+    expect(writeAuditLog).toHaveBeenCalled()
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.serviceUnavailable)
   })
 
@@ -116,6 +121,7 @@ describe('#catchAll', () => {
       heading: req.app.translations['forbidden'],
       message: req.app.translations['you-do']
     })
+    expect(writeAuditLog).toHaveBeenCalled()
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
@@ -129,6 +135,7 @@ describe('#catchAll', () => {
       heading: req.app.translations['unauthorized'],
       message: req.app.translations['you-need-to']
     })
+    expect(writeAuditLog).toHaveBeenCalled()
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
   })
 
@@ -142,6 +149,7 @@ describe('#catchAll', () => {
       heading: req.app.translations['service-problem'],
       message: req.app.translations['try-again']
     })
+    expect(writeAuditLog).toHaveBeenCalled()
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.imATeapot)
   })
 
@@ -168,7 +176,7 @@ describe('#catchAll', () => {
     const h = { continue: 'continue' }
 
     const result = catchAll(req, h)
-
+    expect(writeAuditLog).not.toHaveBeenCalled()
     expect(result).toBe('continue')
   })
 
@@ -182,7 +190,7 @@ describe('#catchAll', () => {
     }
 
     catchAll(req, mockToolkit)
-
+    expect(writeAuditLog).toHaveBeenCalled()
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
       pageTitle: undefined,
       heading: undefined,

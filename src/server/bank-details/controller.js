@@ -98,3 +98,11 @@ export const bankDetailsConfirmedController = {
     }
   }
 }
+
+export const updateBankDetailsController = {
+  handler: (_request, h) => {
+    return h.view('bank-details/update-bank-details.njk', {
+      pageTitle: 'Update Bank Details'
+    })
+  }
+}
