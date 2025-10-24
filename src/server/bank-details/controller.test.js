@@ -3,6 +3,7 @@ import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController,
+  updateBankDetailsInfoController,
   updateBankDetailsController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
@@ -225,7 +226,7 @@ describe('#bankDetailsConfirmedController', () => {
     })
   })
 
-  describe('#updateBankDetailsController', () => {
+  describe('#updateBankDetailsInfoController', () => {
     let h, request
 
     beforeEach(() => {
@@ -235,13 +236,33 @@ describe('#bankDetailsConfirmedController', () => {
     })
 
     it('should render the update bank details view', () => {
-      const result = updateBankDetailsController.handler(request, h)
+      const result = updateBankDetailsInfoController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        'bank-details/update-bank-details-info.njk',
+        { pageTitle: 'How it works' }
+      )
+      expect(result).toBe('view-rendered')
+    })
+  })
+
+  describe('#updateBankDetailsController', () => {
+    let h
+
+    beforeEach(() => {
+      // Mock h.view()
+      h = {
+        view: vi.fn().mockReturnThis()
+      }
+    })
+
+    test('should render the update bank details view with correct page title', () => {
+      updateBankDetailsController.handler({}, h)
 
       expect(h.view).toHaveBeenCalledWith(
         'bank-details/update-bank-details.njk',
         { pageTitle: 'Update Bank Details' }
       )
-      expect(result).toBe('view-rendered')
     })
   })
 })
