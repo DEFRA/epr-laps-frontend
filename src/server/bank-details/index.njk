@@ -92,7 +92,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {# Only show bank details change option for specific roles #}
-{% if userPermissions.changeBankDetailsInfo %}
+{% if userPermissions.createBankDetails %}
 
   {% set detailsHtml %}
     <p>{{ translations['request-to-update-bank-details'] | safe }}</p>
