@@ -138,5 +138,11 @@
   "you-do": "You do not have permission to access this page.",
   "unauthorized": "Unauthorized",
   "you-need-to": "You need to sign in to view this page.",
-  "request-to-update-bank-details": "CEOs and Heads of Finance can submit a request to update local authority’s bank details <a class=\"govuk-link\" href=\"/update-bank-details\">here</a>."
+  "request-to-update-bank-details": "CEOs and Heads of Finance can submit a request to update local authority’s bank details <a class=\"govuk-link\" href=\"/update-bank-details\">here</a>.",
+  "request-bank-details-update": "Request to update local authority bank details",
+  "confirm-new-details": "Confirm new bank account details",
+  "requested-by": "Requested by",
+  "local-auth": "Local authority",
+  "confirm-and-submit": "Confirm and submit",
+  "change": "Change"
 }

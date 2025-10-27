@@ -46,13 +46,26 @@ export const bankDetails = {
       })
       server.route({
         method: 'GET',
-        path: '/bank-details/confirm-new-bank-details',
+        path: '/bank-details/check-bank-details',
         ...newBankDetailsConfirmedController
       })
       server.route({
         method: 'POST',
         path: '/bank-details',
         ...postBankDetailsController
+      })
+      server.route({
+        method: 'GET',
+        path: '/bank-details/bank-details-submitted',
+        handler: (request, h) => {
+          const translations = request.app.translations || {}
+          const currentLang = request.app.currentLang || 'en'
+          return h.view('bank-details/bank-details-created.njk', {
+            pageTitle: 'Bank Details Created',
+            currentLang,
+            translations
+          })
+        }
       })
     }
   }

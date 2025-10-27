@@ -10,8 +10,8 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <span class="govuk-caption-xl">Request to update local authority bank details</span>
-    <h1 class="govuk-heading-xl">Confirm new bank account details</h1>
+    <span class="govuk-caption-xl">{{ translations['request-bank-details-update'] }}</span>
+    <h1 class="govuk-heading-xl">{{ translations['confirm-new-details'] }}</h1>
   </div>
 </div>
 
@@ -21,47 +21,47 @@
     {{ govukSummaryList({
       rows: [
         {
-          key: { text: "Requested by" },
+          key: { text: translations['requested-by'] },
           value: { text: newBankDetails.requestedBy }
         },
         {
-          key: { text: "Local authority" },
+          key: { text: translations['local-auth'] },
           value: { text: authedUser.organisationName }
         },
         {
-          key: { text: "Account name" },
+          key: { text: translations['account-name'] },
           value: { text: newBankDetails.accountName },
           actions: {
             items: [
               {
                 href: "/laps/update-bank-details/update-bank-details",
-                text: "Change",
+                text: translations['change'],
                 visuallyHiddenText: "accountName"
               }
             ]
           }
         },
         {
-          key: { text: "Sort Code" },
+          key: { text: translations['sort-code'] },
           value: { text: newBankDetails.sortCode },
           actions: {
             items: [
               {
                 href: "/laps/update-bank-details/update-bank-details",
-                text: "Change",
+                text: translations['change'],
                 visuallyHiddenText: "sortCode"
               }
             ]
           }
         },
         {
-          key: { text: "Account number" },
+          key: { text: translations['account-number'] },
           value: { text: newBankDetails.accountNumber },
           actions: {
             items: [
               {
                 href: "/laps/update-bank-details/update-bank-details",
-                text: "Change",
+                text: translations['change'],
                 visuallyHiddenText: "accountNumber"
               }
             ]
@@ -76,7 +76,7 @@
       <input type="hidden" name="accountName" value="{{ newBankDetails.accountName }}">
       <input type="hidden" name="sortCode" value="{{ newBankDetails.sortCode }}">
       <input type="hidden" name="requestedBy" value="{{ newBankDetails.requestedBy }}">
-      <button type="submit" class="govuk-button" data-module="govuk-button">Confirm and submit</button>
+      <button type="submit" class="govuk-button" data-module="govuk-button">{{ translations['confirm-and-submit']}}</button>
     </form>
 
   </div>

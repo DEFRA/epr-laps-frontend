@@ -108,7 +108,8 @@ export const updateBankDetailsController = {
 }
 
 export const newBankDetailsConfirmedController = {
-  handler: (_request, h) => {
+  handler: (request, h) => {
+    const { currentLang, translations } = request.app
     // TODO: Get this from where previous page saved it
     const newBankDetails = {
       id: '12345-abcde-67890-fghij',
@@ -117,25 +118,20 @@ export const newBankDetailsConfirmedController = {
       sortCode: '09-03-023',
       requestedBy: 'Juhi'
     }
-    return h.view('bank-details/confirm-new-bank-details.njk', {
+    return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
-      newBankDetails
+      newBankDetails,
+      currentLang,
+      translations
     })
   }
 }
 
 export const postBankDetailsController = {
   handler: async (request, h) => {
-    // const localAuthority = request.auth.credentials.organisationName
-    let viewContext
-    let currentLang
-
+    // TODO: Get payload from previous page
     try {
-      viewContext = await context(request)
-      const { currentLang: ctxCurrentLang } = viewContext
-      currentLang = ctxCurrentLang
-
-      // const { id, accountName, sortCode, accountNumber, requestedBy } = request.payload
+      const { currentLang } = request.app
 
       // Make your API call
       await authUtils.postWithToken(request, '/bank-details', {
@@ -148,7 +144,7 @@ export const postBankDetailsController = {
 
       // Redirect on success
       return h.redirect(
-        `/bank-details/bank-details-created?lang=${currentLang}`
+        `/bank-details/bank-details-submitted?lang=${currentLang}`
       )
     } catch (err) {
       request.logger.error(err, 'Failed to create bank details')
