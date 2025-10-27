@@ -9,36 +9,28 @@
 {% block content %}
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-
+  <div class="govuk-grid-column-full">
     <span class="govuk-caption-xl">Request to update local authority bank details</span>
     <h1 class="govuk-heading-xl">Confirm new bank account details</h1>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
     {{ govukSummaryList({
       rows: [
         {
-          key: {
-            text: "Requested by"
-          },
-          value: {
-            text: newBankDetails.requestedBy
-          }
+          key: { text: "Requested by" },
+          value: { text: newBankDetails.requestedBy }
         },
         {
-          key: {
-            text: "Local authority"
-          },
-          value: {
-            text: test
-          }
+          key: { text: "Local authority" },
+          value: { text: authedUser.organisationName }
         },
         {
-          key: {
-            text: "Account name"
-          },
-          value: {
-            text: newBankDetails.accountName
-          },
+          key: { text: "Account name" },
+          value: { text: newBankDetails.accountName },
           actions: {
             items: [
               {
@@ -50,12 +42,8 @@
           }
         },
         {
-          key: {
-            text: "Sort Code"
-          },
-          value: {
-            text: newBankDetails.sortCode
-          },
+          key: { text: "Sort Code" },
+          value: { text: newBankDetails.sortCode },
           actions: {
             items: [
               {
@@ -67,12 +55,8 @@
           }
         },
         {
-          key: {
-            text: "Account number"
-          },
-          value: {
-            text: newBankDetails.accountNumber
-          },
+          key: { text: "Account number" },
+          value: { text: newBankDetails.accountNumber },
           actions: {
             items: [
               {
@@ -87,14 +71,12 @@
     }) }}
 
     <form id="update-bank-details-form" method="post" action="/bank-details">
-    <input type="hidden" name="id" value="{{ newBankDetails.id }}">
-  <input type="hidden" name="accountNumber" value="{{ newBankDetails.accountNumber }}">
-  <input type="hidden" name="accountName" value="{{ newBankDetails.accountName }}">
-  <input type="hidden" name="sortCode" value="{{ newBankDetails.sortCode }}">
-  <input type="hidden" name="requestedBy" value="{{ newBankDetails.requestedBy }}">
-      <button type="submit" class="govuk-button" data-module="govuk-button">
-        Confirm and submit
-      </button>
+      <input type="hidden" name="id" value="{{ newBankDetails.id }}">
+      <input type="hidden" name="accountNumber" value="{{ newBankDetails.accountNumber }}">
+      <input type="hidden" name="accountName" value="{{ newBankDetails.accountName }}">
+      <input type="hidden" name="sortCode" value="{{ newBankDetails.sortCode }}">
+      <input type="hidden" name="requestedBy" value="{{ newBankDetails.requestedBy }}">
+      <button type="submit" class="govuk-button" data-module="govuk-button">Confirm and submit</button>
     </form>
 
   </div>
