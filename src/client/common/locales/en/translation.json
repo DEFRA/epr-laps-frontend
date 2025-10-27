@@ -144,5 +144,11 @@
   "requested-by": "Requested by",
   "local-auth": "Local authority",
   "confirm-and-submit": "Confirm and submit",
-  "change": "Change"
+  "change": "Change",
+  "request-to": "Request to update local authority bank details",
+  "how-it-works": "How it works",
+  "we-need-your": "We need your local authority's latest bank details to make sure pEPR payments are sent to the correct account.",
+  "submit-your": "Submit your updated bank details securely using the online form",
+  "we-will": "We will contact your local authority's authorised finance officer(e.g. Section 151 officer) to confirm the details",
+  "you-will-receive": "You will receive an email once your updated bank details are verified and approved"
 }

@@ -151,5 +151,11 @@
   "requested-by": "Cais gan",
   "local-auth": "Awdurdod lleol",
   "confirm-and-submit": "Cadarnhau a chyflwyno",
-  "change": "Newid"
+  "change": "Newid",
+  "request-to": "Cais i ddiweddaru manylion banc yr awdurdod lleol",
+  "how-it-works": "Sut mae'n gweithio",
+  "we-need-your": "Mae angen manylion banc diweddaraf eich awdurdod lleol arnom i wneud yn siŵr bod taliadau pEPR yn cael eu hanfon i'r cyfrif cywir.",
+  "submit-your": "Cyflwynwch eich manylion banc wedi'u diweddaru yn ddiogel gan ddefnyddio'r ffurflen ar-lein",
+  "we-will": "Byddwn yn cysylltu â swyddog cyllid awdurdodedig eich awdurdod lleol (e.e. swyddog Adran 151) i gadarnhau'r manylion",
+  "you-will-receive": "Byddwch yn derbyn e-bost unwaith y bydd eich manylion banc wedi'u diweddaru wedi'u gwirio a'u cymeradwyo"
 }
