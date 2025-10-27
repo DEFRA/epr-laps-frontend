@@ -118,7 +118,7 @@ export const updateBankDetailsController = {
 export const bankDetailsSubmittedController = {
   handler: (_request, h) => {
     return h.view('bank-details/bank-details-submitted.njk', {
-      pageTitle: 'Bank Details Submitted'
+      pageTitle: 'Bank details submitted'
     })
   }
 }
