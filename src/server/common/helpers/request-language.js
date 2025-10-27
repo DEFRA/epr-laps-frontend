@@ -34,6 +34,9 @@ export function registerLanguageExtension(server) {
     try {
       request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
     } catch (err) {
+      request.logger.error(
+        `Failed to load translations for "${currentLang}" from ${filePath}: ${err.message}`
+      )
       request.app.translations = {}
     }
 
