@@ -5,7 +5,7 @@ import {
   bankDetailsConfirmedController,
   updateBankDetailsController,
   postBankDetailsController,
-  newBankDetailsConfirmedController,
+  checkBankDetailsController,
   updateBankDetailsInfoController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
@@ -39,8 +39,8 @@ const createH = () => ({
 const createRequest = (overrides = {}) => ({
   auth: {
     credentials: {
-      account: { localAuthorityName: 'Test Local Authority' },
-      organisationName: 'Test Local Authority'
+      account: { localAuthorityName: 'Defra Test' },
+      organisationName: 'Defra Test'
     }
   },
   logger: { error: vi.fn(), info: vi.fn() },
@@ -270,7 +270,7 @@ describe('#bankDetailsConfirmedController', () => {
     })
   })
 
-  describe('#newBankDetailsConfirmedController', () => {
+  describe('#checkBankDetailsController', () => {
     let h, request
 
     beforeEach(() => {
@@ -280,7 +280,7 @@ describe('#bankDetailsConfirmedController', () => {
     })
 
     it('should render the confirm bank details view with correct data', () => {
-      const result = newBankDetailsConfirmedController.handler(request, h)
+      const result = checkBankDetailsController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(
         'bank-details/check-bank-details.njk',

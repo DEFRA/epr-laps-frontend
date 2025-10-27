@@ -115,14 +115,15 @@ export const updateBankDetailsController = {
   }
 }
 
-export const newBankDetailsConfirmedController = {
+const accountName = 'Defra Test'
+export const checkBankDetailsController = {
   handler: (request, h) => {
     const { currentLang, translations } = request.app
     // TODO: Get this from where previous page saved it
     const newBankDetails = {
       id: '12345-abcde-67890-fghij',
       accountNumber: '094785923',
-      accountName: 'Defra Test',
+      accountName: accountName,
       sortCode: '09-03-023',
       requestedBy: 'Juhi'
     }
@@ -144,10 +145,10 @@ export const postBankDetailsController = {
       // Make your API call
       await authUtils.postWithToken(request, '/bank-details', {
         accountNumber: '094785923',
-        accountName: 'Defra Test',
+        accountName: accountName,
         sortCode: '09-03-023',
         requesterName: 'Juhi',
-        localAuthority: 'Defra Test'
+        localAuthority: request.auth.credentials.organisationName
       })
 
       // Redirect on success

@@ -4,7 +4,7 @@ import {
   bankDetailsConfirmedController,
   updateBankDetailsInfoController,
   updateBankDetailsController,
-  newBankDetailsConfirmedController,
+  checkBankDetailsController,
   postBankDetailsController
 } from './controller.js'
 
@@ -53,7 +53,7 @@ export const bankDetails = {
       server.route({
         method: 'GET',
         path: '/bank-details/check-bank-details',
-        ...newBankDetailsConfirmedController
+        ...checkBankDetailsController
       })
       server.route({
         method: 'POST',
@@ -66,7 +66,7 @@ export const bankDetails = {
         handler: (request, h) => {
           const translations = request.app.translations || {}
           const currentLang = request.app.currentLang || 'en'
-          return h.view('bank-details/bank-details-created.njk', {
+          return h.view('bank-details/bank-details-submitted.njk', {
             pageTitle: 'Bank Details Created',
             currentLang,
             translations
