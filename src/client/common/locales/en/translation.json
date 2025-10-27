@@ -144,5 +144,9 @@
   "we-need-your": "We need your local authority's latest bank details to make sure pEPR payments are sent to the correct account.",
   "submit-your": "Submit your updated bank details securely using the online form",
   "we-will": "We will contact your local authority's authorised finance officer(e.g. Section 151 officer) to confirm the details",
-  "you-will-receive": "You will receive an email once your updated bank details are verified and approved"
+  "you-will-receive": "You will receive an email once your updated bank details are verified and approved",
+  "new-bank-acc": "New bank account details submitted",
+  "we-will-verify": "We will verify the information with your authorised finance officer.",
+  "you-will-receive-a-confirmation": "You will receive a confirmation email once the update is approved.",
+  "go-to-bank-details": "<a class=\"govuk-link\" href=\"/bank-details\">Go to Bank details</a>"
 }

@@ -3,7 +3,8 @@ import {
   confirmBankDetailsController,
   bankDetailsConfirmedController,
   updateBankDetailsInfoController,
-  updateBankDetailsController
+  updateBankDetailsController,
+  bankDetailsSubmittedController
 } from './controller.js'
 
 export const bankDetails = {
@@ -47,6 +48,11 @@ export const bankDetails = {
             translations
           })
         }
+      })
+      server.route({
+        method: 'GET',
+        path: '/bank-details-submitted',
+        ...bankDetailsSubmittedController
       })
     }
   }

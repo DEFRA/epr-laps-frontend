@@ -151,5 +151,9 @@
   "we-need-your": "Mae angen manylion banc diweddaraf eich awdurdod lleol arnom i wneud yn siŵr bod taliadau pEPR yn cael eu hanfon i'r cyfrif cywir.",
   "submit-your": "Cyflwynwch eich manylion banc wedi'u diweddaru yn ddiogel gan ddefnyddio'r ffurflen ar-lein",
   "we-will": "Byddwn yn cysylltu â swyddog cyllid awdurdodedig eich awdurdod lleol (e.e. swyddog Adran 151) i gadarnhau'r manylion",
-  "you-will-receive": "Byddwch yn derbyn e-bost unwaith y bydd eich manylion banc wedi'u diweddaru wedi'u gwirio a'u cymeradwyo"
+  "you-will-receive": "Byddwch yn derbyn e-bost unwaith y bydd eich manylion banc wedi'u diweddaru wedi'u gwirio a'u cymeradwyo",
+  "new-bank-acc": "Manylion cyfrif banc newydd wedi'u cyflwyno",
+  "we-will-verify": "Byddwn yn gwirio'r wybodaeth gyda'ch swyddog cyllid awdurdodedig.",
+  "you-will-receive-a-confirmation": "Byddwch yn derbyn e-bost cadarnhau unwaith y bydd y diweddariad wedi'i gymeradwyo.",
+  "go-to-bank-details": "<a class=\"govuk-link\" href=\"/bank-details\">Ewch i fanylion y banc</a>"
 }
