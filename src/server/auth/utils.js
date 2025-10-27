@@ -105,7 +105,6 @@ export const fetchWithToken = async (request, path) => {
   const url = `${apiBaseUrl}${path}`
 
   const headers = setHeaders(token)
-
   return getRequest(url, headers)
 }
 
@@ -123,9 +122,6 @@ export const putWithToken = async (request, path, payload) => {
 export const postWithToken = async (request, path, payload) => {
   const { token } = getToken(request)
 
-  console.log('THE REQUEST', request)
-  console.log('THE PATH', path)
-  console.log('THE PAYLOAD', payload)
   const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${path}`
 
