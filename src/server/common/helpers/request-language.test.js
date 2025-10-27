@@ -3,6 +3,17 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { registerLanguageExtension } from './request-language.js'
 
+function makeRequest(overrides = {}) {
+  return {
+    query: {},
+    path: '/test',
+    app: {},
+    log: vi.fn(),
+    logger: { error: vi.fn() },
+    ...overrides
+  }
+}
+
 describe('registerLanguageExtension', () => {
   let registeredHandler
 
@@ -14,9 +25,6 @@ describe('registerLanguageExtension', () => {
   }
 
   const h = {
-    // Mimic Hapi's response toolkit behaviour used in the module:
-    // - redirect(url).takeover() should be returned for redirects
-    // - continue is returned for normal flow
     redirect: (url) => ({
       takeover: () => ({ redirectTo: url, takeover: true })
     }),
@@ -99,7 +107,6 @@ describe('registerLanguageExtension', () => {
   it('redirects to same path with lang=en when explicit non-allowed lang provided and preserves other query params', () => {
     registerLanguageExtension(server)
 
-    // Ensure no file read happens because redirect is early
     const spy = vi.spyOn(fs, 'readFileSync')
 
     const request = {
@@ -111,16 +118,12 @@ describe('registerLanguageExtension', () => {
 
     const result = registeredHandler(request, h)
 
-    // redirect.takeover() shape asserted
     expect(result).toEqual({ redirectTo: expect.any(String), takeover: true })
     const redirectTo = result.redirectTo
 
-    // redirect must start with the original path
     expect(redirectTo.startsWith(request.path)).toBe(true)
-    // must contain lang=en and preserve other params (order not guaranteed)
     expect(redirectTo).toContain('lang=en')
     expect(redirectTo).toContain('foo=bar')
-    // readFileSync should not have been called
     expect(spy).not.toHaveBeenCalled()
   })
 
@@ -131,13 +134,14 @@ describe('registerLanguageExtension', () => {
       throw new Error('no file')
     })
 
-    const request = { query: { lang: 'en' }, path: '/x', app: {}, log: vi.fn() }
+    const request = makeRequest({ query: { lang: 'en' }, path: '/x' })
     const result = registeredHandler(request, h)
 
     expect(result).toBe(h.continue)
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({})
     expect(spy).toHaveBeenCalled()
+    expect(request.logger.error).toHaveBeenCalled()
   })
 
   it('treats non-string lang values as missing and defaults to en', () => {
