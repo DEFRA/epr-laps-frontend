@@ -3,8 +3,10 @@ import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController,
-  updateBankDetailsInfoController,
-  updateBankDetailsController
+  updateBankDetailsController,
+  postBankDetailsController,
+  checkBankDetailsController,
+  updateBankDetailsInfoController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
@@ -12,7 +14,8 @@ import { context } from '../../config/nunjucks/context/context.js'
 vi.mock('../../server/auth/utils.js', () => ({
   __esModule: true,
   fetchWithToken: vi.fn(),
-  putWithToken: vi.fn()
+  putWithToken: vi.fn(),
+  postWithToken: vi.fn()
 }))
 
 vi.mock('../../config/nunjucks/context/context.js', () => ({
@@ -36,11 +39,12 @@ const createH = () => ({
 const createRequest = (overrides = {}) => ({
   auth: {
     credentials: {
-      account: { localAuthorityName: 'Test Local Authority' },
-      organisationName: 'Test Local Authority'
+      account: { localAuthorityName: 'Defra Test' },
+      organisationName: 'Defra Test'
     }
   },
   logger: { error: vi.fn(), info: vi.fn() },
+  app: { currentLang: 'en', translations: { confirm: 'Confirm' } },
   ...overrides
 })
 
@@ -263,6 +267,68 @@ describe('#bankDetailsConfirmedController', () => {
         'bank-details/update-bank-details.njk',
         { pageTitle: 'Update Bank Details' }
       )
+    })
+  })
+
+  describe('#checkBankDetailsController', () => {
+    let h, request
+
+    beforeEach(() => {
+      h = createH()
+      request = createRequest()
+      vi.clearAllMocks()
+    })
+
+    it('should render the confirm bank details view with correct data', () => {
+      const result = checkBankDetailsController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        'bank-details/check-bank-details.njk',
+        expect.objectContaining({
+          pageTitle: 'Confirm new bank account details',
+          newBankDetails: expect.objectContaining({
+            id: '12345-abcde-67890-fghij',
+            accountNumber: '094785923',
+            accountName: 'Defra Test',
+            sortCode: '09-03-023',
+            requestedBy: 'Juhi'
+          })
+        })
+      )
+      expect(result).toBe('view-rendered')
+    })
+  })
+
+  describe('#postBankDetailsController', () => {
+    let h, request
+
+    beforeEach(() => {
+      h = createH()
+      request = createRequest()
+      vi.clearAllMocks()
+    })
+
+    it('should call postWithToken and redirect on success', async () => {
+      authUtils.postWithToken.mockResolvedValue({})
+
+      const result = await postBankDetailsController.handler(request, h)
+
+      expect(authUtils.postWithToken).toHaveBeenCalledWith(
+        request,
+        '/bank-details',
+        {
+          accountNumber: '094785923',
+          accountName: 'Defra Test',
+          sortCode: '09-03-023',
+          requesterName: 'Juhi',
+          localAuthority: 'Defra Test'
+        }
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        '/bank-details/bank-details-submitted?lang=en'
+      )
+      expect(result).toBe('redirected')
     })
   })
 })

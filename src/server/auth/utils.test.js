@@ -6,7 +6,8 @@ import {
   getRequest,
   putRequest,
   fetchWithToken,
-  putWithToken
+  putWithToken,
+  postWithToken
 } from './utils.js'
 import Wreck from '@hapi/wreck'
 import { config } from './../../config/config.js'
@@ -312,6 +313,43 @@ describe('#utils', () => {
       await expect(putWithToken(request, '/test', {})).rejects.toThrow(
         'Unauthorized'
       )
+    })
+  })
+
+  describe('postWithToken', () => {
+    let request
+
+    beforeEach(() => {
+      vi.clearAllMocks()
+      request = {
+        auth: {
+          credentials: { token: 'abc123' }
+        }
+      }
+    })
+
+    it('should call postRequest with correct URL, payload, and headers', async () => {
+      const payload = { foo: 'bar' }
+      Wreck.post.mockResolvedValue({ payload: { success: true } })
+
+      const result = await postWithToken(request, '/post-path', payload)
+
+      expect(Wreck.post).toHaveBeenCalledWith('http://backend.test/post-path', {
+        payload: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer abc123'
+        },
+        json: true
+      })
+
+      expect(result).toEqual({ success: true })
+    })
+
+    it('should throw Boom error if request fails', async () => {
+      Wreck.post.mockRejectedValue(new Error('fail'))
+
+      await expect(postWithToken(request, '/fail-path', {})).rejects.toThrow()
     })
   })
 })
