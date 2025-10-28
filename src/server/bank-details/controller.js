@@ -63,7 +63,7 @@ export const confirmBankDetailsController = {
 
 export const bankDetailsConfirmedController = {
   handler: async (request, h) => {
-    const localAuthority = request.auth.credentials.organisationName
+    const localAuthority = request.auth.credentials.organisationId
     let viewContext
     let currentLang
 

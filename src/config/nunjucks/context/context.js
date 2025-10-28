@@ -49,7 +49,7 @@ async function context(request) {
   }
 
   try {
-    const bankPath = `/bank-details/${encodeURIComponent(organisationName)}`
+    const bankPath = `/bank-details/${authedUser.organisationId}`
     bankApiData = await fetchWithToken(request, bankPath)
     request.logger.info(
       `Successfully fetched bank details for ${organisationName}`

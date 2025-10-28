@@ -6,22 +6,41 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export function registerLanguageExtension(server) {
+  const allowed = new Set(['en', 'cy'])
+
   server.ext('onRequest', (request, h) => {
-    const lang = request.query.lang || 'en'
+    const raw =
+      request.query && typeof request.query.lang === 'string'
+        ? request.query.lang
+        : ''
+    const lang = raw.trim().toLowerCase()
+    const currentLang = allowed.has(lang) ? lang : 'en'
+
+    if (raw && !allowed.has(lang)) {
+      const query = { ...request.query, lang: currentLang }
+      const qs = new URLSearchParams(query).toString()
+      const redirectTo = request.path + (qs ? `?${qs}` : '')
+
+      return h.redirect(redirectTo).takeover()
+    }
+
     const filePath = path.join(
       __dirname,
       '../../../client/common/locales',
-      lang,
+      currentLang,
       'translation.json'
     )
 
     try {
       request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-    } catch {
+    } catch (err) {
+      request.logger.error(
+        `Failed to load translations for "${currentLang}" from ${filePath}: ${err.message}`
+      )
       request.app.translations = {}
     }
 
-    request.app.currentLang = lang
+    request.app.currentLang = currentLang
     return h.continue
   })
 }
