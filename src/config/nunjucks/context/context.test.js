@@ -78,6 +78,7 @@ describe('context and cache', () => {
       },
       getUserSession: vi.fn().mockResolvedValue({
         organisationName: EN_NAME,
+        organisationId: '123-abc',
         relationships: []
       })
     }
@@ -106,6 +107,7 @@ describe('context and cache', () => {
           bankApiData: null,
           authedUser: {
             organisationName: EN_NAME,
+            organisationId: '123-abc',
             relationships: []
           },
           assetPath: '/public/assets',
@@ -309,7 +311,8 @@ describe('context and cache', () => {
       getUserSession: vi.fn().mockResolvedValue({
         organisationName: EN_NAME,
         relationships: [],
-        currentRole: 'Head of Finance'
+        currentRole: 'Head of Finance',
+        organisationId: '123-abc'
       }),
       state: {
         userSession: null
@@ -334,7 +337,7 @@ describe('context and cache', () => {
 
       expect(fetchWithToken).toHaveBeenCalledWith(
         mockRequest,
-        `/bank-details/${encodeURIComponent(EN_NAME)}`
+        `/bank-details/123-abc`
       )
       expect(ctx.bankApiData).toEqual(fakeApiData)
       expect(mockRequest.logger.info).toHaveBeenCalledWith(

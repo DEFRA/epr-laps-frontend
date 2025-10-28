@@ -1,5 +1,9 @@
 import jwt from '@hapi/jwt'
-import { openIdProvider, extractOrgName, extractRoleName } from './open-id.js'
+import {
+  openIdProvider,
+  extractUserOrgDetails,
+  extractRoleName
+} from './open-id.js'
 
 describe('#openIdProvider', () => {
   let provider
@@ -113,13 +117,13 @@ describe('#openIdProvider', () => {
   })
 })
 
-describe('#extractOrgName', () => {
+describe('#extractUserOrgDetails', () => {
   test('Should return organisation name when relationship matches', () => {
     const payload = {
       currentRelationshipId: '123',
       relationships: ['123:456:MyOrg:0:employee:0']
     }
-    expect(extractOrgName(payload).organisationName).toBe('MyOrg')
+    expect(extractUserOrgDetails(payload).organisationName).toBe('MyOrg')
   })
 
   test('Should fallback to Local Authority when no relationships', () => {
@@ -127,7 +131,9 @@ describe('#extractOrgName', () => {
       currentRelationshipId: null,
       relationships: null
     }
-    expect(extractOrgName(payload).organisationName).toBe('Local Authority')
+    expect(extractUserOrgDetails(payload).organisationName).toBe(
+      'Local Authority'
+    )
   })
 
   test('Should fallback to Local Authority when relationship does not match', () => {
@@ -135,7 +141,9 @@ describe('#extractOrgName', () => {
       currentRelationshipId: '999',
       relationships: ['123:456:OtherOrg:0:employee:0']
     }
-    expect(extractOrgName(payload).organisationName).toBe('Local Authority')
+    expect(extractUserOrgDetails(payload).organisationName).toBe(
+      'Local Authority'
+    )
   })
 
   test('Should handle malformed relationship strings gracefully', () => {
@@ -143,7 +151,20 @@ describe('#extractOrgName', () => {
       currentRelationshipId: '123',
       relationships: ['123']
     }
-    expect(extractOrgName(payload).organisationName).toBe('Local Authority')
+    expect(extractUserOrgDetails(payload).organisationName).toBe(
+      'Local Authority'
+    )
+  })
+
+  test('Should return organisation id', () => {
+    const payload = {
+      currentRelationshipId: '9999',
+      relationships: [
+        '123:456:MyOrg:0:employee:0',
+        '9999:abcd-12345:Test Organization:0:employee:0'
+      ]
+    }
+    expect(extractUserOrgDetails(payload).organisationId).toBe('abcd-12345')
   })
 })
 
