@@ -332,22 +332,5 @@ describe('#bankDetailsConfirmedController', () => {
       )
       expect(result).toBe('redirected')
     })
-
-    it('should return 500 and log error if postWithToken fails', async () => {
-      const error = new Error('API failed')
-      authUtils.postWithToken.mockRejectedValue(error)
-
-      const result = await postBankDetailsController.handler(request, h)
-
-      expect(request.logger.error).toHaveBeenCalledWith(
-        error,
-        'Failed to create bank details'
-      )
-      expect(result).toEqual({
-        payload: { error: 'Failed to create bank details' },
-        statusCode: 500,
-        code: expect.any(Function)
-      })
-    })
   })
 })

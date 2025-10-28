@@ -123,7 +123,7 @@ export const checkBankDetailsController = {
     const newBankDetails = {
       id: '12345-abcde-67890-fghij',
       accountNumber: '094785923',
-      accountName: accountName,
+      accountName,
       sortCode: '09-03-023',
       requestedBy: 'Juhi'
     }
@@ -139,27 +139,23 @@ export const checkBankDetailsController = {
 export const postBankDetailsController = {
   handler: async (request, h) => {
     // TODO: Get payload from previous page
-    try {
-      const { currentLang } = request.app
+    const { currentLang } = request.app
 
-      // Make your API call
-      await authUtils.postWithToken(request, '/bank-details', {
-        accountNumber: '094785923',
-        accountName: accountName,
-        sortCode: '09-03-023',
-        requesterName: 'Juhi',
-        localAuthority: request.auth.credentials.organisationName
-      })
+    // Make your API call
+    await authUtils.postWithToken(request, '/bank-details', {
+      accountNumber: '094785923',
+      accountName,
+      sortCode: '09-03-023',
+      requesterName: 'Juhi',
+      localAuthority: request.auth.credentials.organisationName
+    })
 
-      // Redirect on success
-      return h.redirect(
-        `/bank-details/bank-details-submitted?lang=${currentLang}`
-      )
-    } catch (err) {
-      request.logger.error(err, 'Failed to create bank details')
-      return h
-        .response({ error: 'Failed to create bank details' })
-        .code(statusCodes.internalServerError)
-    }
+    request.logger.info(
+      `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
+    )
+    // Redirect on success
+    return h.redirect(
+      `/bank-details/bank-details-submitted?lang=${currentLang}`
+    )
   }
 }
