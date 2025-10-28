@@ -117,8 +117,7 @@ export const updateBankDetailsController = {
 
 const accountName = 'Defra Test'
 export const checkBankDetailsController = {
-  handler: (request, h) => {
-    const { currentLang, translations } = request.app
+  handler: (_request, h) => {
     // TODO: Get this from where previous page saved it
     const newBankDetails = {
       id: '12345-abcde-67890-fghij',
@@ -129,9 +128,7 @@ export const checkBankDetailsController = {
     }
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
-      newBankDetails,
-      currentLang,
-      translations
+      newBankDetails
     })
   }
 }

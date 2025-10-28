@@ -292,9 +292,7 @@ describe('#bankDetailsConfirmedController', () => {
             accountName: 'Defra Test',
             sortCode: '09-03-023',
             requestedBy: 'Juhi'
-          }),
-          currentLang: 'en',
-          translations: { confirm: 'Confirm' }
+          })
         })
       )
       expect(result).toBe('view-rendered')
