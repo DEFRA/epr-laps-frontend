@@ -115,22 +115,6 @@ export const updateBankDetailsController = {
   }
 }
 
-export const bankDetailsSubmittedController = {
-  handler: async (request, h) => {
-    // // Check if user arrived from a valid submission (check for specific session flag or referrer)
-    const validSubmission = request.yar.get('bankDetailsSubmitted')
-    if (!validSubmission) {
-      return h.redirect('/update-bank-details-info')
-    }
-    // Clear the session flag to prevent refresh/back button issues
-    request.yar.clear('bankDetailsSubmitted')
-
-    return h.view('bank-details/bank-details-submitted.njk', {
-      pageTitle: 'Bank details submitted'
-    })
-  }
-}
-
 const accountName = 'Defra Test'
 export const checkBankDetailsController = {
   handler: (_request, h) => {
