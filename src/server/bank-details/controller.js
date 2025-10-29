@@ -4,6 +4,7 @@
 import { statusCodes } from '../common/constants/status-codes.js'
 import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
+import joi from 'joi'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -154,5 +155,54 @@ export const postBankDetailsController = {
     return h.redirect(
       `/bank-details/bank-details-submitted?lang=${currentLang}`
     )
+  }
+}
+
+export const getExampleController = {
+  handler: async (_request, h) => {
+    return h.view('bank-details/test-update.njk', {
+      pageTitle: 'Test Update Bank Details',
+      payload: {},
+      errors: {}
+    })
+  }
+}
+
+export const postExampleController = {
+  options: {
+    validate: {
+      payload: joi.object({
+        accountName: joi.string().max(10).required().messages({
+          'string.empty': 'Enter account name',
+          'string.max': 'Maximum characters exceeded. You are allowed 10'
+        })
+      }),
+      failAction: async (request, h, err) => {
+        const errors = {}
+        const aggregatedErrors = []
+        if (err && err.details) {
+          err.details.forEach((detail) => {
+            console.log('error context', JSON.stringify(detail))
+            errors[detail.context.key] = { text: detail.message }
+            aggregatedErrors.push({ text: detail.message, href: '#' })
+          })
+        }
+        // const aggregatedErrors = Object.values(errors).map(item => item.text);
+        return h
+          .view('bank-details/test-update.njk', {
+            errors,
+            payload: request.payload,
+            aggregatedErrors
+          })
+          .takeover()
+      }
+    }
+  },
+  handler: (request, h) => {
+    console.log(
+      'we will save the data here and go to the confirm page',
+      request.payload
+    )
+    return h.response('Form submitted successfully.')
   }
 }
