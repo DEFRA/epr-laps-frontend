@@ -5,7 +5,9 @@ import {
   updateBankDetailsInfoController,
   updateBankDetailsController,
   checkBankDetailsController,
-  postBankDetailsController
+  postBankDetailsController,
+  postExampleController,
+  getExampleController
 } from './controller.js'
 
 export const bankDetails = {
@@ -72,6 +74,16 @@ export const bankDetails = {
             translations
           })
         }
+      })
+      server.route({
+        method: 'GET',
+        path: '/test-update',
+        ...getExampleController
+      })
+      server.route({
+        method: 'POST',
+        path: '/test-update',
+        ...postExampleController
       })
     }
   }
