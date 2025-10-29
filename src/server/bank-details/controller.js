@@ -63,7 +63,7 @@ export const confirmBankDetailsController = {
 
 export const bankDetailsConfirmedController = {
   handler: async (request, h) => {
-    const localAuthority = request.auth.credentials.organisationName
+    const localAuthority = request.auth.credentials.organisationId
     let viewContext
     let currentLang
 
@@ -113,5 +113,47 @@ export const updateBankDetailsController = {
       pageTitle: 'Update Bank Details'
       // authedUser: request.auth.credentials
     })
+  }
+}
+
+const accountName = 'Defra Test'
+export const checkBankDetailsController = {
+  handler: (_request, h) => {
+    // TODO: Get this from where previous page saved it
+    const newBankDetails = {
+      id: '12345-abcde-67890-fghij',
+      accountNumber: '094785923',
+      accountName,
+      sortCode: '09-03-023',
+      requestedBy: 'Juhi'
+    }
+    return h.view('bank-details/check-bank-details.njk', {
+      pageTitle: 'Confirm new bank account details',
+      newBankDetails
+    })
+  }
+}
+
+export const postBankDetailsController = {
+  handler: async (request, h) => {
+    // TODO: Get payload from previous page
+    const { currentLang } = request.app
+
+    // Make your API call
+    await authUtils.postWithToken(request, '/bank-details', {
+      accountNumber: '094785923',
+      accountName,
+      sortCode: '09-03-023',
+      requesterName: 'Juhi',
+      localAuthority: request.auth.credentials.organisationName
+    })
+
+    request.logger.info(
+      `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
+    )
+    // Redirect on success
+    return h.redirect(
+      `/bank-details/bank-details-submitted?lang=${currentLang}`
+    )
   }
 }
