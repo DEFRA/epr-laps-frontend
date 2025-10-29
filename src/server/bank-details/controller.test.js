@@ -4,8 +4,7 @@ import {
   confirmBankDetailsController,
   bankDetailsConfirmedController,
   updateBankDetailsInfoController,
-  updateBankDetailsController,
-  bankDetailsSubmittedController
+  updateBankDetailsController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
@@ -265,25 +264,5 @@ describe('#bankDetailsConfirmedController', () => {
         { pageTitle: 'Update Bank Details' }
       )
     })
-  })
-})
-
-describe('#updateBankDetailsSubmittedController', () => {
-  let h, request
-
-  beforeEach(() => {
-    h = createH()
-    request = createRequest()
-    vi.clearAllMocks()
-  })
-
-  it('should render the update bank details view', () => {
-    const result = bankDetailsSubmittedController.handler(request, h)
-
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/bank-details-submitted.njk',
-      { pageTitle: 'Bank details submitted' }
-    )
-    expect(result).toBe('view-rendered')
   })
 })
