@@ -108,9 +108,10 @@ export const updateBankDetailsInfoController = {
 }
 
 export const updateBankDetailsController = {
-  handler: (_request, h) => {
+  handler: (request, h) => {
     return h.view('bank-details/update-bank-details.njk', {
       pageTitle: 'Update Bank Details'
+      // authedUser: request.auth.credentials
     })
   }
 }
