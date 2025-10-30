@@ -188,6 +188,8 @@
   "name": "Enw",
   "purpose": "Pwrpas",
   "expires": "Yn dod i ben",
+  "session": "sesiwn",
+  "user-session": "Sesiwn defnyddiwr",
   "session-cookie-use": "Wedi'i ddefnyddio i'ch cadw wedi mewngofnodi",
   "hours": "Oriau"
 }

@@ -181,6 +181,7 @@
   "name": "Name",
   "purpose": "Purpose",
   "expires": "Expires",
+  "session": "session",
   "session-cookie-use": "Used to keep you signed in",
   "user-session-cookie-use": "Used when user authenticates with our app and its used to store authenticated user information",
   "hours": "hours"
