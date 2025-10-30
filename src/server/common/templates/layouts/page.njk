@@ -18,7 +18,9 @@
 {% endblock %}
 
 {% block header %}
-  {% include "partials/cookie-banner.njk" %}
+  {% if showCookieBanner %}
+    {% include "partials/cookie-banner.njk" %}
+  {% endif %}
   {# serviceName being used in govukHeader will be @deprecated in v6. It has moved to govukServiceNavigation - https://github.com/alphagov/govuk-frontend/blob/main/CHANGELOG.md#move-service-name-and-navigation-links-from-the-govuk-header-to-service-navigation-component #}
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
@@ -93,7 +95,7 @@
         text: translations['privacy']
       },
       {
-        href: "/cookies",
+        href: "/cookies?lang=" + currentLang,
         text: translations['cookies']
       },
       {
