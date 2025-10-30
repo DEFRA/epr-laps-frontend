@@ -1,5 +1,4 @@
 {% extends 'layouts/page.njk' %}
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 {% set language = currentLang %}
@@ -13,7 +12,7 @@
 
     <p>{{ translations['we-will-verify'] }}<br></p>
     <p>{{ translations['you-will-receive-a-confirmation'] }}<br></p>
-    <p>{{ translations['go-to-bank-details'] | safe }}</p>
+    <a href='/bank-details' class='govuk-link'> {{ translations['go-to-bank-details'] }}</a>
   </div>
 </div>
 

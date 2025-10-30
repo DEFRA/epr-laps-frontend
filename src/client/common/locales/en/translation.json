@@ -154,5 +154,5 @@
   "new-bank-acc": "New bank account details submitted",
   "we-will-verify": "We will verify the information with your authorised finance officer.",
   "you-will-receive-a-confirmation": "You will receive a confirmation email once the update is approved.",
-  "go-to-bank-details": "<a class=\"govuk-link\" href=\"/bank-details\">Go to Bank details</a>"
+  "go-to-bank-details": "Go to Bank details"
 }
