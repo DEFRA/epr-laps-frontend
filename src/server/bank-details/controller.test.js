@@ -358,8 +358,7 @@ describe('#bankDetailsConfirmedController', () => {
       expect(h.view).toHaveBeenCalledWith(
         'bank-details/bank-details-submitted.njk',
         expect.objectContaining({
-          pageTitle: 'Bank details submitted',
-          currentLang: 'en'
+          pageTitle: 'Bank details submitted'
         })
       )
       expect(result).toBe('view-rendered')
@@ -372,9 +371,7 @@ describe('#bankDetailsConfirmedController', () => {
 
       expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
       expect(request.yar.clear).not.toHaveBeenCalled()
-      expect(h.redirect).toHaveBeenCalledWith(
-        '/update-bank-details-info?lang=en'
-      )
+      expect(h.redirect).toHaveBeenCalledWith('/update-bank-details-info')
       expect(result).toBe('redirected')
     })
   })

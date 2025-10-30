@@ -119,18 +119,14 @@ export const bankDetailsSubmittedController = {
   handler: async (request, h) => {
     // Check if user arrived from a valid submission (check for specific session flag)
     const validSubmission = request.yar.get('bankDetailsSubmitted')
-    const translations = request.app.translations || {}
-    const currentLang = request.app.currentLang || 'en'
 
     if (!validSubmission) {
-      return h.redirect(`/update-bank-details-info?lang=${currentLang}`)
+      return h.redirect('/update-bank-details-info')
     }
     // Clear the session flag to prevent refresh/back button issues
     request.yar.clear('bankDetailsSubmitted')
     return h.view('bank-details/bank-details-submitted.njk', {
-      pageTitle: 'Bank details submitted',
-      currentLang,
-      translations
+      pageTitle: 'Bank details submitted'
     })
   }
 }
