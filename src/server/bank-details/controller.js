@@ -100,7 +100,7 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
-  handler: (request, h) => {
+  handler: (_request, h) => {
     return h.view('bank-details/update-bank-details-info.njk', {
       pageTitle: 'How it works'
     })
@@ -124,15 +124,14 @@ export const bankDetailsSubmittedController = {
 
     if (!validSubmission) {
       return h.redirect(`/update-bank-details-info?lang=${currentLang}`)
-    } else {
-      // Clear the session flag to prevent refresh/back button issues
-      request.yar.clear('bankDetailsSubmitted')
-      return h.view('bank-details/bank-details-submitted.njk', {
-        pageTitle: 'Bank details submitted',
-        currentLang,
-        translations
-      })
     }
+    // Clear the session flag to prevent refresh/back button issues
+    request.yar.clear('bankDetailsSubmitted')
+    return h.view('bank-details/bank-details-submitted.njk', {
+      pageTitle: 'Bank details submitted',
+      currentLang,
+      translations
+    })
   }
 }
 
