@@ -161,5 +161,19 @@
   "new-bank-acc": "Manylion cyfrif banc newydd wedi'u cyflwyno",
   "we-will-verify": "Byddwn yn gwirio'r wybodaeth gyda'ch swyddog cyllid awdurdodedig.",
   "you-will-receive-a-confirmation": "Byddwch yn derbyn e-bost cadarnhau unwaith y bydd y diweddariad wedi'i gymeradwyo.",
-  "go-to-bank-details": "Ewch i fanylion y banc"
+  "go-to-bank-details": "Ewch i fanylion y banc",
+  "cookies-on-laps": "Cwcis ar Daliadau Awdurdod Lleol",
+  "we-use-essential-cookies": "Rydym yn defnyddio rhai cwcis hanfodol i sicrhau bod y gwasanaeth hwn yn gweithio.",
+  "view-cookies": "Gweld cwcis",
+  "cookie-heading": "Cwcis",
+  "what-are-cookies": "Ffeiliau bach yw cwcis sy'n cael eu cadw ar eich ffôn, tabled neu gyfrifiadur pan fyddwch chi'n ymweld â gwefan.",
+  "why-use-cookies": "Rydym yn defnyddio cwcis i wneud i'r wefan hon weithio ac i gasglu gwybodaeth am sut rydych chi'n defnyddio ein gwasanaeth.",
+  "essential-cookies": "Cwcis hanfodol",
+  "what-essential-cookies-do": "Mae cwcis hanfodol yn cadw eich gwybodaeth yn ddiogel tra byddwch chi'n defnyddio'r gwasanaeth hwn. Nid oes angen i ni ofyn am ganiatâd i'w defnyddio.",
+  "essential-cookies-used": "Cwcis hanfodol rydym yn eu defnyddio",
+  "name": "Enw",
+  "purpose": "Pwrpas",
+  "expires": "Yn dod i ben",
+  "session-cookie-use": "Wedi'i ddefnyddio i'ch cadw wedi mewngofnodi",
+  "hours": "Oriau"
 }

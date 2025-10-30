@@ -1,0 +1,21 @@
+{% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
+
+{% set html %}
+  <p class="govuk-body"> {{translations['we-use-essential-cookies'] }}</p>
+{% endset %}
+
+{{ govukCookieBanner({
+  ariaLabel: "Cookies on Local Authority Payments",
+  messages: [
+    {
+      headingText: translations['cookies-on-laps'],
+      html: html,
+      actions: [
+        {
+          text: translations['view-cookies'],
+          href: "#"
+        }
+      ]
+    }
+  ]
+}) }}

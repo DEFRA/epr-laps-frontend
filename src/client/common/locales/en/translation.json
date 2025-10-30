@@ -154,5 +154,20 @@
   "new-bank-acc": "New bank account details submitted",
   "we-will-verify": "We will verify the information with your authorised finance officer.",
   "you-will-receive-a-confirmation": "You will receive a confirmation email once the update is approved.",
-  "go-to-bank-details": "Go to Bank details"
+  "go-to-bank-details": "Go to Bank details",
+  "cookies-on-laps": "Cookies on Local Authority Payments",
+  "we-use-essential-cookies": "We use some essential cookies to make this service work.",
+  "view-cookies": "View cookies",
+  "cookie-heading": "Cookies",
+  "what-are-cookies": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
+  "why-use-cookies": "We use cookies to make this site work and collect information about how you use our service.",
+  "essential-cookies": "Essential cookies",
+  "what-essential-cookies-do": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+  "essential-cookies-used": "Essential cookies we use",
+  "name": "Name",
+  "purpose": "Purpose",
+  "expires": "Expires",
+  "session-cookie-use": "Used to keep you signed in",
+  "user-session-cookie-use": "Used when user authenticates with our app and its used to store authenticated user information",
+  "hours": "hours"
 }
