@@ -371,7 +371,9 @@ describe('#bankDetailsConfirmedController', () => {
 
       expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
       expect(request.yar.clear).not.toHaveBeenCalled()
-      expect(h.redirect).toHaveBeenCalledWith('/update-bank-details-info')
+      expect(h.redirect).toHaveBeenCalledWith(
+        '/bank-details/update-bank-details-info?lang=en'
+      )
       expect(result).toBe('redirected')
     })
   })
