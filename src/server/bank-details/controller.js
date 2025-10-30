@@ -100,7 +100,7 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
-  handler: (_request, h) => {
+  handler: (request, h) => {
     return h.view('bank-details/update-bank-details-info.njk', {
       pageTitle: 'How it works'
     })
@@ -112,6 +112,27 @@ export const updateBankDetailsController = {
     return h.view('bank-details/update-bank-details.njk', {
       pageTitle: 'Update Bank Details'
     })
+  }
+}
+
+export const bankDetailsSubmittedController = {
+  handler: async (request, h) => {
+    // Check if user arrived from a valid submission (check for specific session flag)
+    const validSubmission = request.yar.get('bankDetailsSubmitted')
+    const translations = request.app.translations || {}
+    const currentLang = request.app.currentLang || 'en'
+
+    if (!validSubmission) {
+      return h.redirect(`/update-bank-details-info?lang=${currentLang}`)
+    } else {
+      // Clear the session flag to prevent refresh/back button issues
+      request.yar.clear('bankDetailsSubmitted')
+      return h.view('bank-details/bank-details-submitted.njk', {
+        pageTitle: 'Bank details submitted',
+        currentLang,
+        translations
+      })
+    }
   }
 }
 
@@ -150,6 +171,10 @@ export const postBankDetailsController = {
     request.logger.info(
       `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
     )
+
+    // Set session flag to allow access to submitted page
+    request.yar.set('bankDetailsSubmitted', true)
+
     // Redirect on success
     return h.redirect(
       `/bank-details/bank-details-submitted?lang=${currentLang}`
