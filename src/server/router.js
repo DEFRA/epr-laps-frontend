@@ -14,7 +14,6 @@ import { noServiceRole } from './no-service-role/index.js'
 import { cookies } from './cookies/index.js'
 import Boom from '@hapi/boom'
 
-
 export const router = {
   plugin: {
     name: 'router',
@@ -35,7 +34,7 @@ export const router = {
         timedOut,
         auth,
         defraAccount,
-        noServiceRole,
+        noServiceRole
       ])
 
       // Static assets
