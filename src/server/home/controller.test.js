@@ -1,27 +1,12 @@
-import { statusCodes } from '../common/constants/status-codes.js'
 import { homeController } from './controller.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
-import * as contextModule from '../../config/nunjucks/context/context.js'
+import { fetchWithToken } from '../auth/utils.js'
+import Boom from '@hapi/boom'
 
 // Mock fetchWithToken if used in controller
 vi.mock('../../server/auth/utils.js', () => ({
   fetchWithToken: vi.fn()
 }))
-
-// Mock context module correctly
-vi.mock('../../config/nunjucks/context/context.js', async () => {
-  const originalModule = await vi.importActual(
-    '../../config/nunjucks/context/context.js'
-  )
-  return {
-    ...originalModule,
-    context: vi.fn().mockResolvedValue({
-      currentLang: 'en',
-      translations: { 'local-authority': 'Mocked Local Authority' },
-      apiData: null
-    })
-  }
-})
 
 describe('#homeController', () => {
   let mockRequest
@@ -45,7 +30,12 @@ describe('#homeController', () => {
     }
 
     mockRequest = {
-      app: {},
+      app: {
+        currentLang: 'en',
+        translations: {
+          'local-authority': 'Mocked Local Authority'
+        }
+      },
       auth: { credentials: {} },
       state: { userSession: { sessionId: 'test-session-id' } },
       server: {
@@ -56,59 +46,56 @@ describe('#homeController', () => {
           }
         }
       },
-      logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() }
+      logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+      yar: {
+        get: vi.fn(),
+        set: vi.fn()
+      }
     }
   })
 
   test('should render view with translations', async () => {
+    mockRequest.yar.get = vi.fn().mockReturnValue({
+      viewFullBankDetails: true
+    })
     await homeController.handler(mockRequest, mockedResponse)
-
     expect(mockedResponse.view).toHaveBeenCalledWith(
       'home/index',
       expect.objectContaining({
         pageTitle: 'Home',
-        currentLang: 'en',
-        translations: { 'local-authority': 'Mocked Local Authority' },
-        breadcrumbs: [{ text: 'Mocked Local Authority', href: '/?lang=en' }],
-        apiData: null
+        breadcrumbs: [{ text: 'Mocked Local Authority', href: '/?lang=en' }]
       })
     )
   })
 
-  test('should handle missing translations and currentLang', async () => {
-    // Override context to simulate missing translations/lang
-    contextModule.context.mockResolvedValueOnce({
-      currentLang: undefined,
-      translations: {},
-      apiData: null
-    })
-
+  test('should call fetch when permissions are not found', async () => {
+    mockRequest.yar.get = vi.fn().mockReturnValue(null)
     await homeController.handler(mockRequest, mockedResponse)
-
+    expect(fetchWithToken).toHaveBeenNthCalledWith(
+      1,
+      mockRequest,
+      '/permissions/config'
+    )
     expect(mockedResponse.view).toHaveBeenCalledWith(
       'home/index',
       expect.objectContaining({
         pageTitle: 'Home',
-        currentLang: undefined,
-        translations: {},
-        breadcrumbs: [{ text: undefined, href: '/?lang=undefined' }],
-        apiData: null
+        breadcrumbs: [{ text: 'Mocked Local Authority', href: '/?lang=en' }]
       })
     )
   })
 
-  test('should respond with error when context throws', async () => {
-    contextModule.context.mockRejectedValueOnce(new Error('Some error'))
-
-    await homeController.handler(mockRequest, mockedResponse)
-
-    expect(mockedResponse.response).toHaveBeenCalledWith({
-      error: 'Failed to render home page'
+  test('should respond with error when there is failure to call backend service', async () => {
+    mockRequest.yar.get = vi.fn().mockReturnValue({
+      viewFullBankDetails: true
     })
+    fetchWithToken.mockRejectedValue(Boom.internal('Failed to fetch data'))
 
-    const responseObj = mockedResponse.response.mock.results[0].value
-    expect(responseObj.code).toHaveBeenCalledWith(
-      statusCodes.internalServerError
-    )
+    await expect(
+      homeController.handler(mockRequest, mockedResponse)
+    ).rejects.toMatchObject({
+      isBoom: true,
+      output: { statusCode: 500 }
+    })
   })
 })
