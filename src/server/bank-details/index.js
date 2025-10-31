@@ -6,7 +6,7 @@ import {
   checkBankDetailsController,
   postBankDetailsController,
   postUpdateBankDetailsController,
-  getUpdateBankDetailsController
+  getUpdateBankDetailsController,
   bankDetailsSubmittedController
 } from './controller.js'
 
