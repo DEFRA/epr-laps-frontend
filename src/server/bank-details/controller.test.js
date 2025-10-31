@@ -7,7 +7,7 @@ import {
   checkBankDetailsController,
   updateBankDetailsInfoController,
   getUpdateBankDetailsController,
-  postUpdateBankDetailsController
+  postUpdateBankDetailsController,
   bankDetailsSubmittedController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
