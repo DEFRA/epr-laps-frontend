@@ -183,8 +183,7 @@ const getTranslations = (lang) => {
       accountNumberEmpty: 'Enter the account number',
       accountNumberDigits: 'Enter a valid account number like 12345678',
       accountNumberMin: 'Account number must be at least 6 digits long',
-      accountNumberMax: 'Account number must be no more than 8 digits long',
-      pageTitle: 'Update Bank Details'
+      accountNumberMax: 'Account number must be no more than 8 digits long'
     },
     cy: {
       accountName: 'Rhowch enw’r cyfrif',
@@ -194,62 +193,42 @@ const getTranslations = (lang) => {
       accountNumberEmpty: 'Rhowch rif y cyfrif',
       accountNumberDigits: 'Rhowch rif cyfrif dilys fel 12345678',
       accountNumberMin: 'Rhaid i rif y cyfrif fod o leiaf 6 digid o hyd',
-      accountNumberMax: 'Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd',
-      pageTitle: 'Diweddaru Manylion Banc'
+      accountNumberMax: 'Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd'
     }
   }
   return translations[lang]
 }
 
-const SORT_CODE_LENGTH = 6
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
 
-const buildSchema = (t) =>
+const buildSchema = (translation) =>
   joi.object({
     accountName: joi.string().max(256).required().messages({
-      'string.empty': t.accountName
+      'string.empty': translation.accountName
     }),
     sortCode: joi
       .string()
       .required()
-      .pattern(/^\d+$/)
-      .custom((value, helpers) => {
-        const clean = value.replace(/[-\s]/g, '')
-        if (clean.length !== SORT_CODE_LENGTH) {
-          return helpers.error('string.lengthSix')
-        }
-        return value
-      })
+      .pattern(/^(?=(?:\D*\d){6}$)[\d\s-]+$/) // exactly 6 digits, allows spaces & dashes
+      .max(8)
       .messages({
-        'string.empty': t.sortCodeEmpty,
-        'string.pattern.base': t.sortCodePattern,
-        'string.lengthSix': t.sortCodeLength
+        'string.empty': translation.sortCodeEmpty,
+        'string.pattern.base': translation.sortCodePattern,
+        'string.lengthSix': translation.sortCodeLength
       }),
     accountNumber: joi
       .string()
+      .replace(/\s+/g, '')
       .required()
-      .custom((value, helpers) => {
-        const clean = value.replaceAll(' ', '')
-        if (!clean) {
-          return helpers.error('string.empty')
-        }
-        if (!/^\d+$/.test(clean)) {
-          return helpers.error('string.digits')
-        }
-        if (clean.length < ACCOUNT_NUMBER_MIN) {
-          return helpers.error('string.minSix')
-        }
-        if (clean.length > ACCOUNT_NUMBER_MAX) {
-          return helpers.error('string.maxEight')
-        }
-        return value
-      })
+      .pattern(/^\d+$/, 'digits')
+      .min(ACCOUNT_NUMBER_MIN)
+      .max(ACCOUNT_NUMBER_MAX)
       .messages({
-        'string.empty': t.accountNumberEmpty,
-        'string.digits': t.accountNumberDigits,
-        'string.minSix': t.accountNumberMin,
-        'string.maxEight': t.accountNumberMax
+        'string.empty': translation.accountNumberEmpty,
+        'string.pattern.name': translation.accountNumberDigits,
+        'string.min': translation.accountNumberMin,
+        'string.max': translation.accountNumberMax
       })
   })
 
@@ -258,7 +237,7 @@ export const getUpdateBankDetailsController = {
     const lang = request.query.lang || 'en'
     request.yar.set('lang', lang)
 
-    const t = getTranslations(lang)
+    const translation = getTranslations(lang)
 
     const payload = request.yar.get('payload') || {}
 
@@ -274,7 +253,9 @@ export const getUpdateBankDetailsController = {
     }
 
     if (request.yar.get('formSubmitted') === true) {
-      const { error } = buildSchema(t).validate(payload, { abortEarly: false })
+      const { error } = buildSchema(translation).validate(payload, {
+        abortEarly: false
+      })
       if (error?.details) {
         for (const detail of error.details) {
           errors[detail.context.key] = { text: detail.message }
@@ -291,58 +272,54 @@ export const getUpdateBankDetailsController = {
       payload,
       errors,
       aggregatedErrors,
-      t
+      translation
     })
   }
 }
 
 export const postUpdateBankDetailsController = {
-  options: {
-    validate: {
-      payload: joi.object({}), // placeholder
-      failAction: async (request, h) => {
-        const lang = request.yar.get('lang') || 'en'
-        const t = getTranslations(lang)
-        const schema = buildSchema(t)
+  handler: async (request, h) => {
+    const lang = request.yar.get('lang') || 'en'
+    const translation = getTranslations(lang)
+    const payload = request.payload
 
-        const { error } = schema.validate(request.payload, {
-          abortEarly: false
+    // Validate manually using buildSchema
+    const schema = buildSchema(translation)
+    const { error } = schema.validate(payload, { abortEarly: false })
+
+    if (error?.details) {
+      const errors = {}
+      const aggregatedErrors = []
+
+      for (const detail of error.details) {
+        errors[detail.context.key] = { text: detail.message }
+        aggregatedErrors.push({
+          text: detail.message,
+          href: `#${detail.context.key}`
         })
-
-        const errors = {}
-        const aggregatedErrors = []
-
-        if (error?.details) {
-          for (const detail of error.details) {
-            errors[detail.context.key] = { text: detail.message }
-            aggregatedErrors.push({
-              text: detail.message,
-              href: `#${detail.context.key}`
-            })
-          }
-        }
-
-        // Store payload and mark form as submitted
-        request.yar.set('payload', request.payload)
-        request.yar.set('formSubmitted', true)
-
-        return h
-          .view('bank-details/update-bank-details.njk', {
-            payload: request.payload,
-            errors,
-            aggregatedErrors,
-            t
-          })
-          .takeover()
       }
+
+      request.yar.set('payload', payload)
+      request.yar.set('formSubmitted', true)
+
+      return h
+        .view('bank-details/update-bank-details.njk', {
+          pageTitle: 'Update Bank Details',
+          payload,
+          errors,
+          aggregatedErrors,
+          translation
+        })
+        .takeover()
     }
-  },
-  handler: (request, h) => {
+
+    // Successful submission → redirect
+    console.log('Form submitted successfully', payload)
+
     request.yar.clear('payload')
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    // Redirect to check-bank-details
     return h.redirect('/check-bank-details')
   }
 }

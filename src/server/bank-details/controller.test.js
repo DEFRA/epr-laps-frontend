@@ -318,21 +318,16 @@ describe('#bankDetailsConfirmedController', () => {
     })
 
     it('renders view with validation errors when payload invalid', async () => {
-      const failAction =
-        postUpdateBankDetailsController.options.validate.failAction
+      // Directly call the post handler (no failAction)
       request.payload = { accountName: '', sortCode: '', accountNumber: '' }
 
-      const result = await failAction(request, h)
+      const result = await postUpdateBankDetailsController.handler(request, h)
+      const [template, context] = h.view.mock.calls[0]
 
-      expect(h.view).toHaveBeenCalledWith(
-        'bank-details/update-bank-details.njk',
-        expect.objectContaining({
-          payload: request.payload,
-          errors: expect.any(Object),
-          aggregatedErrors: expect.any(Array),
-          t: expect.any(Object)
-        })
-      )
+      expect(template).toBe('bank-details/update-bank-details.njk')
+      expect(context.payload).toEqual(request.payload)
+      expect(context.errors).toBeTypeOf('object')
+      expect(Array.isArray(context.aggregatedErrors)).toBe(true)
       expect(result.value).toBe('view-rendered')
     })
 
