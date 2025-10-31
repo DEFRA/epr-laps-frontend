@@ -17,7 +17,7 @@
       <p class="govuk-body">{{ translations['what-essential-cookies-do'] }}</p>
 
       {{ govukTable({
-        caption: "Essential cookies we use",
+        caption: translations['essential-cookies-used'],
         captionClasses: "govuk-table__caption--s",
         firstCellIsHeader: false,
         head: [
@@ -27,12 +27,12 @@
         ],
         rows: [
           [
-            { text: "session" },
-            { text: "Used to keep you signed in" },
+            { text: translations['session']},
+            { text: translations['session-cookie-use'] },
             { text: sessionCookieExpiry }
           ],
           [
-            { text: "userSession" },
+            { text: translations['user-session'] },
             { text: translations['user-session-cookie-use'] },
             { text: sessionCookieExpiry }
           ]
