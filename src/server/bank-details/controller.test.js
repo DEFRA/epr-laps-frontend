@@ -264,7 +264,8 @@ describe('#bankDetailsConfirmedController', () => {
         })),
         response: vi.fn(() => ({
           code: vi.fn().mockReturnValue('response-set')
-        }))
+        })),
+        redirect: vi.fn((url) => url)
       }
 
       yar = {
@@ -337,8 +338,10 @@ describe('#bankDetailsConfirmedController', () => {
       }
 
       const result = await postUpdateBankDetailsController.handler(request, h)
-      expect(h.response).toHaveBeenCalledWith('Form submitted successfully.')
-      expect(result.code()).toBe('response-set')
+
+      // Ensure redirect was called with correct URL
+      expect(h.redirect).toHaveBeenCalledWith('/check-bank-details')
+      expect(result).toBe('/check-bank-details') // because mock returns url
     })
   })
 

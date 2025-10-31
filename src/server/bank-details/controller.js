@@ -108,15 +108,6 @@ export const updateBankDetailsInfoController = {
   }
 }
 
-// export const updateBankDetailsController = {
-//   handler: (request, h) => {
-//     return h.view('bank-details/update-bank-details.njk', {
-//       pageTitle: 'Update Bank Details'
-//       // authedUser: request.auth.credentials
-//     })
-//   }
-// }
-
 const accountName = 'Defra Test'
 export const checkBankDetailsController = {
   handler: (_request, h) => {
@@ -187,9 +178,13 @@ const getTranslations = (lang) => {
   return translations[lang]
 }
 
+const SORT_CODE_LENGTH = 6
+const ACCOUNT_NUMBER_MIN = 6
+const ACCOUNT_NUMBER_MAX = 8
+
 const buildSchema = (t) =>
   joi.object({
-    accountName: joi.string().max(10).required().messages({
+    accountName: joi.string().max(256).required().messages({
       'string.empty': t.accountName
     }),
     sortCode: joi
@@ -198,7 +193,9 @@ const buildSchema = (t) =>
       .pattern(/^\d+$/)
       .custom((value, helpers) => {
         const clean = value.replace(/[-\s]/g, '')
-        if (clean.length !== 6) return helpers.error('string.lengthSix')
+        if (clean.length !== SORT_CODE_LENGTH) {
+          return helpers.error('string.lengthSix')
+        }
         return value
       })
       .messages({
@@ -210,11 +207,19 @@ const buildSchema = (t) =>
       .string()
       .required()
       .custom((value, helpers) => {
-        const clean = value.replace(/\s/g, '')
-        if (!clean) return helpers.error('string.empty')
-        if (!/^\d+$/.test(clean)) return helpers.error('string.digits')
-        if (clean.length < 6) return helpers.error('string.minSix')
-        if (clean.length > 8) return helpers.error('string.maxEight')
+        const clean = value.replaceAll(' ', '')
+        if (!clean) {
+          return helpers.error('string.empty')
+        }
+        if (!/^\d+$/.test(clean)) {
+          return helpers.error('string.digits')
+        }
+        if (clean.length < ACCOUNT_NUMBER_MIN) {
+          return helpers.error('string.minSix')
+        }
+        if (clean.length > ACCOUNT_NUMBER_MAX) {
+          return helpers.error('string.maxEight')
+        }
         return value
       })
       .messages({
@@ -248,13 +253,13 @@ export const getUpdateBankDetailsController = {
     if (request.yar.get('formSubmitted') === true) {
       const { error } = buildSchema(t).validate(payload, { abortEarly: false })
       if (error?.details) {
-        error.details.forEach((detail) => {
+        for (const detail of error.details) {
           errors[detail.context.key] = { text: detail.message }
           aggregatedErrors.push({
             text: detail.message,
             href: `#${detail.context.key}`
           })
-        })
+        }
       }
     }
 
@@ -272,7 +277,7 @@ export const postUpdateBankDetailsController = {
   options: {
     validate: {
       payload: joi.object({}), // placeholder
-      failAction: async (request, h, err) => {
+      failAction: async (request, h) => {
         const lang = request.yar.get('lang') || 'en'
         const t = getTranslations(lang)
         const schema = buildSchema(t)
@@ -285,13 +290,13 @@ export const postUpdateBankDetailsController = {
         const aggregatedErrors = []
 
         if (error?.details) {
-          error.details.forEach((detail) => {
+          for (const detail of error.details) {
             errors[detail.context.key] = { text: detail.message }
             aggregatedErrors.push({
               text: detail.message,
               href: `#${detail.context.key}`
             })
-          })
+          }
         }
 
         // Store payload and mark form as submitted
@@ -314,7 +319,7 @@ export const postUpdateBankDetailsController = {
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    console.log('Form submitted successfully', request.payload)
-    return h.response('Form submitted successfully.')
+    // Redirect to check-bank-details
+    return h.redirect('/check-bank-details')
   }
 }
