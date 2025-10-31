@@ -152,9 +152,9 @@
   "we-will": "We will contact your local authority's authorised finance officer(e.g. Section 151 officer) to confirm the details",
   "you-will-receive": "You will receive an email once your updated bank details are verified and approved",
   "new-bank": "New bank account details",
-  "requested-by": "Requested by",
   "local-authority-name": "Local authority name",
   "must-be": "Must be 6 digits long",
   "must-be-between": "Must be between 6 and 8 digits long",
-  "enter-account": "Enter account name"
+  "enter-account": "Enter account name",
+  "there-is": "There is a problem"
 }

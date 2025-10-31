@@ -3,10 +3,11 @@ import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController,
-  updateBankDetailsController,
   postBankDetailsController,
   checkBankDetailsController,
-  updateBankDetailsInfoController
+  updateBankDetailsInfoController,
+  getUpdateBankDetailsController,
+  postUpdateBankDetailsController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
@@ -250,23 +251,94 @@ describe('#bankDetailsConfirmedController', () => {
     })
   })
 
-  describe('#updateBankDetailsController', () => {
+  describe('bank-details controllers', () => {
     let h
+    let yar
+    let request
 
     beforeEach(() => {
-      // Mock h.view()
       h = {
-        view: vi.fn().mockReturnThis()
+        view: vi.fn(() => ({
+          value: 'view-rendered',
+          takeover: vi.fn().mockReturnValue({ value: 'view-rendered' })
+        })),
+        response: vi.fn(() => ({
+          code: vi.fn().mockReturnValue('response-set')
+        }))
+      }
+
+      yar = {
+        store: {},
+        get: vi.fn(function (key) {
+          return this.store[key]
+        }),
+        set: vi.fn(function (key, value) {
+          this.store[key] = value
+        }),
+        clear: vi.fn(function (key) {
+          delete this.store[key]
+        })
+      }
+
+      request = {
+        query: {},
+        headers: {},
+        path: '/bank-details',
+        payload: {},
+        yar
       }
     })
 
-    test('should render the update bank details view with correct page title', () => {
-      updateBankDetailsController.handler({}, h)
+    it('renders the view correctly with default language', async () => {
+      const result = await getUpdateBankDetailsController.handler(request, h)
+      const [template, context] = h.view.mock.calls[0]
+
+      expect(template).toBe('bank-details/update-bank-details.njk')
+      expect(context.pageTitle).toBe('Update Bank Details')
+      expect(context.errors).toEqual({})
+      expect(result.value).toBe('view-rendered')
+    })
+
+    it('validates payload when formSubmitted = true and returns errors', async () => {
+      yar.set('payload', { accountName: '', sortCode: '', accountNumber: '' })
+      yar.set('formSubmitted', true)
+
+      const result = await getUpdateBankDetailsController.handler(request, h)
+      const [, context] = h.view.mock.calls[0]
+
+      expect(context.errors).toBeTypeOf('object')
+      expect(result.value).toBe('view-rendered')
+    })
+
+    it('renders view with validation errors when payload invalid', async () => {
+      const failAction =
+        postUpdateBankDetailsController.options.validate.failAction
+      request.payload = { accountName: '', sortCode: '', accountNumber: '' }
+
+      const result = await failAction(request, h)
 
       expect(h.view).toHaveBeenCalledWith(
         'bank-details/update-bank-details.njk',
-        { pageTitle: 'Update Bank Details' }
+        expect.objectContaining({
+          payload: request.payload,
+          errors: expect.any(Object),
+          aggregatedErrors: expect.any(Array),
+          t: expect.any(Object)
+        })
       )
+      expect(result.value).toBe('view-rendered')
+    })
+
+    it('returns success response when payload valid', async () => {
+      request.payload = {
+        accountName: 'Test Account',
+        sortCode: '123456',
+        accountNumber: '12345678'
+      }
+
+      const result = await postUpdateBankDetailsController.handler(request, h)
+      expect(h.response).toHaveBeenCalledWith('Form submitted successfully.')
+      expect(result.code()).toBe('response-set')
     })
   })
 

@@ -159,9 +159,9 @@
   "we-will": "Byddwn yn cysylltu â swyddog cyllid awdurdodedig eich awdurdod lleol (e.e. swyddog Adran 151) i gadarnhau'r manylion",
   "you-will-receive": "Byddwch yn derbyn e-bost unwaith y bydd eich manylion banc wedi'u diweddaru wedi'u gwirio a'u cymeradwyo",
   "new-bank": "Manylion cyfrif banc newydd",
-  "requested-by": "Cais gan",
   "local-authority-name": "Enw'r awdurdod lleol",
   "must-be": "Rhaid bod yn 6 digid o hyd",
   "must-be-between": "Rhaid bod rhwng 6 ac 8 digid o hyd",
-  "enter-account": "Rhowch enw'r cyfrif"
+  "enter-account": "Rhowch enw'r cyfrif",
+  "there-is": "Mae yna broblem"
 }

@@ -4,49 +4,47 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% set showBackLink = true %}
-
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-
-    {# Error summary placeholder at the top #}
-    <div id="error-summary-container"></div>
-
-    <form id="update-bank-form" method="get" action="/bank-details/check-bank-details" class="govuk-form-group" novalidate>
-
-      <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-          <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
-          <h1 class="govuk-fieldset__heading">{{ translations['new-bank'] }}</h1>
-        </legend>
-
-        <div class="govuk-form-group govuk-!-margin-top-4">
-          <p class="govuk-body govuk-!-font-weight-regular">{{ translations['requested-by'] }}</p>
-          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
-            {{ authedUser.displayName }}
-          </p>
-        </div>
-
-        <div class="govuk-form-group">
-          <p class="govuk-body govuk-!-font-weight-regular">{{ translations['local-authority-name'] }}</p>
-          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
-            {{ authedUser.organisationName }}
-          </p>
-        </div>
-
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {# Error summary placeholder at the top #}
+            {% if aggregatedErrors.length %}
+                {{ govukErrorSummary({
+                    titleText: translations['there-is'],
+                    errorList: aggregatedErrors
+                }) }}
+            {% endif %}
+            <form id="update-bank-form" method="post" action="/update-bank-details" class="govuk-form-group" novalidate>
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                        <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
+                        <h1 class="govuk-fieldset__heading">{{ translations['new-bank'] }}</h1>
+                    </legend>
+                    <div class="govuk-form-group govuk-!-margin-top-4">
+                        <p class="govuk-body govuk-!-font-weight-regular">{{ translations['requested-by'] }}</p>
+                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
+                            {{ authedUser.displayName }}
+                        </p>
+                    </div>
+                    <div class="govuk-form-group">
+                        <p class="govuk-body govuk-!-font-weight-regular">{{ translations['local-authority-name'] }}</p>
+                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
+                            {{ authedUser.organisationName }}
+                        </p>
+                    </div>
         {% call govukFieldset({
           legend: {
             classes: "govuk-fieldset__legend--l",
             isPageHeading: false
           }
         }) %}
-
-          {{ govukInput({
+        {{ govukInput({
             label: { text: translations['account-name']  },
-            id: "account-name",
+            id: "accountName",
             name: "accountName",
+            value: payload.accountName,
             spellcheck: false,
-            autocomplete: "account-name",
+            errorMessage: errors.accountName,
             attributes: { maxlength: "256" }
           }) }}
 
@@ -56,6 +54,8 @@
             id: "sort-code",
             name: "sortCode",
             inputmode: "numeric",
+            value: payload.sortCode,
+            errorMessage: errors.sortCode,
             spellcheck: false,
             classes: "govuk-input--width-5 govuk-input--extra-letter-spacing",
             attributes: { maxlength: "8" },
@@ -68,220 +68,25 @@
             id: "account-number",
             name: "accountNumber",
             inputmode: "numeric",
+            value: payload.accountNumber,
+            errorMessage: errors.accountNumber,
             spellcheck: false,
             classes: "govuk-input--width-10",
             attributes: { maxlength: "10" },
             autocomplete: "account-number"
           }) }}
 
-        {% endcall %}
-      </fieldset>
-
-      <div class="govuk-!-margin-top-6">
-  {{ govukButton({
+                    {% endcall %}
+                </fieldset>
+                <div class="govuk-!-margin-top-6">
+                    {{ govukButton({
         text: translations['continue'],
         type: "submit"
       }) }}
-</div>
+                </div>
+            </div>
+        </div>
 
-  </div>
-</div>
 
-<script>
-const TRANSLATIONS = {
-  en: {
-    enterAccount: "Enter account name",
-    enterSortCode: "Enter sort code",
-    invalidSortCode: "Enter a valid sort code like 309430",
-    sortCodeLength: "Sort code must be 6 digits long",
-    enterAccountNumber: "Enter account number",
-    invalidAccountNumber: "Enter a valid account number like 12345678",
-    accountNumberMinLength: "Account number must be at least 6 digits long",
-    accountNumberMaxLength: "Enter a valid account number like 12345678",
-    problemTitle: "There is a problem"
-  },
-  cy: {
-    enterAccount: "Nodwch enw’r cyfrif",
-    enterSortCode: "Nodwch god cangen",
-    invalidSortCode: "Nodwch god cangen dilys fel 309430",
-    sortCodeLength: "Rhaid i god cangen fod 6 digid o hyd",
-    enterAccountNumber: "Nodwch rif y cyfrif",
-    invalidAccountNumber: "Nodwch rif cyfrif dilys fel 12345678",
-    accountNumberMinLength: "Rhaid i rif y cyfrif fod o leiaf 6 digid",
-    accountNumberMaxLength: "Nodwch rif cyfrif dilys fel 12345678",
-    problemTitle: "Mae problem wedi digwydd"
-  }
-};
-
-const SESSION_KEY = 'updateBankErrorsSnapshot';
-const INPUT_KEY = 'updateBankInputsSession';
-const LANG_FLAG = 'updateBankLangToggle';
-const IDS = ['account-name','sort-code','account-number'];
-const initialLang = document.documentElement.getAttribute('lang') || 'en';
-
-function getLang() { return document.documentElement.getAttribute('lang') === 'cy' ? 'cy' : 'en'; }
-function escapeHtml(s) { return typeof s !== 'string' ? s : s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-function findFormGroup(el) { return el.closest('.govuk-form-group') || el.parentElement || document.body; }
-function getInputsSnapshot() { const snap = {}; IDS.forEach(id => { const el = document.getElementById(id); snap[id] = el ? el.value : ''; }); return snap; }
-function saveInputsToSession() { try { sessionStorage.setItem(INPUT_KEY, JSON.stringify(getInputsSnapshot())); } catch(e) {} }
-function persistSessionSnapshot(errors) { try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ errors, inputs: getInputsSnapshot(), ts: Date.now() })); } catch(e) {} }
-function setLangFlagBeforeNav() { try { sessionStorage.setItem(LANG_FLAG,'1'); } catch(e) {} }
-function clearUIErrors() { document.querySelectorAll('.govuk-form-group--error').forEach(n=>n.classList.remove('govuk-form-group--error')); document.querySelectorAll('.govuk-error-message').forEach(n=>n.remove()); const c=document.getElementById('error-summary-container'); if(c) c.innerHTML=''; }
-
-function renderErrors(errors){
-  clearUIErrors();
-  const lang = getLang();
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
-
-  errors.forEach(err=>{
-    const inputEl=document.querySelector(err.href);
-    if(inputEl){
-      const wrapper=findFormGroup(inputEl);
-      wrapper.classList.add('govuk-form-group--error');
-      wrapper.querySelectorAll('.govuk-error-message').forEach(x=>x.remove());
-      const p=document.createElement('p');
-      p.className='govuk-error-message';
-      p.dataset.errorKey=err.key;
-      p.setAttribute('role','alert');
-      p.innerHTML=`<span class="govuk-visually-hidden">Error:</span> ${escapeHtml(t[err.key])}`;
-      const hint=wrapper.querySelector('.govuk-hint');
-      const label=wrapper.querySelector('.govuk-label');
-      if(hint) hint.insertAdjacentElement('afterend',p);
-      else if(label) label.insertAdjacentElement('afterend',p);
-      else wrapper.insertBefore(p,wrapper.firstChild);
-    }
-  });
-
-  const list=errors.map(er=>`<li><a href="${er.href}" data-error-key="${er.key}">${escapeHtml(t[er.key])}</a></li>`).join('');
-  const html=`
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">${escapeHtml(t.problemTitle)}</h2>
-    <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list">${list}</ul></div>
-  </div>`;
-  const container=document.getElementById('error-summary-container');
-  if(container) container.innerHTML=html;
-}
-
-function translateUIErrors(newLang){
-  const t=TRANSLATIONS[newLang]||TRANSLATIONS.en;
-  document.querySelectorAll('.govuk-error-message').forEach(m=>{
-    const key=m.dataset.errorKey; if(key&&t[key]) m.innerHTML=`<span class="govuk-visually-hidden">Error:</span> ${escapeHtml(t[key])}`;
-  });
-  const title=document.querySelector('.govuk-error-summary__title'); if(title) title.textContent=t.problemTitle;
-  document.querySelectorAll('.govuk-error-summary__list a[data-error-key]').forEach(a=>{
-    const key=a.dataset.errorKey; if(key&&t[key]) a.textContent=t[key];
-  });
-}
-
-function collectValidationErrors(){
-  const errors=[];
-  const accountName=document.getElementById('account-name').value.trim();
-  const sortCodeRaw=document.getElementById('sort-code').value.replace(/[-\s]/g,'');
-  const accountNumberRaw=document.getElementById('account-number').value.replace(/\s/g,'');
-
-  // ACCOUNT NAME
-  if(!accountName) errors.push({ key:'enterAccount', href:'#account-name' });
-
-  // SORT CODE
-  if(!sortCodeRaw) errors.push({ key:'enterSortCode', href:'#sort-code' });
-  else if(!/^\d+$/.test(sortCodeRaw)) errors.push({ key:'invalidSortCode', href:'#sort-code' });
-  else if(sortCodeRaw.length<6) errors.push({ key:'sortCodeLength', href:'#sort-code' });
-
-  // ACCOUNT NUMBER
-  if(!accountNumberRaw) errors.push({ key:'enterAccountNumber', href:'#account-number' });
-  else if(!/^\d+$/.test(accountNumberRaw)) errors.push({ key:'invalidAccountNumber', href:'#account-number' });
-  else if(accountNumberRaw.length<6) errors.push({ key:'accountNumberMinLength', href:'#account-number' });
-  else if(accountNumberRaw.length>8) errors.push({ key:'accountNumberMaxLength', href:'#account-number' });
-
-  return errors;
-}
-
-function tryRestoreOnLoad(){
-  try{
-    const fromToggle=sessionStorage.getItem(LANG_FLAG)==='1';
-    if(!fromToggle) sessionStorage.removeItem(INPUT_KEY);
-
-    const raw=sessionStorage.getItem(SESSION_KEY);
-    if(!raw) return;
-
-    const state=JSON.parse(raw);
-    if(state.inputs) IDS.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=state.inputs[id]||''; });
-    if(fromToggle && state.errors?.length) renderErrors(state.errors);
-    sessionStorage.removeItem(LANG_FLAG);
-  }catch(e){ sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(LANG_FLAG); }
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  const form=document.getElementById('update-bank-form');
-  if(!form) return;
-  tryRestoreOnLoad();
-
-  IDS.forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('input',()=>{
-      saveInputsToSession();
-      try{
-        const raw=sessionStorage.getItem(SESSION_KEY);
-        if(raw){
-          const state=JSON.parse(raw);
-          state.inputs=getInputsSnapshot();
-          sessionStorage.setItem(SESSION_KEY,JSON.stringify(state));
-        }
-      }catch(e){}
-    });
-  });
-
-  form.addEventListener('submit',ev=>{
-    ev.preventDefault();
-    clearUIErrors();
-    const errors=collectValidationErrors();
-    if(errors.length){
-      renderErrors(errors);
-      persistSessionSnapshot(errors);
-      saveInputsToSession();
-      const summary=document.querySelector('.govuk-error-summary');
-      if(summary) summary.focus();
-      window.scrollTo({ top:0, behavior:'smooth' });
-      return;
-    }
-    sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(LANG_FLAG);
-    form.submit();
-  });
-
-  document.addEventListener('click',ev=>{
-    const target=ev.target;
-    if(!target) return;
-    const toggleEl=target.closest('[data-lang]')||target.closest('[data-lang-toggle]');
-    if(toggleEl){
-      setLangFlagBeforeNav();
-      persistSessionSnapshot(collectValidationErrors());
-      saveInputsToSession();
-      return;
-    }
-    const anchor=target.closest('a[href]');
-    if(anchor){
-      const href=anchor.getAttribute('href')||'';
-      if(href.match(/(\?|\/)(lang=cy|lang=en|cy\/|en\/)/i)){
-        setLangFlagBeforeNav();
-        persistSessionSnapshot(collectValidationErrors());
-        saveInputsToSession();
-      }
-    }
-  },true);
-
-  window.addEventListener('beforeunload',()=>{
-    const currentLang=getLang();
-    if(currentLang!==initialLang){
-      setLangFlagBeforeNav();
-      persistSessionSnapshot(collectValidationErrors());
-      saveInputsToSession();
-    }
-  });
-
-  const mo=new MutationObserver(()=>translateUIErrors(getLang()));
-  mo.observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-});
-</script>
-{% endblock %}
+        
+    {% endblock %}
