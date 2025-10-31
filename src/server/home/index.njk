@@ -29,8 +29,9 @@
     caption: authedUser.organisationName
 
   }) }}
-
-      <div class="govuk-grid-row">
+  
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full" style="display: flex; flex-wrap: wrap;">
         {{ appCustomCard({
           title: translations['payment-documen'],
          link: "/payment-documents?lang=" + currentLang,
@@ -48,19 +49,23 @@
             translations['view-bank-detai']
           ]
         }) }}
-        </div>
-        <div class="govuk-grid-row">
-        {{ appCustomCard({
-          title: translations['get-help'],
-          link: "/get-help?lang=" + currentLang,
-          body: translations['you-can:'],
-          list: [
-            translations['view-customer-info'],
-            translations['link-to-further'],
-            translations['raise-a-support']
-          ]
-        }) }}
-      </div>
+    </div>
+  </div>
+  
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ appCustomCard({
+        title: translations['get-help'],
+        link: "/get-help?lang=" + currentLang,
+        body: translations['you-can:'],
+        list: [
+          translations['view-customer-info'],
+          translations['link-to-further'],
+          translations['raise-a-support']
+        ]
+      }) }}
+    </div>
+  </div>
 
 
 {% endblock %}
