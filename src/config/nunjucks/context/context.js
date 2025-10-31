@@ -32,7 +32,9 @@ async function context(request) {
   }
 
   authedUser.organisationName = displayOrgName
-
+  const showCookieBanner =
+    !request.path.startsWith('/cookies') &&
+    !request.path.startsWith('/sign-out')
   let bankApiData = null
 
   try {
@@ -81,6 +83,7 @@ async function context(request) {
     navigation,
     sessionTimer,
     showBetaBanner: config.get('showBetaBanner'),
+    showCookieBanner,
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`
