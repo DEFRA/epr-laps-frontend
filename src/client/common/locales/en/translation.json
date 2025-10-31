@@ -183,6 +183,10 @@
   "expires": "Expires",
   "session": "session",
   "session-cookie-use": "Used to keep you signed in",
+  "user-session": "userSession",
   "user-session-cookie-use": "Used when user authenticates with our app and its used to store authenticated user information",
-  "hours": "hours"
+  "hours": "hours",
+  "days": "days",
+  "years": "years",
+  "minutes": "minutes"
 }

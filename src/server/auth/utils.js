@@ -131,11 +131,16 @@ export const postWithToken = async (request, path, payload) => {
 }
 
 export const formatDuration = (ms) => {
+  const SECONDS_IN_MINUTE = 60
+  const MINUTES_IN_HOUR = 60
+  const HOURS_IN_DAY = 24
+  const DAYS_IN_YEAR = 365 // avoid magic number
+
   const seconds = ms / 1000
-  const minutes = seconds / 60
-  const hours = minutes / 60
-  const days = hours / 24
-  const years = days / 365
+  const minutes = seconds / SECONDS_IN_MINUTE
+  const hours = minutes / MINUTES_IN_HOUR
+  const days = hours / HOURS_IN_DAY
+  const years = days / DAYS_IN_YEAR
 
   if (years >= 1) {
     return `${Math.round(years)} year${years >= 2 ? 's' : ''}`

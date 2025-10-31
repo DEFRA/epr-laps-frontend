@@ -191,5 +191,9 @@
   "session": "sesiwn",
   "user-session": "Sesiwn defnyddiwr",
   "session-cookie-use": "Wedi'i ddefnyddio i'ch cadw wedi mewngofnodi",
-  "hours": "Oriau"
+  "user-session-cookie-use": "Fe'i defnyddir pan fydd defnyddiwr yn dilysu gyda'n ap ac fe'i defnyddir i storio gwybodaeth ddilys am ddefnyddwyr",
+  "hours": "oriau",
+  "days": "dyddiau",
+  "years": "mlynedd",
+  "minutes": "munudau"
 }
