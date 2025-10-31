@@ -16,3 +16,8 @@
   .govuk-grid-row {
     display: flex;
   }
+
+  .govuk-grid-column-full {
+    display: flex;
+    flex-wrap: wrap;
+  }
