@@ -145,7 +145,7 @@
   "you-do": "Nid oes gennych ganiatâd i gael mynediad i'r dudalen hon.",
   "unauthorized": "Anawdurdodedig",
   "you-need-to": "Mae angen i chi fewngofnodi i weld y dudalen hon.",
-  "request-to-update-bank-details": "Gall Prif Swyddogion Gweithredol a Phenaethiaid Cyllid gyflwyno cais i ddiweddaru manylion banc awdurdod lleol <a class=\"govuk-link\" href=\"/update-bank-details\">yma</a>.",
+  "request-to-update-bank-details": "Gall Prif Swyddogion Gweithredol a Phenaethiaid Cyllid gyflwyno cais i ddiweddaru manylion banc awdurdod lleol <a class=\"govuk-link\" href=\"/update-bank-details-info\">yma</a>.",
   "request-bank-details-update": "Cais i ddiweddaru manylion banc yr awdurdod lleol",
   "confirm-new-details": "Cadarnhewch fanylion cyfrif banc newydd",
   "requested-by": "Cais gan",
@@ -163,5 +163,9 @@
   "must-be": "Rhaid bod yn 6 digid o hyd",
   "must-be-between": "Rhaid bod rhwng 6 ac 8 digid o hyd",
   "enter-account": "Rhowch enw'r cyfrif",
-  "there-is": "Mae yna broblem"
+  "there-is": "Mae yna broblem",
+  "new-bank-acc": "Manylion cyfrif banc newydd wedi'u cyflwyno",
+  "we-will-verify": "Byddwn yn gwirio'r wybodaeth gyda'ch swyddog cyllid awdurdodedig.",
+  "you-will-receive-a-confirmation": "Byddwch yn derbyn e-bost cadarnhau unwaith y bydd y diweddariad wedi'i gymeradwyo.",
+  "go-to-bank-details": "Ewch i fanylion y banc"
 }

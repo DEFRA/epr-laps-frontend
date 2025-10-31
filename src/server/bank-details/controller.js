@@ -108,6 +108,25 @@ export const updateBankDetailsInfoController = {
   }
 }
 
+export const bankDetailsSubmittedController = {
+  handler: async (request, h) => {
+    const { currentLang } = request.app
+    // Check if user arrived from a valid submission (check for specific session flag)
+    const validSubmission = request.yar.get('bankDetailsSubmitted')
+
+    if (!validSubmission) {
+      return h.redirect(
+        `/bank-details/update-bank-details-info?lang=${currentLang}`
+      )
+    }
+    // Clear the session flag to prevent refresh/back button issues
+    request.yar.clear('bankDetailsSubmitted')
+    return h.view('bank-details/bank-details-submitted.njk', {
+      pageTitle: 'Bank details submitted'
+    })
+  }
+}
+
 const accountName = 'Defra Test'
 export const checkBankDetailsController = {
   handler: (_request, h) => {
@@ -143,6 +162,10 @@ export const postBankDetailsController = {
     request.logger.info(
       `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
     )
+
+    // Set session flag to allow access to submitted page
+    request.yar.set('bankDetailsSubmitted', true)
+
     // Redirect on success
     return h.redirect(
       `/bank-details/bank-details-submitted?lang=${currentLang}`

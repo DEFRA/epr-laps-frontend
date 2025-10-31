@@ -7,7 +7,8 @@ import {
   checkBankDetailsController,
   updateBankDetailsInfoController,
   getUpdateBankDetailsController,
-  postUpdateBankDetailsController
+  postUpdateBankDetailsController,
+  bankDetailsSubmittedController
 } from './controller.js'
 import * as authUtils from '../../server/auth/utils.js'
 import { context } from '../../config/nunjucks/context/context.js'
@@ -46,6 +47,11 @@ const createRequest = (overrides = {}) => ({
   },
   logger: { error: vi.fn(), info: vi.fn() },
   app: { currentLang: 'en', translations: { confirm: 'Confirm' } },
+  yar: {
+    get: vi.fn(),
+    set: vi.fn(),
+    clear: vi.fn()
+  },
   ...overrides
 })
 
@@ -383,7 +389,7 @@ describe('#bankDetailsConfirmedController', () => {
       vi.clearAllMocks()
     })
 
-    it('should call postWithToken and redirect on success', async () => {
+    it('should call postWithToken, set session flag, and redirect on success', async () => {
       authUtils.postWithToken.mockResolvedValue({})
 
       const result = await postBankDetailsController.handler(request, h)
@@ -400,8 +406,48 @@ describe('#bankDetailsConfirmedController', () => {
         }
       )
 
+      expect(request.yar.set).toHaveBeenCalledWith('bankDetailsSubmitted', true)
       expect(h.redirect).toHaveBeenCalledWith(
         '/bank-details/bank-details-submitted?lang=en'
+      )
+      expect(result).toBe('redirected')
+    })
+  })
+
+  describe('#bankDetailsSubmittedController', () => {
+    let h, request
+
+    beforeEach(() => {
+      h = createH()
+      request = createRequest()
+      vi.clearAllMocks()
+    })
+
+    it('should render the submitted page when valid session flag exists', async () => {
+      request.yar.get.mockReturnValue(true)
+
+      const result = await bankDetailsSubmittedController.handler(request, h)
+
+      expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
+      expect(request.yar.clear).toHaveBeenCalledWith('bankDetailsSubmitted')
+      expect(h.view).toHaveBeenCalledWith(
+        'bank-details/bank-details-submitted.njk',
+        expect.objectContaining({
+          pageTitle: 'Bank details submitted'
+        })
+      )
+      expect(result).toBe('view-rendered')
+    })
+
+    it('should redirect to update info page when no valid session flag exists', async () => {
+      request.yar.get.mockReturnValue(null)
+
+      const result = await bankDetailsSubmittedController.handler(request, h)
+
+      expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
+      expect(request.yar.clear).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        '/bank-details/update-bank-details-info?lang=en'
       )
       expect(result).toBe('redirected')
     })
