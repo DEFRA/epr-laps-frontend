@@ -138,7 +138,7 @@
   "you-do": "You do not have permission to access this page.",
   "unauthorized": "Unauthorized",
   "you-need-to": "You need to sign in to view this page.",
-  "request-to-update-bank-details": "CEOs and Heads of Finance can submit a request to update local authority’s bank details <a class=\"govuk-link\" href=\"/update-bank-details\">here</a>.",
+  "request-to-update-bank-details": "CEOs and Heads of Finance can submit a request to update local authority’s bank details <a class=\"govuk-link\" href=\"/update-bank-details-info\">here</a>.",
   "request-bank-details-update": "Request to update local authority bank details",
   "confirm-new-details": "Confirm new bank account details",
   "requested-by": "Requested by",
@@ -156,5 +156,9 @@
   "must-be": "Must be 6 digits long",
   "must-be-between": "Must be between 6 and 8 digits long",
   "enter-account": "Enter account name",
-  "there-is": "There is a problem"
+  "there-is": "There is a problem",
+  "new-bank-acc": "New bank account details submitted",
+  "we-will-verify": "We will verify the information with your authorised finance officer.",
+  "you-will-receive-a-confirmation": "You will receive a confirmation email once the update is approved.",
+  "go-to-bank-details": "Go to Bank details"
 }

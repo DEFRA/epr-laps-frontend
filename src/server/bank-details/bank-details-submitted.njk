@@ -1,13 +1,19 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
+{% set language = currentLang %}
+
 {% block content %}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ govukPanel({
-      titleText: 'Bank details submitted'
-    }) }}
 
+    {{ govukPanel({titleText: translations['new-bank-acc']}) }}
+
+    <p>{{ translations['we-will-verify'] }}<br></p>
+    <p>{{ translations['you-will-receive-a-confirmation'] }}<br></p>
+    <a href='/bank-details' class='govuk-link'> {{ translations['go-to-bank-details'] }}</a>
   </div>
 </div>
+
 {% endblock %}
