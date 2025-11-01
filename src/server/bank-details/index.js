@@ -41,13 +41,9 @@ export const bankDetails = {
       server.route({
         method: 'GET',
         path: '/bank-details/bank-details-confirmed',
-        handler: (request, h) => {
-          const translations = request.app.translations || {}
-          const currentLang = request.app.currentLang || 'en'
+        handler: (_request, h) => {
           return h.view('bank-details/bank-details-confirmed.njk', {
-            pageTitle: 'Bank Details Confirmed',
-            currentLang,
-            translations
+            pageTitle: 'Bank Details Confirmed'
           })
         }
       })

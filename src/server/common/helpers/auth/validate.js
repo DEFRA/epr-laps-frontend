@@ -16,6 +16,7 @@ export const validateUserSession = async (request, session) => {
   const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
   if (tokenHasExpired) {
+    request.yar.reset()
     const response = await refreshAccessToken(request, session)
 
     if (!response.ok) {

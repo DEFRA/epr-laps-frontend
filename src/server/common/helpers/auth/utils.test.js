@@ -54,6 +54,9 @@ describe('#utils', () => {
         userSession: {
           sessionId: 'test-id'
         }
+      },
+      yar: {
+        reset: vi.fn()
       }
     }
 
@@ -143,6 +146,7 @@ describe('#utils', () => {
 
       expect(mockRequest.server.app.cache.drop).toHaveBeenCalledWith('test-id')
       expect(mockRequest.cookieAuth.clear).toHaveBeenCalled()
+      expect(mockRequest.yar.reset).toHaveBeenCalled()
     })
   })
 

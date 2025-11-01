@@ -28,7 +28,11 @@ describe('#validateUserSession', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    mockRequest = {}
+    mockRequest = {
+      yar: {
+        reset: vi.fn()
+      }
+    }
 
     mockSession = {
       sessionId: 'test-session-id'
@@ -122,6 +126,7 @@ describe('#validateUserSession', () => {
       mockRequest,
       mockRefreshResponse.json
     )
+    expect(mockRequest.yar.reset).toHaveBeenCalled()
   })
 
   test('should return is valid: false when user token expired and refresh fails', async () => {
@@ -145,5 +150,6 @@ describe('#validateUserSession', () => {
       mockSession
     )
     expect(authUtils.updateUserSession).not.toHaveBeenCalled()
+    expect(mockRequest.yar.reset).toHaveBeenCalled()
   })
 })
