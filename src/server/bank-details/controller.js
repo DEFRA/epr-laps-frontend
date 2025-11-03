@@ -5,6 +5,9 @@ import * as authUtils from '../../server/auth/utils.js'
 import joi from 'joi'
 import Boom from '@hapi/boom'
 
+const ACCOUNT_NUMBER_MIN = 6
+const ACCOUNT_NUMBER_MAX = 8
+
 export const bankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
@@ -151,9 +154,6 @@ export const postBankDetailsController = {
     )
   }
 }
-
-const ACCOUNT_NUMBER_MIN = 6
-const ACCOUNT_NUMBER_MAX = 8
 
 const buildSchema = (translations) =>
   joi.object({
