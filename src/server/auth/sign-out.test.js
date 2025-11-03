@@ -31,7 +31,6 @@ describe('#signOutController', () => {
   test('should redirect users to auth page when there is no authentication', async () => {
     getUserSession.mockReturnValueOnce(null)
     const mockedRequest = {
-      app: { currentLang: 'en' },
       auth: { credentials: {} },
       logger: { info: vi.fn(), debug: vi.fn() }
     }
@@ -44,13 +43,11 @@ describe('#signOutController', () => {
 
   test('should call removeUserSession and redirect uri when user is authenticated', async () => {
     const mockedUserSession = {
-      app: { currentLang: 'en' },
       logoutUrl: 'testLogout',
       idToken: 'testId'
     }
 
     const mockedRequest = {
-      app: { currentLang: 'en' },
       auth: { credentials: { sessionId: 'testSessionId' } },
       headers: { referer: 'http://localhost:3000/' },
       logger: { info: vi.fn(), debug: vi.fn() }
@@ -66,7 +63,7 @@ describe('#signOutController', () => {
       mockedRequest.auth.credentials
     )
     expect(mockedResponse.redirect).toHaveBeenCalledWith(
-      `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout?lang=en`
+      `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout`
     )
   })
 })
