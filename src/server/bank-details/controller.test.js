@@ -285,26 +285,24 @@ describe('#bankDetailsConfirmedController', () => {
       request = {
         query: {},
         headers: {},
-        path: '/bank-details',
+        path: '/update-bank-details',
         payload: {},
-        yar
-      }
-
-      // Minimal translations required for Joi validation and pageTitle
-      context.mockResolvedValue({
-        currentLang: 'en',
-        translations: {
-          updateBankDetailsPageTitle: 'Update Bank Details',
-          accountName: 'Enter account name',
-          sortCodeEmpty: 'Enter the sort code',
-          sortCodePattern: 'Enter a valid sort code like 309430',
-          sortCodeLength: 'Sort code must be 6 digits long',
-          accountNumberEmpty: 'Enter the account number',
-          accountNumberDigits: 'Enter a valid account number like 12345678',
-          accountNumberMin: 'Account number must be at least 6 digits long',
-          accountNumberMax: 'Account number must be no more than 8 digits long'
+        yar,
+        app: {
+          currentLang: 'en',
+          translations: {
+            accountName: 'Enter account name',
+            sortCodeEmpty: 'Enter the sort code',
+            sortCodePattern: 'Enter a valid sort code like 309430',
+            sortCodeLength: 'Sort code must be 6 digits long',
+            accountNumberEmpty: 'Enter the account number',
+            accountNumberDigits: 'Enter a valid account number like 12345678',
+            accountNumberMin: 'Account number must be at least 6 digits long',
+            accountNumberMax:
+              'Account number must be no more than 8 digits long'
+          }
         }
-      })
+      }
     })
 
     it('renders the update bank details page with empty form', async () => {
@@ -314,6 +312,19 @@ describe('#bankDetailsConfirmedController', () => {
       expect(template).toBe('bank-details/update-bank-details.njk')
       expect(contextData.pageTitle).toBe('Update Bank Details')
       expect(contextData.errors).toEqual({})
+      expect(result.value).toBe('view-rendered')
+    })
+
+    it('revalidates payload on GET when formSubmitted is true (coverage test)', async () => {
+      yar.set('payload', { accountName: '', sortCode: '', accountNumber: '' })
+      yar.set('formSubmitted', true)
+      request.headers.referer = request.path
+
+      const result = await getUpdateBankDetailsController.handler(request, h)
+      const [, contextData] = h.view.mock.calls[0]
+
+      expect(contextData.errors).toBeTypeOf('object')
+      expect(Array.isArray(contextData.aggregatedErrors)).toBe(true)
       expect(result.value).toBe('view-rendered')
     })
 

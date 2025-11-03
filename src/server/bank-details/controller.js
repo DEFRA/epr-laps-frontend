@@ -208,7 +208,7 @@ const buildSchema = (translations) =>
 
 export const getUpdateBankDetailsController = {
   handler: async (request, h) => {
-    const { currentLang, translations } = await context(request)
+    const { currentLang, translations } = request.app
     const payload = request.yar.get('payload') || {}
     const errors = {}
     const aggregatedErrors = []
@@ -249,7 +249,7 @@ export const getUpdateBankDetailsController = {
 
 export const postUpdateBankDetailsController = {
   handler: async (request, h) => {
-    const { currentLang, translations } = await context(request)
+    const { currentLang, translations } = request.app
     const payload = request.payload
     const schema = buildSchema(translations)
     const { error } = schema.validate(payload, { abortEarly: false })
