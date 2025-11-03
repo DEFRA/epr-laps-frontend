@@ -14,6 +14,7 @@ export const getUserSession = async (request, session) => {
 
 export const removeUserSession = (request, session) => {
   request.server.app.cache.drop(session.sessionId)
+  request.yar.reset()
   request.cookieAuth.clear()
 }
 
