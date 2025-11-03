@@ -310,6 +310,7 @@ describe('#updateBankDetailsController', () => {
       expect(h.redirect).toHaveBeenCalledWith('/check-bank-details')
       expect(result).toBe('/check-bank-details')
     })
+  })
     
 describe('#checkBankDetailsController', () => {
   let h, request
