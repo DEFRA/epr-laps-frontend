@@ -260,7 +260,7 @@ describe('#updateBankDetailsController', () => {
       expect(result.value).toBe('view-rendered')
     })
 
-    it('revalidates payload on GET when formSubmitted is true (coverage test)', async () => {
+    it('revalidates payload on GET when formSubmitted is true', async () => {
       yar.set('payload', { accountName: '', sortCode: '', accountNumber: '' })
       yar.set('formSubmitted', true)
       request.headers.referer = request.path
@@ -310,6 +310,7 @@ describe('#updateBankDetailsController', () => {
       expect(h.redirect).toHaveBeenCalledWith('/check-bank-details')
       expect(result).toBe('/check-bank-details')
     })
+  })
   })
     
 describe('#checkBankDetailsController', () => {
