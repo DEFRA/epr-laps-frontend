@@ -3,10 +3,11 @@ import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController,
-  updateBankDetailsController,
   postBankDetailsController,
   checkBankDetailsController,
   updateBankDetailsInfoController,
+  getUpdateBankDetailsController,
+  postUpdateBankDetailsController,
   bankDetailsSubmittedController
 } from './controller.js'
 import Boom from '@hapi/boom'
@@ -192,22 +193,111 @@ describe('#updateBankDetailsInfoController', () => {
 })
 
 describe('#updateBankDetailsController', () => {
-  let h
+  let h, yar, request
 
   beforeEach(() => {
-    // Mock h.view()
     h = {
-      view: vi.fn().mockReturnThis()
+      view: vi.fn(() => ({
+        value: 'view-rendered',
+        takeover: vi.fn().mockReturnValue({ value: 'view-rendered' })
+      })),
+      redirect: vi.fn((url) => url)
+    }
+
+    yar = {
+      store: {},
+      get: vi.fn(function (key) {
+        return this.store[key]
+      }),
+      set: vi.fn(function (key, value) {
+        this.store[key] = value
+      }),
+      clear: vi.fn(function (key) {
+        delete this.store[key]
+      })
+    }
+
+    request = {
+      query: {},
+      headers: {},
+      path: '/update-bank-details',
+      payload: {},
+      yar,
+      app: {
+        currentLang: 'en',
+        translations: {
+          accountName: 'Enter account name',
+          sortCodeEmpty: 'Enter the sort code',
+          sortCodePattern: 'Enter a valid sort code like 309430',
+          sortCodeLength: 'Sort code must be 6 digits long',
+          accountNumberEmpty: 'Enter the account number',
+          accountNumberDigits: 'Enter a valid account number like 12345678',
+          accountNumberMin: 'Account number must be at least 6 digits long',
+          accountNumberMax: 'Account number must be no more than 8 digits long'
+        }
+      }
     }
   })
 
-  test('should render the update bank details view with correct page title', () => {
-    updateBankDetailsController.handler({}, h)
+  it('renders the update bank details page with empty form', async () => {
+    const result = await getUpdateBankDetailsController.handler(request, h)
+    const [template, contextData] = h.view.mock.calls[0]
 
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/update-bank-details.njk',
-      { pageTitle: 'Update Bank Details' }
-    )
+    expect(template).toBe('bank-details/update-bank-details.njk')
+    expect(contextData.pageTitle).toBe('Update Bank Details')
+    expect(contextData.errors).toEqual({})
+    expect(result.value).toBe('view-rendered')
+  })
+
+  it('revalidates payload on GET when formSubmitted is true', async () => {
+    yar.set('payload', { accountName: '', sortCode: '', accountNumber: '' })
+    yar.set('formSubmitted', true)
+    request.headers.referer = request.path
+
+    const result = await getUpdateBankDetailsController.handler(request, h)
+    const [, contextData] = h.view.mock.calls[0]
+
+    expect(contextData.errors).toBeTypeOf('object')
+    expect(Array.isArray(contextData.aggregatedErrors)).toBe(true)
+    expect(result.value).toBe('view-rendered')
+  })
+
+  it('renders validation errors when payload invalid on GET', async () => {
+    yar.set('payload', { accountName: '', sortCode: '', accountNumber: '' })
+    yar.set('formSubmitted', true)
+
+    const result = await getUpdateBankDetailsController.handler(request, h)
+    const [, contextData] = h.view.mock.calls[0]
+
+    expect(contextData.errors).toBeTypeOf('object')
+    expect(Array.isArray(contextData.aggregatedErrors)).toBe(true)
+    expect(result.value).toBe('view-rendered')
+  })
+
+  it('renders validation errors when payload invalid on POST', async () => {
+    request.payload = { accountName: '', sortCode: '', accountNumber: '' }
+
+    const result = await postUpdateBankDetailsController.handler(request, h)
+    const [template, contextData] = h.view.mock.calls[0]
+
+    expect(template).toBe('bank-details/update-bank-details.njk')
+    expect(contextData.payload).toEqual(request.payload)
+    expect(contextData.errors).toBeTypeOf('object')
+    expect(Array.isArray(contextData.aggregatedErrors)).toBe(true)
+    expect(result.value).toBe('view-rendered')
+  })
+
+  it('redirects to check-bank-details when payload is valid', async () => {
+    request.payload = {
+      accountName: 'Test Account',
+      sortCode: '123456',
+      accountNumber: '12345678'
+    }
+
+    const result = await postUpdateBankDetailsController.handler(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith('/check-bank-details')
+    expect(result).toBe('/check-bank-details')
   })
 })
 

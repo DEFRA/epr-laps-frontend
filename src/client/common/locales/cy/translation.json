@@ -158,8 +158,22 @@
   "submit-your": "Cyflwynwch eich manylion banc wedi'u diweddaru yn ddiogel gan ddefnyddio'r ffurflen ar-lein",
   "we-will": "Byddwn yn cysylltu â swyddog cyllid awdurdodedig eich awdurdod lleol (e.e. swyddog Adran 151) i gadarnhau'r manylion",
   "you-will-receive": "Byddwch yn derbyn e-bost unwaith y bydd eich manylion banc wedi'u diweddaru wedi'u gwirio a'u cymeradwyo",
+  "new-bank": "Manylion cyfrif banc newydd",
+  "local-authority-name": "Enw'r awdurdod lleol",
+  "must-be": "Rhaid bod yn 6 digid o hyd",
+  "must-be-between": "Rhaid bod rhwng 6 ac 8 digid o hyd",
+  "enter-account": "Rhowch enw'r cyfrif",
+  "there-is": "Mae yna broblem",
   "new-bank-acc": "Manylion cyfrif banc newydd wedi'u cyflwyno",
   "we-will-verify": "Byddwn yn gwirio'r wybodaeth gyda'ch swyddog cyllid awdurdodedig.",
   "you-will-receive-a-confirmation": "Byddwch yn derbyn e-bost cadarnhau unwaith y bydd y diweddariad wedi'i gymeradwyo.",
-  "go-to-bank-details": "Ewch i fanylion y banc"
+  "go-to-bank-details": "Ewch i fanylion y banc",
+  "accountName": "Rhowch enw’r cyfrif",
+  "sortCodeEmpty": "Rhowch y cod didoli",
+  "sortCodePattern": "Rhowch god didoli dilys fel 309430",
+  "sortCodeLength": "Rhaid i’r cod didoli fod yn 6 digid o hyd",
+  "accountNumberEmpty": "Rhowch rif y cyfrif",
+  "accountNumberDigits": "Rhowch rif cyfrif dilys fel 12345678",
+  "accountNumberMin": "Rhaid i rif y cyfrif fod o leiaf 6 digid o hyd",
+  "accountNumberMax": "Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd"
 }

@@ -151,8 +151,22 @@
   "submit-your": "Submit your updated bank details securely using the online form",
   "we-will": "We will contact your local authority's authorised finance officer(e.g. Section 151 officer) to confirm the details",
   "you-will-receive": "You will receive an email once your updated bank details are verified and approved",
+  "new-bank": "New bank account details",
+  "local-authority-name": "Local authority name",
+  "must-be": "Must be 6 digits long",
+  "must-be-between": "Must be between 6 and 8 digits long",
+  "enter-account": "Enter account name",
+  "there-is": "There is a problem",
   "new-bank-acc": "New bank account details submitted",
   "we-will-verify": "We will verify the information with your authorised finance officer.",
   "you-will-receive-a-confirmation": "You will receive a confirmation email once the update is approved.",
-  "go-to-bank-details": "Go to Bank details"
+  "go-to-bank-details": "Go to Bank details",
+  "accountName": "Enter account name",
+  "sortCodeEmpty": "Enter the sort code",
+  "sortCodePattern": "Enter a valid sort code like 309430",
+  "sortCodeLength": "Sort code must be 6 digits long",
+  "accountNumberEmpty": "Enter the account number",
+  "accountNumberDigits": "Enter a valid account number like 12345678",
+  "accountNumberMin": "Account number must be at least 6 digits long",
+  "accountNumberMax": "Account number must be no more than 8 digits long"
 }

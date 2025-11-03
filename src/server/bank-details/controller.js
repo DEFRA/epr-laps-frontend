@@ -2,7 +2,11 @@
  * A GDS styled example bank details controller
  */
 import * as authUtils from '../../server/auth/utils.js'
+import joi from 'joi'
 import Boom from '@hapi/boom'
+
+const ACCOUNT_NUMBER_MIN = 6
+const ACCOUNT_NUMBER_MAX = 8
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -86,14 +90,6 @@ export const updateBankDetailsInfoController = {
   }
 }
 
-export const updateBankDetailsController = {
-  handler: (_request, h) => {
-    return h.view('bank-details/update-bank-details.njk', {
-      pageTitle: 'Update Bank Details'
-    })
-  }
-}
-
 export const bankDetailsSubmittedController = {
   handler: async (request, h) => {
     const { currentLang } = request.app
@@ -156,5 +152,118 @@ export const postBankDetailsController = {
     return h.redirect(
       `/bank-details/bank-details-submitted?lang=${currentLang}`
     )
+  }
+}
+
+const buildSchema = (translations) =>
+  joi.object({
+    accountName: joi.string().max(256).required().messages({
+      'string.empty': translations['accountName']
+    }),
+    sortCode: joi
+      .string()
+      .required()
+      .pattern(/^(?=(?:\D*\d){6}$)[\d\s-]+$/)
+      .max(8)
+      .messages({
+        'string.empty': translations['sortCodeEmpty'],
+        'string.pattern.base': translations['sortCodePattern'],
+        'string.lengthSix': translations['sortCodeLength']
+      }),
+    accountNumber: joi
+      .string()
+      .replace(/\s+/g, '')
+      .required()
+      .pattern(/^\d+$/, 'digits')
+      .min(ACCOUNT_NUMBER_MIN)
+      .max(ACCOUNT_NUMBER_MAX)
+      .messages({
+        'string.empty': translations['accountNumberEmpty'],
+        'string.pattern.name': translations['accountNumberDigits'],
+        'string.min': translations['accountNumberMin'],
+        'string.max': translations['accountNumberMax']
+      })
+  })
+
+export const getUpdateBankDetailsController = {
+  handler: async (request, h) => {
+    const { currentLang, translations } = request.app
+    const payload = request.yar.get('payload') || {}
+    const errors = {}
+    const aggregatedErrors = []
+
+    const referrer = request.headers.referer || ''
+    const cameFromPost = referrer.includes(request.path)
+
+    if (!cameFromPost) {
+      request.yar.clear('payload')
+      request.yar.set('formSubmitted', false)
+    }
+
+    if (request.yar.get('formSubmitted') === true) {
+      const { error } = buildSchema(translations).validate(payload, {
+        abortEarly: false
+      })
+      if (error?.details) {
+        for (const detail of error.details) {
+          errors[detail.context.key] = { text: detail.message }
+          aggregatedErrors.push({
+            text: detail.message,
+            href: `#${detail.context.key}`
+          })
+        }
+      }
+    }
+
+    return h.view('bank-details/update-bank-details.njk', {
+      pageTitle: 'Update Bank Details',
+      payload,
+      errors,
+      aggregatedErrors,
+      currentLang,
+      translations
+    })
+  }
+}
+
+export const postUpdateBankDetailsController = {
+  handler: async (request, h) => {
+    const { currentLang, translations } = request.app
+    const payload = request.payload
+    const schema = buildSchema(translations)
+    const { error } = schema.validate(payload, { abortEarly: false })
+
+    if (error?.details) {
+      const errors = {}
+      const aggregatedErrors = []
+
+      for (const detail of error.details) {
+        errors[detail.context.key] = { text: detail.message }
+        aggregatedErrors.push({
+          text: detail.message,
+          href: `#${detail.context.key}`
+        })
+      }
+
+      request.yar.set('payload', payload)
+      request.yar.set('formSubmitted', true)
+
+      return h
+        .view('bank-details/update-bank-details.njk', {
+          pageTitle: 'Update Bank Details',
+          payload,
+          errors,
+          aggregatedErrors,
+          currentLang,
+          translations
+        })
+        .takeover()
+    }
+
+    request.yar.clear('payload')
+    request.yar.set('formSubmitted', false)
+    request.yar.set('visited', false)
+
+    return h.redirect('/check-bank-details')
   }
 }

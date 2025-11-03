@@ -3,9 +3,10 @@ import {
   confirmBankDetailsController,
   bankDetailsConfirmedController,
   updateBankDetailsInfoController,
-  updateBankDetailsController,
   checkBankDetailsController,
   postBankDetailsController,
+  postUpdateBankDetailsController,
+  getUpdateBankDetailsController,
   bankDetailsSubmittedController
 } from './controller.js'
 
@@ -29,15 +30,22 @@ export const bankDetails = {
         ...updateBankDetailsInfoController
       })
       server.route({
-        method: 'GET',
-        path: '/update-bank-details',
-        ...updateBankDetailsController
-      })
-      server.route({
         method: 'POST',
         path: '/bank-details/bank-details-confirmed',
         ...bankDetailsConfirmedController
       })
+
+      server.route({
+        method: 'GET',
+        path: '/update-bank-details',
+        ...getUpdateBankDetailsController
+      })
+      server.route({
+        method: 'POST',
+        path: '/update-bank-details',
+        ...postUpdateBankDetailsController
+      })
+
       server.route({
         method: 'GET',
         path: '/bank-details/bank-details-confirmed',
