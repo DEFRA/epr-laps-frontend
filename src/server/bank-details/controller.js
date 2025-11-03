@@ -2,7 +2,6 @@
  * A GDS styled example bank details controller
  */
 import * as authUtils from '../../server/auth/utils.js'
-import { context } from '../../config/nunjucks/context/context.js'
 import joi from 'joi'
 import Boom from '@hapi/boom'
 
