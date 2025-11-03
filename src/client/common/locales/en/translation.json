@@ -160,5 +160,13 @@
   "new-bank-acc": "New bank account details submitted",
   "we-will-verify": "We will verify the information with your authorised finance officer.",
   "you-will-receive-a-confirmation": "You will receive a confirmation email once the update is approved.",
-  "go-to-bank-details": "Go to Bank details"
+  "go-to-bank-details": "Go to Bank details",
+  "accountName": "Enter account name",
+  "sortCodeEmpty": "Enter the sort code",
+  "sortCodePattern": "Enter a valid sort code like 309430",
+  "sortCodeLength": "Sort code must be 6 digits long",
+  "accountNumberEmpty": "Enter the account number",
+  "accountNumberDigits": "Enter a valid account number like 12345678",
+  "accountNumberMin": "Account number must be at least 6 digits long",
+  "accountNumberMax": "Account number must be no more than 8 digits long"
 }

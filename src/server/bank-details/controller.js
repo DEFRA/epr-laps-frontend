@@ -173,49 +173,23 @@ export const postBankDetailsController = {
   }
 }
 
-const getTranslations = (lang) => {
-  const translations = {
-    en: {
-      accountName: 'Enter account name',
-      sortCodeEmpty: 'Enter the sort code',
-      sortCodePattern: 'Enter a valid sort code like 309430',
-      sortCodeLength: 'Sort code must be 6 digits long',
-      accountNumberEmpty: 'Enter the account number',
-      accountNumberDigits: 'Enter a valid account number like 12345678',
-      accountNumberMin: 'Account number must be at least 6 digits long',
-      accountNumberMax: 'Account number must be no more than 8 digits long'
-    },
-    cy: {
-      accountName: 'Rhowch enw’r cyfrif',
-      sortCodeEmpty: 'Rhowch y cod didoli',
-      sortCodePattern: 'Rhowch god didoli dilys fel 309430',
-      sortCodeLength: 'Rhaid i’r cod didoli fod yn 6 digid o hyd',
-      accountNumberEmpty: 'Rhowch rif y cyfrif',
-      accountNumberDigits: 'Rhowch rif cyfrif dilys fel 12345678',
-      accountNumberMin: 'Rhaid i rif y cyfrif fod o leiaf 6 digid o hyd',
-      accountNumberMax: 'Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd'
-    }
-  }
-  return translations[lang]
-}
-
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
 
-const buildSchema = (translation) =>
+const buildSchema = (translations) =>
   joi.object({
     accountName: joi.string().max(256).required().messages({
-      'string.empty': translation.accountName
+      'string.empty': translations['accountName']
     }),
     sortCode: joi
       .string()
       .required()
-      .pattern(/^(?=(?:\D*\d){6}$)[\d\s-]+$/) // exactly 6 digits, allows spaces & dashes
+      .pattern(/^(?=(?:\D*\d){6}$)[\d\s-]+$/)
       .max(8)
       .messages({
-        'string.empty': translation.sortCodeEmpty,
-        'string.pattern.base': translation.sortCodePattern,
-        'string.lengthSix': translation.sortCodeLength
+        'string.empty': translations['sortCodeEmpty'],
+        'string.pattern.base': translations['sortCodePattern'],
+        'string.lengthSix': translations['sortCodeLength']
       }),
     accountNumber: joi
       .string()
@@ -225,22 +199,17 @@ const buildSchema = (translation) =>
       .min(ACCOUNT_NUMBER_MIN)
       .max(ACCOUNT_NUMBER_MAX)
       .messages({
-        'string.empty': translation.accountNumberEmpty,
-        'string.pattern.name': translation.accountNumberDigits,
-        'string.min': translation.accountNumberMin,
-        'string.max': translation.accountNumberMax
+        'string.empty': translations['accountNumberEmpty'],
+        'string.pattern.name': translations['accountNumberDigits'],
+        'string.min': translations['accountNumberMin'],
+        'string.max': translations['accountNumberMax']
       })
   })
 
 export const getUpdateBankDetailsController = {
   handler: async (request, h) => {
-    const lang = request.query.lang || 'en'
-    request.yar.set('lang', lang)
-
-    const translation = getTranslations(lang)
-
+    const { currentLang, translations } = await context(request)
     const payload = request.yar.get('payload') || {}
-
     const errors = {}
     const aggregatedErrors = []
 
@@ -253,7 +222,7 @@ export const getUpdateBankDetailsController = {
     }
 
     if (request.yar.get('formSubmitted') === true) {
-      const { error } = buildSchema(translation).validate(payload, {
+      const { error } = buildSchema(translations).validate(payload, {
         abortEarly: false
       })
       if (error?.details) {
@@ -272,19 +241,17 @@ export const getUpdateBankDetailsController = {
       payload,
       errors,
       aggregatedErrors,
-      translation
+      currentLang,
+      translations
     })
   }
 }
 
 export const postUpdateBankDetailsController = {
   handler: async (request, h) => {
-    const lang = request.yar.get('lang') || 'en'
-    const translation = getTranslations(lang)
+    const { currentLang, translations } = await context(request)
     const payload = request.payload
-
-    // Validate manually using buildSchema
-    const schema = buildSchema(translation)
+    const schema = buildSchema(translations)
     const { error } = schema.validate(payload, { abortEarly: false })
 
     if (error?.details) {
@@ -308,13 +275,11 @@ export const postUpdateBankDetailsController = {
           payload,
           errors,
           aggregatedErrors,
-          translation
+          currentLang,
+          translations
         })
         .takeover()
     }
-
-    // Successful submission → redirect
-    console.log('Form submitted successfully', payload)
 
     request.yar.clear('payload')
     request.yar.set('formSubmitted', false)
