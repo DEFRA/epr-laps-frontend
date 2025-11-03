@@ -10,6 +10,7 @@ export const signOutController = {
   handler: async (request, h) => {
     const userSession = await getUserSession(request, request.auth.credentials)
 
+    const currentLang = request.app.currentLang
     if (!userSession) {
       request.logger.info('No active user session. Redirecting to home page')
       return h.redirect('/')
@@ -22,7 +23,7 @@ export const signOutController = {
     const fallbackUrl = config.get('defraId.redirectUrl').replace(/\/$/, '') // remove trailing slash if present
 
     const logoutUrl = encodeURI(
-      `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${fallbackUrl}/logout`
+      `${userSession.logoutUrl}?id_token_hint=${idToken}&post_logout_redirect_uri=${fallbackUrl}/logout?lang=${currentLang}`
     )
 
     request.logger.debug(`Redirecting user to: ${logoutUrl}`)
