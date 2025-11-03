@@ -8,7 +8,8 @@ import {
   updateBankDetailsInfoController,
   getUpdateBankDetailsController,
   postUpdateBankDetailsController,
-  bankDetailsSubmittedController
+  bankDetailsSubmittedController,
+  translateBankDetails
 } from './controller.js'
 import Boom from '@hapi/boom'
 import { postWithToken, putWithToken } from '../auth/utils.js'
@@ -78,6 +79,26 @@ describe('#bankDetailsController', () => {
       isBoom: true,
       output: { statusCode: 500 }
     })
+  })
+})
+
+describe('translateBankDetails', () => {
+  const translations = { 'ending-with': 'ending with (translated)' }
+
+  it('returns empty string for falsy or non-string input', () => {
+    expect(translateBankDetails(null, translations)).toBe('')
+    expect(translateBankDetails(undefined, translations)).toBe('')
+    expect(translateBankDetails(12345678, translations)).toBe('')
+  })
+
+  it('returns trimmed value if "ending with" not present', () => {
+    expect(translateBankDetails(' 12-33-22 ', translations)).toBe('12-33-22')
+  })
+
+  it('replaces "ending with" with translation', () => {
+    const value = 'Sort code ending with 22'
+    const result = translateBankDetails(value, translations)
+    expect(result).toBe('Sort code ending with (translated) 22')
   })
 })
 

@@ -175,5 +175,6 @@
   "accountNumberEmpty": "Rhowch rif y cyfrif",
   "accountNumberDigits": "Rhowch rif cyfrif dilys fel 12345678",
   "accountNumberMin": "Rhaid i rif y cyfrif fod o leiaf 6 digid o hyd",
-  "accountNumberMax": "Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd"
+  "accountNumberMax": "Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd",
+  "ending-with": "yn gorffen gyda"
 }

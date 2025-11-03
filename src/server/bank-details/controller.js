@@ -38,6 +38,29 @@ export const bankDetailsController = {
   }
 }
 
+/**
+ * Formats a bank detail (sort code or account number) for display.
+ *
+ * - Shows the full value as-is unless it already includes "ending with".
+ * - Only translates "ending with" if it exists in the string.
+ *
+ * @param {string} value - The raw sort code or account number.
+ * @param {object} translations - The translations object (must include "ending-with").
+ * @returns {string} Formatted string suitable for UI display.
+ */
+export function translateBankDetails(value, translations) {
+  if (!value || typeof value !== 'string') return ''
+
+  const trimmed = value.trim()
+  const endingWithTranslation = translations['ending-with']
+
+  if (/ending with/i.test(trimmed)) {
+    return trimmed.replace(/ending with/i, endingWithTranslation)
+  }
+
+  return trimmed
+}
+
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
     const bankApiData = request.yar.get('bankDetails')
