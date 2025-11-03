@@ -49,7 +49,9 @@ export const bankDetailsController = {
  * @returns {string} Formatted string suitable for UI display.
  */
 export function translateBankDetails(value, translations) {
-  if (!value || typeof value !== 'string') return ''
+  if (!value || typeof value !== 'string') {
+    return ''
+  }
 
   const trimmed = value.trim()
   const endingWithTranslation = translations['ending-with']
