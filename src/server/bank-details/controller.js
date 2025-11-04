@@ -115,6 +115,10 @@ export const checkBankDetailsController = {
     newBankDetails.requesterName = request.auth.credentials.displayName
     newBankDetails.localAuthority = request.auth.credentials.organisationName
 
+    if (!newBankDetails) {
+      return h.redirect('bank-details/update-bank-details')
+    }
+
     request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
@@ -127,6 +131,10 @@ export const postBankDetailsController = {
   handler: async (request, h) => {
     const { currentLang } = request.app
     const payload = request.yar.get('ConfirmedBankDetails')
+
+    if (!payload) {
+      return h.redirect('bank-details/update-bank-details')
+    }
 
     // Make your API call
     await authUtils.postWithToken(request, '/bank-details', payload)
