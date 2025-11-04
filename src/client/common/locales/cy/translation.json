@@ -145,7 +145,7 @@
   "you-do": "Nid oes gennych ganiatâd i gael mynediad i'r dudalen hon.",
   "unauthorized": "Anawdurdodedig",
   "you-need-to": "Mae angen i chi fewngofnodi i weld y dudalen hon.",
-  "request-to-update-bank-details": "Gall Prif Swyddogion Gweithredol a Phenaethiaid Cyllid gyflwyno cais i ddiweddaru manylion banc awdurdod lleol <a class=\"govuk-link\" href=\"/update-bank-details-info\">yma</a>.",
+  "request-to-update-bank-details": "Gall Prif Swyddogion Gweithredol a Phenaethiaid Cyllid gyflwyno cais i ddiweddaru manylion banc awdurdod lleol",
   "request-bank-details-update": "Cais i ddiweddaru manylion banc yr awdurdod lleol",
   "confirm-new-details": "Cadarnhewch fanylion cyfrif banc newydd",
   "requested-by": "Cais gan",
@@ -175,5 +175,6 @@
   "accountNumberEmpty": "Rhowch rif y cyfrif",
   "accountNumberDigits": "Rhowch rif cyfrif dilys fel 12345678",
   "accountNumberMin": "Rhaid i rif y cyfrif fod o leiaf 6 digid o hyd",
-  "accountNumberMax": "Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd"
+  "accountNumberMax": "Rhaid i rif y cyfrif fod dim mwy na 8 digid o hyd",
+  "here": "yma"
 }
