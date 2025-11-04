@@ -95,10 +95,12 @@
 {% if userPermissions.createBankDetails %}
 
   {% set detailsHtml %}
-    <p>
-    {{ translations['request-to-update-bank-details'] }}
-    <a href='/update-bank-details-info' class='govuk-link'>{{ translations['submit-a-request'] }}</a>
-    </p>
+  <p>
+   {{ translations['request-to-update-bank-details'] }}
+    <a class="govuk-link" href="/update-bank-details-info?lang={{ currentLang }}">
+    {{ translations['submit-a-request'] }}
+     </a>
+   </p>
 
     <p><strong>{{ translations['email'] }}</strong><br>
       <a href="mailto:{{ translations['eprcustomerserv'] }}">{{ translations['eprcustomerserv'] }}</a><br>
