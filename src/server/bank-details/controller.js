@@ -112,12 +112,13 @@ export const bankDetailsSubmittedController = {
 export const checkBankDetailsController = {
   handler: (request, h) => {
     const newBankDetails = request.yar.get('payload')
-    newBankDetails.requesterName = request.auth.credentials.displayName
-    newBankDetails.localAuthority = request.auth.credentials.organisationName
 
     if (!newBankDetails) {
       return h.redirect('bank-details/update-bank-details')
     }
+
+    newBankDetails.requesterName = request.auth.credentials.displayName
+    newBankDetails.localAuthority = request.auth.credentials.organisationName
 
     request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {

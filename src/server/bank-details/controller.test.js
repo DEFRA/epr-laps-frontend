@@ -358,6 +358,16 @@ describe('#checkBankDetailsController', () => {
     )
     expect(result).toBe('view-rendered')
   })
+
+  it('should redirect to /update-bank-details if payload is missing', () => {
+    request.yar.get = vi.fn().mockReturnValue(undefined)
+
+    const result = checkBankDetailsController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('payload')
+    expect(h.redirect).toHaveBeenCalledWith('bank-details/update-bank-details')
+    expect(result).toBe('redirected')
+  })
 })
 
 describe('#postBankDetailsController', () => {
