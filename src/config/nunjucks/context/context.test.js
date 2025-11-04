@@ -58,6 +58,7 @@ describe('context and cache', () => {
         assetPath: '/public',
         serviceName: 'EPR-LAPs',
         showBetaBanner: true,
+        showCookieBanner: true,
         'defraId.manageAccountUrl': manageDefraAccountUrl,
         sessionTimer: 2
       }
@@ -125,6 +126,7 @@ describe('context and cache', () => {
           serviceUrl: '/',
           sessionTimer: 120000,
           showBetaBanner: true,
+          showCookieBanner: true,
           translations: {
             laNames: { [EN_NAME]: CY_NAME },
             'sign-out': 'Sign out',

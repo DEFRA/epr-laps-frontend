@@ -31,6 +31,10 @@ async function context(request) {
 
   authedUser.organisationName = displayOrgName
 
+  const showCookieBanner =
+    !request.path.startsWith('/cookies') &&
+    !request.path.startsWith('/sign-out')
+
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -52,6 +56,7 @@ async function context(request) {
     navigation,
     sessionTimer,
     showBetaBanner: config.get('showBetaBanner'),
+    showCookieBanner,
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`
