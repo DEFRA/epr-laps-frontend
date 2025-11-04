@@ -13,6 +13,19 @@ export const bankDetailsController = {
     const { currentLang, translations } = request.app
 
     const bankApiData = request.yar.get('bankDetails')
+
+    if (!bankApiData) {
+      throw Boom.internal('Bank details not found in session')
+    }
+
+    const translatedSortCode = translateBankDetails(
+      bankApiData.sortCode,
+      translations
+    )
+    const translatedAccountNumber = translateBankDetails(
+      bankApiData.accountNumber,
+      translations
+    )
     if (!bankApiData) {
       throw Boom.internal('Bank details not found in session')
     }
@@ -33,7 +46,9 @@ export const bankDetailsController = {
         }
       ],
       bankApiData,
-      userPermissions
+      userPermissions,
+      translatedSortCode,
+      translatedAccountNumber
     })
   }
 }
