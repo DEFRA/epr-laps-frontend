@@ -429,6 +429,17 @@ describe('#postBankDetailsController', () => {
     )
     expect(result).toBe('redirected')
   })
+
+  it('should redirect to /update-bank-details if ConfirmedBankDetails is missing', async () => {
+    request.yar.get = vi.fn().mockReturnValue(undefined)
+
+    const result = await postBankDetailsController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('ConfirmedBankDetails')
+    expect(h.redirect).toHaveBeenCalledWith('bank-details/update-bank-details')
+    expect(h.view).not.toHaveBeenCalled?.()
+    expect(result).toBe('redirected')
+  })
 })
 
 describe('#bankDetailsSubmittedController', () => {
