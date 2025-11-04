@@ -6,14 +6,10 @@ import { fileURLToPath } from 'node:url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const allowedLangs = new Set(['en', 'cy'])
-
 export const signOutController = {
   handler: (request, h) => {
     const langFromQuery = request.query?.lang?.trim().toLowerCase()
-    const currentLang = allowedLangs.has(langFromQuery)
-      ? langFromQuery
-      : request.yar?.get('lang') || 'en'
+    const currentLang = langFromQuery || request.yar?.get('lang') || 'en'
 
     // Load translations
     let translations = {}
