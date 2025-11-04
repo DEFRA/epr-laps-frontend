@@ -8,7 +8,8 @@ import {
   updateBankDetailsInfoController,
   getUpdateBankDetailsController,
   postUpdateBankDetailsController,
-  bankDetailsSubmittedController
+  bankDetailsSubmittedController,
+  translateBankDetails
 } from './controller.js'
 import Boom from '@hapi/boom'
 import { postWithToken, putWithToken } from '../auth/utils.js'
@@ -78,6 +79,26 @@ describe('#bankDetailsController', () => {
       isBoom: true,
       output: { statusCode: 500 }
     })
+  })
+})
+
+describe('translateBankDetails', () => {
+  const translations = { 'ending-with': 'ending with (translated)' }
+
+  it('returns empty string for falsy or non-string input', () => {
+    expect(translateBankDetails(null, translations)).toBe('')
+    expect(translateBankDetails(undefined, translations)).toBe('')
+    expect(translateBankDetails(12345678, translations)).toBe('')
+  })
+
+  it('returns trimmed value if "ending with" not present', () => {
+    expect(translateBankDetails(' 12-33-22 ', translations)).toBe('12-33-22')
+  })
+
+  it('replaces "ending with" with translation', () => {
+    const value = 'Sort code ending with 22'
+    const result = translateBankDetails(value, translations)
+    expect(result).toBe('Sort code ending with (translated) 22')
   })
 })
 
@@ -296,8 +317,8 @@ describe('#updateBankDetailsController', () => {
 
     const result = await postUpdateBankDetailsController.handler(request, h)
 
-    expect(h.redirect).toHaveBeenCalledWith('/check-bank-details')
-    expect(result).toBe('/check-bank-details')
+    expect(h.redirect).toHaveBeenCalledWith('bank-details/check-bank-details')
+    expect(result).toBe('bank-details/check-bank-details')
   })
 })
 
@@ -306,27 +327,67 @@ describe('#checkBankDetailsController', () => {
 
   beforeEach(() => {
     h = createH()
-    request = createRequest()
+    request = createRequest({
+      auth: {
+        credentials: {
+          displayName: 'XYZ',
+          organisationName: 'Defra Test'
+        }
+      },
+      yar: {
+        get: vi.fn().mockImplementation((key) => {
+          if (key === 'payload') {
+            return {
+              id: '12345-abcde-67890-fghij',
+              accountNumber: '094785923',
+              accountName: 'Defra Test',
+              sortCode: '09-03-023'
+            }
+          }
+        }),
+        set: vi.fn()
+      }
+    })
     vi.clearAllMocks()
   })
 
   it('should render the confirm bank details view with correct data', () => {
     const result = checkBankDetailsController.handler(request, h)
 
+    expect(request.yar.get).toHaveBeenCalledWith('payload')
+    expect(request.yar.set).toHaveBeenCalledWith(
+      'ConfirmedBankDetails',
+      expect.objectContaining({
+        id: '12345-abcde-67890-fghij',
+        accountNumber: '094785923',
+        accountName: 'Defra Test',
+        sortCode: '09-03-023',
+        requesterName: 'XYZ',
+        localAuthority: 'Defra Test'
+      })
+    )
+
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/check-bank-details.njk',
       expect.objectContaining({
         pageTitle: 'Confirm new bank account details',
         newBankDetails: expect.objectContaining({
-          id: '12345-abcde-67890-fghij',
-          accountNumber: '094785923',
-          accountName: 'Defra Test',
-          sortCode: '09-03-023',
-          requestedBy: 'Juhi'
+          requesterName: 'XYZ',
+          localAuthority: 'Defra Test'
         })
       })
     )
     expect(result).toBe('view-rendered')
+  })
+
+  it('should redirect to /update-bank-details if payload is missing', () => {
+    request.yar.get = vi.fn().mockReturnValue(undefined)
+
+    const result = checkBankDetailsController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('payload')
+    expect(h.redirect).toHaveBeenCalledWith('bank-details/update-bank-details')
+    expect(result).toBe('redirected')
   })
 })
 
@@ -335,11 +396,36 @@ describe('#postBankDetailsController', () => {
 
   beforeEach(() => {
     h = createH()
-    request = createRequest()
+    request = createRequest({
+      app: { currentLang: 'en' },
+      auth: {
+        credentials: {
+          displayName: 'Juhi',
+          organisationName: 'Defra Test'
+        }
+      },
+      yar: {
+        get: vi.fn((key) => {
+          if (key === 'ConfirmedBankDetails') {
+            return {
+              accountNumber: '094785923',
+              accountName: 'Defra Test',
+              sortCode: '09-03-023',
+              requesterName: 'Juhi',
+              localAuthority: 'Defra Test'
+            }
+          }
+        }),
+        set: vi.fn(),
+        clear: vi.fn()
+      },
+      logger: { info: vi.fn() }
+    })
+
     vi.clearAllMocks()
   })
 
-  it('should call postWithToken, set session flag, and redirect on success', async () => {
+  it('should call postWithToken, set session flag, clear session, and redirect on success', async () => {
     postWithToken.mockResolvedValue({})
 
     const result = await postBankDetailsController.handler(request, h)
@@ -351,10 +437,28 @@ describe('#postBankDetailsController', () => {
       requesterName: 'Juhi',
       localAuthority: 'Defra Test'
     })
+    expect(request.logger.info).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Bank details successfully posted for organisation'
+      )
+    )
     expect(request.yar.set).toHaveBeenCalledWith('bankDetailsSubmitted', true)
+    expect(request.yar.clear).toHaveBeenCalledWith('ConfirmedBankDetails')
+    expect(request.yar.clear).toHaveBeenCalledWith('payload')
     expect(h.redirect).toHaveBeenCalledWith(
       '/bank-details/bank-details-submitted?lang=en'
     )
+    expect(result).toBe('redirected')
+  })
+
+  it('should redirect to /update-bank-details if ConfirmedBankDetails is missing', async () => {
+    request.yar.get = vi.fn().mockReturnValue(undefined)
+
+    const result = await postBankDetailsController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('ConfirmedBankDetails')
+    expect(h.redirect).toHaveBeenCalledWith('bank-details/update-bank-details')
+    expect(h.view).not.toHaveBeenCalled?.()
     expect(result).toBe('redirected')
   })
 })

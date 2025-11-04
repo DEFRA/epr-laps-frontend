@@ -10,8 +10,7 @@
   "glamshire-count": "Glamshire County Council",
   "payment-documen": "Payment documents",
   "you-can-view-an": "You can view and download your:",
-  "estimated-grant": "estimated grant payment amounts for Extended Producer Responsibility (EPR) packaging",
-  "remittance-advi": "remittance advice with payment details",
+  "documents-relating": "documents relating to your grant finding, assessments and payments",
   "bank-details": "Bank details",
   "you-can:": "You can:",
   "view-bank-detai": "view bank details",
@@ -37,7 +36,7 @@
   "we'll-let-you-k": "We'll let you know once the update is complete",
   "email": "Email",
   "eprcustomerserv": "eprcustomerservice@defra.gov.uk",
-  "we-aim-to-respo": "We aim to respond within 20 working days.",
+  "we-aim-to-respo": "We aim to respond to your request within 5 working days but complex queries may take up to 20 days.",
   "telephone": "Telephone",
   "0300-060-0002": "0300 060 0002",
   "monday-to-frida": "Monday to Friday 8am to 4.30pm (closed on weekends and bank holidays)",
@@ -138,7 +137,8 @@
   "you-do": "You do not have permission to access this page.",
   "unauthorized": "Unauthorized",
   "you-need-to": "You need to sign in to view this page.",
-  "request-to-update-bank-details": "CEOs and Heads of Finance can submit a request to update local authority’s bank details",
+  "request-to-update-bank-details": "CEOs and Heads of Finance can",
+  "submit-a-request": "submit a request to update local authority’s bank details.",
   "request-bank-details-update": "Request to update local authority bank details",
   "confirm-new-details": "Confirm new bank account details",
   "requested-by": "Requested by",
@@ -169,5 +169,5 @@
   "accountNumberDigits": "Enter a valid account number like 12345678",
   "accountNumberMin": "Account number must be at least 6 digits long",
   "accountNumberMax": "Account number must be no more than 8 digits long",
-  "here": "here"
+  "ending-with": "ending with"
 }

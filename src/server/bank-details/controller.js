@@ -38,6 +38,31 @@ export const bankDetailsController = {
   }
 }
 
+/**
+ * Formats a bank detail (sort code or account number) for display.
+ *
+ * - Shows the full value as-is unless it already includes "ending with".
+ * - Only translates "ending with" if it exists in the string.
+ *
+ * @param {string} value - The raw sort code or account number.
+ * @param {object} translations - The translations object (must include "ending-with").
+ * @returns {string} Formatted string suitable for UI display.
+ */
+export function translateBankDetails(value, translations) {
+  if (!value || typeof value !== 'string') {
+    return ''
+  }
+
+  const trimmed = value.trim()
+  const endingWithTranslation = translations['ending-with']
+
+  if (/ending with/i.test(trimmed)) {
+    return trimmed.replace(/ending with/i, endingWithTranslation)
+  }
+
+  return trimmed
+}
+
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
     const bankApiData = request.yar.get('bankDetails')
@@ -109,17 +134,18 @@ export const bankDetailsSubmittedController = {
   }
 }
 
-const accountName = 'Defra Test'
 export const checkBankDetailsController = {
-  handler: (_request, h) => {
-    // TODO: Get this from where previous page saved it
-    const newBankDetails = {
-      id: '12345-abcde-67890-fghij',
-      accountNumber: '094785923',
-      accountName,
-      sortCode: '09-03-023',
-      requestedBy: 'Juhi'
+  handler: (request, h) => {
+    const newBankDetails = request.yar.get('payload')
+
+    if (!newBankDetails) {
+      return h.redirect('bank-details/update-bank-details')
     }
+
+    newBankDetails.requesterName = request.auth.credentials.displayName
+    newBankDetails.localAuthority = request.auth.credentials.organisationName
+
+    request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
       newBankDetails
@@ -129,17 +155,15 @@ export const checkBankDetailsController = {
 
 export const postBankDetailsController = {
   handler: async (request, h) => {
-    // TODO: Get payload from previous page
     const { currentLang } = request.app
+    const payload = request.yar.get('ConfirmedBankDetails')
+
+    if (!payload) {
+      return h.redirect('bank-details/update-bank-details')
+    }
 
     // Make your API call
-    await authUtils.postWithToken(request, '/bank-details', {
-      accountNumber: '094785923',
-      accountName,
-      sortCode: '09-03-023',
-      requesterName: 'Juhi',
-      localAuthority: request.auth.credentials.organisationName
-    })
+    await authUtils.postWithToken(request, '/bank-details', payload)
 
     request.logger.info(
       `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
@@ -147,6 +171,9 @@ export const postBankDetailsController = {
 
     // Set session flag to allow access to submitted page
     request.yar.set('bankDetailsSubmitted', true)
+
+    request.yar.clear('ConfirmedBankDetails')
+    request.yar.clear('payload')
 
     // Redirect on success
     return h.redirect(
@@ -260,10 +287,10 @@ export const postUpdateBankDetailsController = {
         .takeover()
     }
 
-    request.yar.clear('payload')
+    request.yar.set('payload', payload)
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    return h.redirect('/check-bank-details')
+    return h.redirect('bank-details/check-bank-details')
   }
 }

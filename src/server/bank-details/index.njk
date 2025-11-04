@@ -75,7 +75,7 @@
         text: translations['sort-code'] 
       },
       {
-        text: bankApiData.sortCode
+        text: translatedSortCode
       }
     ],
     [
@@ -83,7 +83,7 @@
         text: translations['account-number']
       },
       {
-        text: bankApiData.accountNumber
+        text: translatedAccountNumber
       }
     ]
   ]
@@ -98,8 +98,8 @@
   <p>
    {{ translations['request-to-update-bank-details'] }}
     <a class="govuk-link" href="/update-bank-details-info?lang={{ currentLang }}">
-    {{ translations['here'] }}
-     </a>.
+    {{ translations['submit-a-request'] }}
+     </a>
    </p>
 
     <p><strong>{{ translations['email'] }}</strong><br>
