@@ -22,7 +22,7 @@ export const signOutController = {
       )
       translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
     } catch (err) {
-      console.error(
+      request.logger.error(
         `Failed to load translations for "${currentLang}":`,
         err.message
       )

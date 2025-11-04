@@ -4,6 +4,7 @@ import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
 import { signOutController } from './controller.js'
 import { removeUserSession } from '../common/helpers/auth/utils.js'
+import fs from 'fs'
 
 vi.mock('../common/helpers/auth/get-oidc-config.js')
 
@@ -108,6 +109,66 @@ describe('#signOutController', () => {
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
       currentLang: 'en',
       translations: expect.any(Object)
+    })
+  })
+
+  it('should default to "en" when no lang provided in query or session', async () => {
+    const request = {
+      query: {},
+      yar: { get: vi.fn().mockReturnValue(undefined) },
+      state: {}
+    }
+
+    await signOutController.handler(request, mockedResponse)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
+      currentLang: 'en',
+      translations: expect.any(Object)
+    })
+  })
+
+  it('should read translation file from expected path', async () => {
+    const fsSpy = vi
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue(JSON.stringify({ key: 'value' }))
+
+    const request = {
+      query: { lang: 'es' },
+      yar: { get: vi.fn() },
+      state: {}
+    }
+
+    await signOutController.handler(request, mockedResponse)
+
+    expect(fsSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/client\/common\/locales\/es\/translation\.json$/),
+      'utf8'
+    )
+
+    fsSpy.mockRestore()
+  })
+
+  it('should handle missing translation file gracefully and log error', async () => {
+    const request = {
+      query: { lang: 'de' },
+      yar: { get: vi.fn() },
+      state: {},
+      logger: { error: vi.fn() }
+    }
+
+    vi.spyOn(fs, 'readFileSync').mockImplementation(() => {
+      throw new Error('File not found')
+    })
+
+    await signOutController.handler(request, mockedResponse)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      'Failed to load translations for "de":',
+      'File not found'
+    )
+    expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
+      currentLang: 'de',
+      translations: {}
     })
   })
 })
