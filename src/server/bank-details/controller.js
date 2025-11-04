@@ -109,17 +109,13 @@ export const bankDetailsSubmittedController = {
   }
 }
 
-const accountName = 'Defra Test'
 export const checkBankDetailsController = {
-  handler: (_request, h) => {
-    // TODO: Get this from where previous page saved it
-    const newBankDetails = {
-      id: '12345-abcde-67890-fghij',
-      accountNumber: '094785923',
-      accountName,
-      sortCode: '09-03-023',
-      requestedBy: 'Juhi'
-    }
+  handler: (request, h) => {
+    const newBankDetails = request.yar.get('payload')
+    newBankDetails.requesterName = request.auth.credentials.displayName
+    newBankDetails.localAuthority = request.auth.credentials.organisationName
+
+    request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
       newBankDetails
@@ -129,17 +125,11 @@ export const checkBankDetailsController = {
 
 export const postBankDetailsController = {
   handler: async (request, h) => {
-    // TODO: Get payload from previous page
     const { currentLang } = request.app
+    const payload = request.yar.get('ConfirmedBankDetails')
 
     // Make your API call
-    await authUtils.postWithToken(request, '/bank-details', {
-      accountNumber: '094785923',
-      accountName,
-      sortCode: '09-03-023',
-      requesterName: 'Juhi',
-      localAuthority: request.auth.credentials.organisationName
-    })
+    await authUtils.postWithToken(request, '/bank-details', payload)
 
     request.logger.info(
       `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
@@ -147,6 +137,9 @@ export const postBankDetailsController = {
 
     // Set session flag to allow access to submitted page
     request.yar.set('bankDetailsSubmitted', true)
+
+    request.yar.clear('ConfirmedBankDetails')
+    request.yar.clear('payload')
 
     // Redirect on success
     return h.redirect(
@@ -260,10 +253,10 @@ export const postUpdateBankDetailsController = {
         .takeover()
     }
 
-    request.yar.clear('payload')
+    request.yar.set('payload', payload)
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    return h.redirect('/check-bank-details')
+    return h.redirect('bank-details/check-bank-details')
   }
 }
