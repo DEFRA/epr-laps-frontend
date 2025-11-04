@@ -45,7 +45,8 @@ describe('#signOutController', () => {
       app: {
         translations: { 'local-authority': 'Mocked Local Authority' },
         currentLang: 'en'
-      }
+      },
+      yar: { set: vi.fn(), get: vi.fn() }
     }
     const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
@@ -63,44 +64,50 @@ describe('#signOutController', () => {
       app: {
         translations: { 'local-authority': 'Mocked Local Authority' },
         currentLang: 'en'
-      }
+      },
+      yar: { set: vi.fn(), get: vi.fn().mockReturnValue('en') }
     }
 
     await signOutController.handler(mockRequest, mockedResponse)
 
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
-      pageTitle: 'Sign out',
-      heading: 'Glamshire County Council'
+      currentLang: 'en',
+      translations: expect.any(Object)
     })
   })
 
   it('should call removeUserSession if userSession exists', async () => {
     const request = {
       state: { userSession: { userId: '123' } },
-      auth: { credentials: { userId: '123' } }
+      auth: { credentials: { userId: '123' } },
+      yar: { get: vi.fn().mockReturnValue('en'), set: vi.fn() }
     }
 
     await signOutController.handler(request, mockedResponse)
 
     expect(removeUserSession).toHaveBeenCalledWith(
       request,
-      request.auth.credentials
+      request.state.userSession
     )
+
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
-      pageTitle: 'Sign out',
-      heading: 'Glamshire County Council'
+      currentLang: 'en',
+      translations: expect.any(Object)
     })
   })
 
   it('should not call removeUserSession if userSession is missing', async () => {
-    const request = { state: {} }
+    const request = {
+      state: {},
+      yar: { get: vi.fn().mockReturnValue('en') }
+    }
 
     await signOutController.handler(request, mockedResponse)
 
     expect(removeUserSession).not.toHaveBeenCalled()
     expect(mockedResponse.view).toHaveBeenCalledWith('sign-out/index.njk', {
-      pageTitle: 'Sign out',
-      heading: 'Glamshire County Council'
+      currentLang: 'en',
+      translations: expect.any(Object)
     })
   })
 })
