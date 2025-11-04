@@ -168,5 +168,20 @@
   "accountNumberEmpty": "Enter the account number",
   "accountNumberDigits": "Enter a valid account number like 12345678",
   "accountNumberMin": "Account number must be at least 6 digits long",
-  "accountNumberMax": "Account number must be no more than 8 digits long"
+  "accountNumberMax": "Account number must be no more than 8 digits long",
+  "cookies-on-laps": "Cookies on Local Authority Payments",
+  "we-use-essential-cookies": "We use some essential cookies to make this service work.",
+  "view-cookies": "View cookies",
+  "cookie-heading": "Cookies",
+  "what-are-cookies": "Cookies are small files saved on your phone, tablet or computer when you visit a website.",
+  "why-use-cookies": "We use cookies to make this site work and collect information about how you use our service.",
+  "essential-cookies": "Essential cookies",
+  "what-essential-cookies-do": "Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.",
+  "essential-cookies-used": "Essential cookies we use",
+  "name": "Name",
+  "purpose": "Purpose",
+  "expires": "Expires",
+  "session-cookie-use": "Used to keep you signed in",
+  "user-session-cookie-use": "Used when user authenticates with our app and its used to store authenticated user information",
+  "hours": "hours"
 }
