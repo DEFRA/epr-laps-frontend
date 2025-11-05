@@ -12,6 +12,18 @@ export const cookies = {
             auth: false
           },
           ...cookiesController
+        },
+        {
+          method: 'POST',
+          path: '/cookies/hide',
+          options: {
+            auth: false
+          },
+          handler: (request, h) => {
+            return h
+              .redirect(request.info.referrer || '/')
+              .state('hideBanner', 'true')
+          }
         }
       ])
     }

@@ -59,6 +59,20 @@ export async function createServer() {
     }
   })
 
+  server.state('hideBanner', {
+    ttl: 365 * 24 * 60 * 60 * 1000, // 1 year
+    isSecure: process.env.NODE_ENV === 'production',
+    isHttpOnly: false,
+    path: '/'
+  })
+
+  server.ext('onPreHandler', (request, h) => {
+    request.app.cookies = {
+      hideBanner: request.state.hideBanner === 'true'
+    }
+    return h.continue
+  })
+  
   server.app.cache = server.cache({
     cache: 'session',
     expiresIn: config.get('redis.ttl'),
