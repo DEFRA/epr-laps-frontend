@@ -304,6 +304,34 @@ export const config = convict({
     format: String,
     default: 'EPRCustomerService@defra.gov.uk',
     env: 'CUSTOMER_SERVICE_EMAIL'
+  },
+  cookies: {
+    hideBanner: {
+      ttl: {
+        doc: 'TTL for hideBanner cookie (milliseconds)',
+        format: Number,
+        default: 365 * 24 * 60 * 60 * 1000,
+        env: 'HIDE_BANNER_COOKIE_TTL'
+      },
+      secure: {
+        doc: 'Whether the hideBanner cookie is secure (HTTPS only)',
+        format: Boolean,
+        default: isProduction,
+        env: 'HIDE_BANNER_COOKIE_SECURE'
+      },
+      httpOnly: {
+        doc: 'Whether the hideBanner cookie is HTTP-only',
+        format: Boolean,
+        default: false,
+        env: 'HIDE_BANNER_COOKIE_HTTP_ONLY'
+      },
+      path: {
+        doc: 'Path for which the hideBanner cookie applies',
+        format: String,
+        default: '/',
+        env: 'HIDE_BANNER_COOKIE_PATH'
+      }
+    }
   }
 })
 

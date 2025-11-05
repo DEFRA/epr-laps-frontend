@@ -60,10 +60,10 @@ export async function createServer() {
   })
 
   server.state('hideBanner', {
-    ttl: 365 * 24 * 60 * 60 * 1000, // 1 year
-    isSecure: process.env.NODE_ENV === 'production',
-    isHttpOnly: false,
-    path: '/'
+    ttl: config.get('cookies.hideBanner.ttl'),
+    isSecure: config.get('cookies.hideBanner.secure'),
+    isHttpOnly: config.get('cookies.hideBanner.httpOnly'),
+    path: config.get('cookies.hideBanner.path')
   })
 
   server.ext('onPreHandler', (request, h) => {
@@ -72,7 +72,7 @@ export async function createServer() {
     }
     return h.continue
   })
-  
+
   server.app.cache = server.cache({
     cache: 'session',
     expiresIn: config.get('redis.ttl'),
