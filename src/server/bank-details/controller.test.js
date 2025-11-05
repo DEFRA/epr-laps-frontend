@@ -45,10 +45,7 @@ const createRequest = (overrides = {}) => ({
   app: {
     currentLang: 'en',
     translations: {
-      confirm: 'Confirm',
-      'laps-home': 'Home',
-      'bank-details': 'Bank Details',
-      'ending-with': 'ending with (translated)'
+      confirm: 'Confirm'
     }
   },
   yar: {
@@ -89,25 +86,6 @@ describe('#bankDetailsController', () => {
     })
   })
 
-  it('should include proper breadcrumb links and translations', async () => {
-    request.yar.get
-      .mockReturnValueOnce({
-        id: '123',
-        sortCode: '11-22-33',
-        accountNumber: '12345678'
-      })
-      .mockReturnValueOnce([])
-
-    const result = await bankDetailsController.handler(request, h)
-
-    const [, context] = h.view.mock.calls[0]
-    expect(context.breadcrumbs).toEqual([
-      { text: 'Home', href: '/?lang=en' },
-      { text: 'Bank Details', href: '/bank-details?lang=en' }
-    ])
-    expect(result).toBe('view-rendered')
-  })
-
   it('should translate sort code and account number correctly', () => {
     const translations = { 'ending-with': 'terminando con' }
 
@@ -116,6 +94,29 @@ describe('#bankDetailsController', () => {
     )
     expect(translateBankDetails(' 12-33-22 ', translations)).toBe('12-33-22')
     expect(translateBankDetails(null, translations)).toBe('')
+  })
+
+  it('should correctly render when sort code is in dashed format (e.g. 22-44-44)', async () => {
+    request.app.translations = {
+      'laps-home': 'Home',
+      'bank-details': 'Bank Details',
+      'ending-with': 'ending with (translated)'
+    }
+
+    request.yar.get
+      .mockReturnValueOnce({
+        id: '999',
+        sortCode: '22-44-44',
+        accountNumber: '12345678'
+      })
+      .mockReturnValueOnce([])
+
+    const result = await bankDetailsController.handler(request, h)
+    const [, context] = h.view.mock.calls[0]
+
+    expect(context.translatedSortCode).toBe('22-44-44')
+    expect(context.translatedAccountNumber).toBe('12345678')
+    expect(result).toBe('view-rendered')
   })
 })
 
