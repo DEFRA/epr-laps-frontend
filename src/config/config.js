@@ -16,6 +16,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
 const oneDay = 1000 * 60 * 60 * 24
+const oneYear = 1000 * 60 * 60 * 24 * 365
 
 export const config = convict({
   serviceVersion: {
@@ -310,7 +311,7 @@ export const config = convict({
       ttl: {
         doc: 'TTL for hideBanner cookie (milliseconds)',
         format: Number,
-        default: 365 * 24 * 60 * 60 * 1000,
+        default: oneYear,
         env: 'HIDE_BANNER_COOKIE_TTL'
       },
       secure: {
