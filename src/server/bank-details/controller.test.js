@@ -42,7 +42,15 @@ const createRequest = (overrides = {}) => ({
     }
   },
   logger: { error: vi.fn(), info: vi.fn() },
-  app: { currentLang: 'en', translations: { confirm: 'Confirm' } },
+  app: {
+    currentLang: 'en',
+    translations: {
+      confirm: 'Confirm',
+      'laps-home': 'Home',
+      'bank-details': 'Bank Details',
+      'ending-with': 'ending with (translated)'
+    }
+  },
   yar: {
     get: vi.fn(),
     set: vi.fn(),
@@ -79,6 +87,35 @@ describe('#bankDetailsController', () => {
       isBoom: true,
       output: { statusCode: 500 }
     })
+  })
+
+  it('should include proper breadcrumb links and translations', async () => {
+    request.yar.get
+      .mockReturnValueOnce({
+        id: '123',
+        sortCode: '11-22-33',
+        accountNumber: '12345678'
+      })
+      .mockReturnValueOnce([])
+
+    const result = await bankDetailsController.handler(request, h)
+
+    const [, context] = h.view.mock.calls[0]
+    expect(context.breadcrumbs).toEqual([
+      { text: 'Home', href: '/?lang=en' },
+      { text: 'Bank Details', href: '/bank-details?lang=en' }
+    ])
+    expect(result).toBe('view-rendered')
+  })
+
+  it('should translate sort code and account number correctly', () => {
+    const translations = { 'ending-with': 'terminando con' }
+
+    expect(translateBankDetails('ending with 22', translations)).toBe(
+      'terminando con 22'
+    )
+    expect(translateBankDetails(' 12-33-22 ', translations)).toBe('12-33-22')
+    expect(translateBankDetails(null, translations)).toBe('')
   })
 })
 
