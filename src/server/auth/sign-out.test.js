@@ -32,9 +32,7 @@ describe('#signOutController', () => {
     getUserSession.mockReturnValueOnce(null)
     const mockedRequest = {
       auth: { credentials: {} },
-      logger: { info: vi.fn(), debug: vi.fn() },
-      app: { currentLang: 'en' },
-      yar: { set: vi.fn(), get: vi.fn() }
+      logger: { info: vi.fn(), debug: vi.fn() }
     }
     const mockedResponse = { redirect: vi.fn() }
 
@@ -52,9 +50,7 @@ describe('#signOutController', () => {
     const mockedRequest = {
       auth: { credentials: { sessionId: 'testSessionId' } },
       headers: { referer: 'http://localhost:3000/' },
-      logger: { info: vi.fn(), debug: vi.fn() },
-      app: { currentLang: 'en' },
-      yar: { set: vi.fn(), get: vi.fn() }
+      logger: { info: vi.fn(), debug: vi.fn() }
     }
 
     const mockedResponse = { redirect: vi.fn() }
