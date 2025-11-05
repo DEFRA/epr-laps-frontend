@@ -9,7 +9,7 @@ export const signOutController = {
   path: '/sign-out',
   handler: async (request, h) => {
     const userSession = await getUserSession(request, request.auth.credentials)
-
+    request.yar.set('lang', request.app.currentLang)
     if (!userSession) {
       request.logger.info('No active user session. Redirecting to home page')
       return h.redirect('/')
