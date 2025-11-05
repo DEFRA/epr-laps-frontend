@@ -15,8 +15,9 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
+const daysInYear = 365
 const oneDay = 1000 * 60 * 60 * 24
-const oneYear = oneDay * 365
+const oneYear = oneDay * daysInYear
 
 export const config = convict({
   serviceVersion: {
