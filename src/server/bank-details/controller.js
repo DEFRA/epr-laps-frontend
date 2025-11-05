@@ -123,9 +123,11 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
-  handler: (_request, h) => {
+  handler: (request, h) => {
+    const currentLang = request.app.currentLang
     return h.view('bank-details/update-bank-details-info.njk', {
-      pageTitle: 'How it works'
+      pageTitle: 'How it works',
+      currentLang
     })
   }
 }

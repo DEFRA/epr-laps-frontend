@@ -207,7 +207,7 @@ describe('#updateBankDetailsInfoController', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/update-bank-details-info.njk',
-      { pageTitle: 'How it works' }
+      { pageTitle: 'How it works', currentLang: 'en' }
     )
     expect(result).toBe('view-rendered')
   })
