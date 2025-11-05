@@ -10,8 +10,7 @@
   "glamshire-count": "Cyngor Sir Forgannwg",
   "payment-documen": "Dogfennau talu",
   "you-can-view-an": "Gallwch weld a lawrlwytho eich:",
-  "estimated-grant": "symiau taliadau grant amcangyfrifedig ar gyfer pecynnu Cyfrifoldeb Cynhyrchydd Estynedig (EPR)",
-  "remittance-advi": "cyngor trosglwyddo gyda manylion talu",
+  "documents-relating": "dogfennau sy'n ymwneud â'ch canfyddiad grant, asesiadau a thaliadau",
   "bank-details": "Manylion banc",
   "you-can:": "Gallwch chi:",
   "view-bank-detai": "gweld manylion banc",
@@ -38,7 +37,7 @@
   "we'll-let-you-k": "Rwy'n cadarnhau bod y manylion hyn yn gywir",
   "email": "Ebost",
   "eprcustomerserv": "gwasanaethcustomerepr@defra.gov.uk",
-  "we-aim-to-respo": "Ein nod yw ymateb o fewn 20 diwrnod gwaith.",
+  "we-aim-to-respo": "Ein nod yw ymateb i'ch cais o fewn 5 diwrnod gwaith ond gall ymholiadau cymhleth gymryd hyd at 20 diwrnod.",
   "telephone": "Ffon",
   "0300-060-0002": "eprcustomerservice@defra.gov.uk",
   "monday-to-frida": "Dydd Llun i ddydd Gwener 8am i 4.30pm (ar gau ar benwythnosau a gwyliau banc)",
@@ -145,7 +144,8 @@
   "you-do": "Nid oes gennych ganiatâd i gael mynediad i'r dudalen hon.",
   "unauthorized": "Anawdurdodedig",
   "you-need-to": "Mae angen i chi fewngofnodi i weld y dudalen hon.",
-  "request-to-update-bank-details": "Gall Prif Swyddogion Gweithredol a Phenaethiaid Cyllid gyflwyno cais i ddiweddaru manylion banc awdurdod lleol <a class=\"govuk-link\" href=\"/update-bank-details-info\">yma</a>.",
+  "request-to-update-bank-details": "Gall Prif Swyddogion Gweithredol a Phenaethiaid Cyllid",
+  "submit-a-request": "cyflwyno cais i ddiweddaru manylion banc yr awdurdod lleol.",
   "request-bank-details-update": "Cais i ddiweddaru manylion banc yr awdurdod lleol",
   "confirm-new-details": "Cadarnhewch fanylion cyfrif banc newydd",
   "requested-by": "Cais gan",
@@ -195,5 +195,6 @@
   "hours": "oriau",
   "days": "dyddiau",
   "years": "mlynedd",
-  "minutes": "munudau"
+  "minutes": "munudau",
+  "ending-with": "yn gorffen gyda"
 }
