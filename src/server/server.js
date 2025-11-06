@@ -59,16 +59,16 @@ export async function createServer() {
     }
   })
 
-  server.state('hideBanner', {
-    ttl: config.get('cookies.hideBanner.ttl'),
-    isSecure: config.get('cookies.hideBanner.secure'),
-    isHttpOnly: config.get('cookies.hideBanner.httpOnly'),
-    path: config.get('cookies.hideBanner.path')
+  server.state('cookie_policy', {
+    ttl: config.get('cookies.cookie_policy.ttl'),
+    isSecure: config.get('cookies.cookie_policy.secure'),
+    isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
+    path: config.get('cookies.cookie_policy.path')
   })
 
   server.ext('onPreHandler', (request, h) => {
     request.app.cookies = {
-      hideBanner: request.state.hideBanner === 'true'
+      cookie_policy: request.state.cookie_policy === 'true'
     }
     return h.continue
   })

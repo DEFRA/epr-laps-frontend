@@ -22,7 +22,7 @@ export const cookies = {
           handler: (request, h) => {
             return h
               .redirect(request.info.referrer || '/')
-              .state('hideBanner', 'true')
+              .state('cookie_policy', 'true')
           }
         }
       ])

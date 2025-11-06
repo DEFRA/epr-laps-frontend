@@ -308,27 +308,27 @@ export const config = convict({
     env: 'CUSTOMER_SERVICE_EMAIL'
   },
   cookies: {
-    hideBanner: {
+    cookie_policy: {
       ttl: {
-        doc: 'TTL for hideBanner cookie (milliseconds)',
+        doc: 'TTL for cookie_policy cookie (milliseconds)',
         format: Number,
         default: oneYear,
         env: 'HIDE_BANNER_COOKIE_TTL'
       },
       secure: {
-        doc: 'Whether the hideBanner cookie is secure (HTTPS only)',
+        doc: 'Whether the cookie_policy cookie is secure (HTTPS only)',
         format: Boolean,
         default: isProduction,
         env: 'HIDE_BANNER_COOKIE_SECURE'
       },
       httpOnly: {
-        doc: 'Whether the hideBanner cookie is HTTP-only',
+        doc: 'Whether the cookie_policy cookie is HTTP-only',
         format: Boolean,
         default: false,
         env: 'HIDE_BANNER_COOKIE_HTTP_ONLY'
       },
       path: {
-        doc: 'Path for which the hideBanner cookie applies',
+        doc: 'Path for which the cookie_policy cookie applies',
         format: String,
         default: '/',
         env: 'HIDE_BANNER_COOKIE_PATH'
