@@ -17,8 +17,12 @@ const cookiesController = {
       sessionCookieExpiry = sessionCookieExpiry.replace(regex, translated)
     }
 
+    const cookiePolicyExpiry = formatDuration(
+      config.get('cookies.cookie_policy.ttl')
+    )
     return h.view('cookies/index.njk', {
       sessionCookieExpiry,
+      cookiePolicyExpiry,
       currentPath: request.path
     })
   }
