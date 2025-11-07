@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block header %}
-  {% if not cookies.cookie_policy %}
+  {% if not cookies.cookie_preferences_set %}
     {% include "partials/cookie-banner.njk" %}
   {% endif %}
   {# serviceName being used in govukHeader will be @deprecated in v6. It has moved to govukServiceNavigation - https://github.com/alphagov/govuk-frontend/blob/main/CHANGELOG.md#move-service-name-and-navigation-links-from-the-govuk-header-to-service-navigation-component #}

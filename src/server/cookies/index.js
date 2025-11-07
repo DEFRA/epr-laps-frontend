@@ -22,7 +22,7 @@ export const cookies = {
           handler: (request, h) => {
             return h
               .redirect(request.info.referrer || '/')
-              .state('cookie_policy', 'true')
+              .state('cookie_preferences_set', 'true')
           }
         }
       ])

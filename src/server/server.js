@@ -59,7 +59,7 @@ export async function createServer() {
     }
   })
 
-  server.state('cookie_policy', {
+  server.state('cookie_preferences_set', {
     ttl: config.get('cookies.cookie_policy.ttl'),
     isSecure: config.get('cookies.cookie_policy.secure'),
     isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
@@ -68,7 +68,7 @@ export async function createServer() {
 
   server.ext('onPreHandler', (request, h) => {
     request.app.cookies = {
-      cookie_policy: request.state.cookie_policy === 'true'
+      cookie_preferences_set: request.state.cookie_preferences_set === 'true'
     }
     return h.continue
   })
