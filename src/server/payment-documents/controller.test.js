@@ -115,7 +115,7 @@ describe('paymentDocumentsController', () => {
   })
 
   it('returns empty array if documentApiData is null', () => {
-    const result = buildFinancialYearOptions(null, {}, null, '2023-to-2024')
+    const result = buildFinancialYearOptions(null, {}, '2023-to-2024')
     expect(result).toEqual([])
   })
 
@@ -123,7 +123,6 @@ describe('paymentDocumentsController', () => {
     const result = buildFinancialYearOptions(
       'not-an-object',
       {},
-      null,
       '2023-to-2024'
     )
     expect(result).toEqual([])

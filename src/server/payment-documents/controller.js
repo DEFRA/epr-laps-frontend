@@ -31,12 +31,8 @@ export const paymentDocumentsController = {
     financialYearOptions = buildFinancialYearOptions(
       documentApiData,
       translations,
-      selectedYear,
       selectedYear
     )
-
-    console.log('selected', selectedYear)
-
     // Determine which year to show
     const yearToShow =
       selectedYear && documentApiData[selectedYear]
@@ -84,8 +80,7 @@ function getTranslationKey(documentName) {
 export function buildFinancialYearOptions(
   documentApiData,
   translations,
-  selectedYear,
-  currentFY
+  selectedYear
 ) {
   if (!documentApiData || typeof documentApiData !== 'object') {
     return []
@@ -95,7 +90,7 @@ export function buildFinancialYearOptions(
   return entries.map(([financialYear, _docs]) => ({
     value: financialYear,
     text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
-    selected: financialYear === (selectedYear || currentFY)
+    selected: financialYear === selectedYear
   }))
 }
 
