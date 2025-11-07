@@ -59,12 +59,12 @@ export async function createServer() {
     }
   })
 
-  server.state('cookie_preferences_set', {
-    ttl: config.get('cookies.cookie_policy.ttl'),
-    isSecure: config.get('cookies.cookie_policy.secure'),
-    isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
-    path: config.get('cookies.cookie_policy.path')
-  })
+  // server.state('cookie_preferences_set', {
+  //   ttl: config.get('cookies.cookie_policy.ttl'),
+  //   isSecure: config.get('cookies.cookie_policy.secure'),
+  //   isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
+  //   path: config.get('cookies.cookie_policy.path')
+  // })
 
   server.ext('onPreHandler', (request, h) => {
     request.app.cookies = {

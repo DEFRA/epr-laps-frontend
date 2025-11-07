@@ -1,5 +1,5 @@
 import { cookiesController } from './controller.js'
-
+import { setCookiePreference } from '../../server/common/helpers/cookies.js'
 export const cookies = {
   plugin: {
     name: 'cookies',
@@ -20,9 +20,7 @@ export const cookies = {
             auth: false
           },
           handler: (request, h) => {
-            return h
-              .redirect(request.info.referrer || '/')
-              .state('cookie_preferences_set', 'true')
+            return setCookiePreference(h, request)
           }
         }
       ])

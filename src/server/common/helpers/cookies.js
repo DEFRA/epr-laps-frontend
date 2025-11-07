@@ -22,3 +22,14 @@ export function setDefaultCookiePolicy(response) {
 
   return response
 }
+
+export function setCookiePreference(h, request) {
+  return h
+    .redirect(request.info.referrer || '/')
+    .state('cookie_preferences_set', 'true', {
+      ttl: config.get('cookies.cookie_policy.ttl'),
+      isSecure: config.get('cookies.cookie_policy.secure'),
+      isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
+      path: config.get('cookies.cookie_policy.path')
+    })
+}
