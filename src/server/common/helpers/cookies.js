@@ -27,6 +27,6 @@ export function setCookiePreference(h, request) {
       ttl: config.get('cookies.cookie_policy.ttl'),
       isSecure: config.get('cookies.cookie_policy.secure'),
       isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
-      path: config.get('cookies.cookie_policy.path')
+      path: '/'
     })
 }

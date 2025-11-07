@@ -313,25 +313,19 @@ export const config = convict({
         doc: 'TTL for cookie_policy cookie (milliseconds)',
         format: Number,
         default: oneYear,
-        env: 'HIDE_BANNER_COOKIE_TTL'
+        env: 'COOKIE_TTL'
       },
       secure: {
         doc: 'Whether the cookie_policy cookie is secure (HTTPS only)',
         format: Boolean,
         default: isProduction,
-        env: 'HIDE_BANNER_COOKIE_SECURE'
+        env: 'COOKIE_SECURE'
       },
       httpOnly: {
         doc: 'Whether the cookie_policy cookie is HTTP-only',
         format: Boolean,
         default: false,
-        env: 'HIDE_BANNER_COOKIE_HTTP_ONLY'
-      },
-      path: {
-        doc: 'Path for which the cookie_policy cookie applies',
-        format: String,
-        default: '/',
-        env: 'HIDE_BANNER_COOKIE_PATH'
+        env: 'COOKIE_HTTP_ONLY'
       }
     }
   }
