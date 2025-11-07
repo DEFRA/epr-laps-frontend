@@ -1,5 +1,6 @@
 import { setDefaultCookiePolicy } from './cookies.js'
 import { config } from '../../../config/config.js'
+import { vi, describe, test, beforeEach, expect } from 'vitest'
 
 vi.mock('../../../config/config.js', () => ({
   config: {
@@ -32,16 +33,18 @@ describe('setDefaultCookiePolicy', () => {
     )
   })
 
-  test('should handle when hOrResponse is a toolkit with a response() method', () => {
+  test('should handle when toolkit is passed with response() method', () => {
     const mockState = vi.fn()
     const mockResponse = { state: mockState }
-    const mockToolkit = { response: vi.fn(() => mockResponse) }
+    const mockToolkit = {
+      response: vi.fn(() => mockResponse)
+    }
 
     config.get.mockReturnValue(654321)
 
-    const result = setDefaultCookiePolicy(mockToolkit)
+    const result = setDefaultCookiePolicy(mockToolkit.response())
 
-    expect(mockToolkit.response).toHaveBeenCalled()
+    expect(mockToolkit.response).toHaveBeenCalledTimes(1)
     expect(mockState).toHaveBeenCalledWith(
       'cookie_policy',
       JSON.stringify({
