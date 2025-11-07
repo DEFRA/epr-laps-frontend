@@ -6,21 +6,18 @@ import { config } from '../../../config/config.js'
  * @param {ResponseObject} response
  * @returns {ResponseObject}
  */
-export function setDefaultCookiePolicy(response) {
-  response.state(
-    'cookie_policy',
-    JSON.stringify({
-      essential: true,
-      settings: false,
-      usage: false,
-      campaigns: false
-    }),
-    {
-      maxAge: config.get('cookies.cookie_policy.ttl')
-    }
-  )
 
-  return response
+export function setDefaultCookiePolicy(response) {
+  const cookiesPolicy = {
+    essential: true,
+    settings: false,
+    usage: false,
+    campaigns: false
+  }
+  response.state('cookie_policy', cookiesPolicy, {
+    encoding: 'base64json',
+    maxAge: config.get('cookies.cookie_policy.ttl')
+  })
 }
 
 export function setCookiePreference(h, request) {

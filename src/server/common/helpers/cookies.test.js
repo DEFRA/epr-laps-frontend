@@ -23,13 +23,13 @@ describe('setDefaultCookiePolicy', () => {
 
     expect(mockState).toHaveBeenCalledWith(
       'cookie_policy',
-      JSON.stringify({
+      {
         essential: true,
         settings: false,
         usage: false,
         campaigns: false
-      }),
-      { maxAge: 123456 }
+      },
+      { encoding: 'base64json', maxAge: 123456 }
     )
   })
 
@@ -42,20 +42,21 @@ describe('setDefaultCookiePolicy', () => {
 
     config.get.mockReturnValue(654321)
 
-    const result = setDefaultCookiePolicy(mockToolkit.response())
+    const responseFromToolkit = mockToolkit.response()
+    setDefaultCookiePolicy(responseFromToolkit)
 
     expect(mockToolkit.response).toHaveBeenCalledTimes(1)
     expect(mockState).toHaveBeenCalledWith(
       'cookie_policy',
-      JSON.stringify({
+      {
         essential: true,
         settings: false,
         usage: false,
         campaigns: false
-      }),
-      { maxAge: 654321 }
+      },
+      { encoding: 'base64json', maxAge: 654321 }
     )
-    expect(result).toBe(mockResponse)
+    expect(responseFromToolkit).toBe(mockResponse)
   })
 
   test('should return the same response object passed in', () => {
@@ -63,6 +64,7 @@ describe('setDefaultCookiePolicy', () => {
     config.get.mockReturnValue(1000)
 
     const result = setDefaultCookiePolicy(mockResponse)
-    expect(result).toBe(mockResponse)
+
+    expect(result).toBeUndefined()
   })
 })
