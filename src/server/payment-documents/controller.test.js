@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   paymentDocumentsController,
   fileDownloadController,
-  buildFinancialYearOptions
+  buildFinancialYearOptions,
+  findSelectedOption
 } from './controller.js'
 import { fetchWithToken } from '../../server/auth/utils.js'
 import { statusCodes } from '../common/constants/status-codes.js'
@@ -38,7 +39,10 @@ describe('paymentDocumentsController', () => {
         }
       },
       logger: { info: vi.fn() },
-      payload: {}
+      payload: {},
+      yar: {
+        flash: vi.fn()
+      }
     }
 
     // Mock fetchWithToken to return two documents
@@ -74,6 +78,7 @@ describe('paymentDocumentsController', () => {
   })
 
   it('renders payment documents with correct rows', async () => {
+    request.yar.flash.mockReturnValueOnce(['2024 to 2025']).mockReturnValue()
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
@@ -82,6 +87,7 @@ describe('paymentDocumentsController', () => {
   })
 
   it('applies bold-row class only to documents within the last 30 days', async () => {
+    request.yar.flash.mockReturnValue([])
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
@@ -100,6 +106,7 @@ describe('paymentDocumentsController', () => {
     })
     request.method = 'get'
     request.app.currentLang = 'es'
+    request.yar.flash.mockReturnValue([])
 
     await paymentDocumentsController.handler(request, h)
 
@@ -188,5 +195,38 @@ describe('fileDownloadController', () => {
 
     const responseMock = h.response.mock.results[0].value
     expect(responseMock.code).toHaveBeenCalledWith(statusCodes.notFound)
+  })
+})
+
+describe('findSelectedOption', () => {
+  const request = {
+    yar: {
+      flash: vi.fn().mockReturnValue(['2022 to 2023'])
+    },
+    payload: {
+      sort: '2021 to 2022'
+    }
+  }
+
+  it('should return flash value when not post and flash exists', () => {
+    const result = findSelectedOption(false, request, {
+      currentFiscalYear: '2023 to 2024'
+    })
+    expect(result).toBe('2022 to 2023')
+  })
+
+  it('should return request payload when its a post request', () => {
+    const result = findSelectedOption(true, request, {
+      currentFiscalYear: '2023 to 2024'
+    })
+    expect(result).toBe('2021 to 2022')
+  })
+
+  it('should return current fiscal year when not post and no flash', () => {
+    request.yar.flash.mockReturnValueOnce([])
+    const result = findSelectedOption(false, request, {
+      currentFiscalYear: '2023 to 2024'
+    })
+    expect(result).toBe('2023 to 2024')
   })
 })

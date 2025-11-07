@@ -10,12 +10,10 @@ export const paymentDocumentsController = {
     const organisationName = request.auth.credentials.organisationName
 
     const isPost = request.method === 'post'
-    const selectedYear = isPost ? request.payload.sort : null
 
     let documentApiData = {}
     let rows = []
     let financialYearOptions = []
-    let currentFY = ''
     let warningText = ''
     const documentPath = `/documents/${request.auth.credentials.organisationId}`
     documentApiData = await fetchWithToken(request, documentPath)
@@ -25,17 +23,19 @@ export const paymentDocumentsController = {
     )
 
     // Build financial year dropdown
-    currentFY = documentApiData.currentFiscalYear
+    const selectedYear = findSelectedOption(isPost, request, documentApiData)
     warningText = translations['fy-warning-text']
-      ? translations['fy-warning-text'].replace('{year}', currentFY)
-      : `For the ${currentFY} financial year, there will be a single payment covering quarters 1 and 2.`
+      ? translations['fy-warning-text'].replace('{year}', selectedYear)
+      : `For the ${selectedYear} financial year, there will be a single payment covering quarters 1 and 2.`
 
     financialYearOptions = buildFinancialYearOptions(
       documentApiData,
       translations,
       selectedYear,
-      currentFY
+      selectedYear
     )
+
+    console.log('selected', selectedYear)
 
     // Determine which year to show
     const yearToShow =
@@ -50,6 +50,7 @@ export const paymentDocumentsController = {
     const docsToShow = docsByYear[langKey] || []
 
     rows = buildTableRows(docsToShow, translations)
+    request.yar.flash('selectedYear', selectedYear)
 
     return h.view('payment-documents/index.njk', {
       pageTitle: 'Payment documents',
@@ -66,7 +67,7 @@ export const paymentDocumentsController = {
       ],
       rows,
       financialYearOptions,
-      currentFY,
+      currentFY: documentApiData.currentFiscalYear,
       warningText
     })
   }
@@ -134,6 +135,14 @@ function buildTableRows(docsToShow, translations) {
       }
     ]
   })
+}
+
+export function findSelectedOption(isPost, request, documentApiData) {
+  const messages = request.yar.flash('selectedYear')
+  if (messages.length > 0 && !isPost) {
+    return messages[0]
+  }
+  return isPost ? request.payload.sort : documentApiData.currentFiscalYear
 }
 
 /**
