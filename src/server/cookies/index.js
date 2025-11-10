@@ -20,7 +20,8 @@ export const cookies = {
             auth: false
           },
           handler: (request, h) => {
-            return setCookiePreference(h, request)
+            const response = h.redirect(request.info.referrer || '/')
+            return setCookiePreference(response)
           }
         }
       ])

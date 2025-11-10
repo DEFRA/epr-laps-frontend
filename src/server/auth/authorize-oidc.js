@@ -31,8 +31,13 @@ export const authorizeOIDCController = {
 
     const response = h.redirect(redirect)
 
-    setDefaultCookiePolicy(response)
+    const defaultPolicy = {
+      essential: true,
+      settings: false,
+      usage: false,
+      campaigns: false
+    }
 
-    return response
+    return setDefaultCookiePolicy(response, defaultPolicy)
   }
 }

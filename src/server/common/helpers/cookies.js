@@ -7,26 +7,20 @@ import { config } from '../../../config/config.js'
  * @returns {ResponseObject}
  */
 
-export function setDefaultCookiePolicy(response) {
-  const cookiesPolicy = {
-    essential: true,
-    settings: false,
-    usage: false,
-    campaigns: false
-  }
+export function setDefaultCookiePolicy(response, cookiesPolicy) {
   response.state('cookie_policy', cookiesPolicy, {
     encoding: 'base64json',
     maxAge: config.get('cookies.cookie_policy.ttl')
   })
+  return response
 }
 
-export function setCookiePreference(h, request) {
-  return h
-    .redirect(request.info.referrer || '/')
-    .state('cookie_preferences_set', 'true', {
-      ttl: config.get('cookies.cookie_policy.ttl'),
-      isSecure: config.get('cookies.cookie_policy.secure'),
-      isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
-      path: '/'
-    })
+export function setCookiePreference(response) {
+  response.state('cookie_preferences_set', 'true', {
+    ttl: config.get('cookies.cookie_policy.ttl'),
+    isSecure: config.get('cookies.cookie_policy.secure'),
+    isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
+    path: '/'
+  })
+  return response
 }

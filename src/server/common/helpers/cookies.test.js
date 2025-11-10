@@ -13,24 +13,25 @@ describe('setDefaultCookiePolicy', () => {
     vi.clearAllMocks()
   })
 
+  const defaultPolicy = {
+    essential: true,
+    settings: false,
+    usage: false,
+    campaigns: false
+  }
+
   test('should call response.state with correct cookie name, value, and options', () => {
     const mockState = vi.fn()
     const mockResponse = { state: mockState }
 
     config.get.mockReturnValue(123456)
 
-    setDefaultCookiePolicy(mockResponse)
+    setDefaultCookiePolicy(mockResponse, defaultPolicy)
 
-    expect(mockState).toHaveBeenCalledWith(
-      'cookie_policy',
-      {
-        essential: true,
-        settings: false,
-        usage: false,
-        campaigns: false
-      },
-      { encoding: 'base64json', maxAge: 123456 }
-    )
+    expect(mockState).toHaveBeenCalledWith('cookie_policy', defaultPolicy, {
+      encoding: 'base64json',
+      maxAge: 123456
+    })
   })
 
   test('should handle when toolkit is passed with response() method', () => {
@@ -43,19 +44,13 @@ describe('setDefaultCookiePolicy', () => {
     config.get.mockReturnValue(654321)
 
     const responseFromToolkit = mockToolkit.response()
-    setDefaultCookiePolicy(responseFromToolkit)
+    setDefaultCookiePolicy(responseFromToolkit, defaultPolicy)
 
     expect(mockToolkit.response).toHaveBeenCalledTimes(1)
-    expect(mockState).toHaveBeenCalledWith(
-      'cookie_policy',
-      {
-        essential: true,
-        settings: false,
-        usage: false,
-        campaigns: false
-      },
-      { encoding: 'base64json', maxAge: 654321 }
-    )
+    expect(mockState).toHaveBeenCalledWith('cookie_policy', defaultPolicy, {
+      encoding: 'base64json',
+      maxAge: 654321
+    })
     expect(responseFromToolkit).toBe(mockResponse)
   })
 
@@ -63,8 +58,8 @@ describe('setDefaultCookiePolicy', () => {
     const mockResponse = { state: vi.fn() }
     config.get.mockReturnValue(1000)
 
-    const result = setDefaultCookiePolicy(mockResponse)
+    const result = setDefaultCookiePolicy(mockResponse, defaultPolicy)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe(mockResponse)
   })
 })
