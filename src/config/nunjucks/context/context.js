@@ -43,8 +43,9 @@ async function context(request) {
   const sessionTimer = config.get('sessionTimer') * 60 * 1000
 
   const cookies = {
-    cookie_preferences_set: request.state.cookie_preferences_set === true
+    cookie_preferences_set: !!request.state.cookie_preferences_set
   }
+
   return {
     authedUser,
     assetPath: `${assetPath}/assets`,

@@ -7,12 +7,17 @@ import { config } from '../../../config/config.js'
  * @returns {ResponseObject}
  */
 
-export function setDefaultCookiePolicy(response, cookiesPolicy) {
+export function setDefaultCookiePolicy(response) {
+  const cookiesPolicy = {
+    essential: true,
+    settings: false,
+    usage: false,
+    campaigns: false
+  }
   response.state('cookie_policy', cookiesPolicy, {
     encoding: 'base64json',
     maxAge: config.get('cookies.cookie_policy.ttl')
   })
-  return response
 }
 
 export function setCookiePreference(response) {

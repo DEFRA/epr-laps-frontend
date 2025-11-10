@@ -58,8 +58,8 @@ describe('setDefaultCookiePolicy', () => {
     const mockResponse = { state: vi.fn() }
     config.get.mockReturnValue(1000)
 
-    const result = setDefaultCookiePolicy(mockResponse, defaultPolicy)
+    const result = setDefaultCookiePolicy(mockResponse)
 
-    expect(result).toBe(mockResponse)
+    expect(result).toBeUndefined()
   })
 })
