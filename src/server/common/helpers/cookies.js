@@ -16,7 +16,8 @@ export function setDefaultCookiePolicy(response, cookiesPolicy) {
 }
 
 export function setCookiePreference(response) {
-  response.state('cookie_preferences_set', 'true', {
+  response.state('cookie_preferences_set', true, {
+    encoding: 'base64json',
     ttl: config.get('cookies.cookie_policy.ttl'),
     isSecure: config.get('cookies.cookie_policy.secure'),
     isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
