@@ -111,6 +111,9 @@ describe('context and cache', () => {
           },
           assetPath: '/public/assets',
           breadcrumbs: [],
+          cookies: {
+            cookie_preferences_set: false
+          },
           currentLang: 'en',
           getAssetPath: expect.any(Function),
           navigation: [

@@ -1,4 +1,5 @@
 import { setUserSession } from './utils.js'
+import { setDefaultCookiePolicy } from '../../server/common/helpers/cookies.js'
 
 export const authorizeOIDCController = {
   method: ['GET', 'POST'],
@@ -28,6 +29,10 @@ export const authorizeOIDCController = {
     )
     const redirect = request.yar.flash('referrer')?.at(0) ?? '/'
 
-    return h.redirect(redirect)
+    const response = h.redirect(redirect)
+
+    setDefaultCookiePolicy(response)
+
+    return response
   }
 }

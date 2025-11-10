@@ -11,6 +11,7 @@ import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
 import { timedOut } from './timed-out/index.js'
 import { noServiceRole } from './no-service-role/index.js'
+import { cookies } from './cookies/index.js'
 import Boom from '@hapi/boom'
 
 export const router = {
@@ -32,7 +33,8 @@ export const router = {
         timedOut,
         auth,
         defraAccount,
-        noServiceRole
+        noServiceRole,
+        cookies
       ])
 
       // Static assets
