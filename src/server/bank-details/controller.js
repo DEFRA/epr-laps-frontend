@@ -80,7 +80,16 @@ export function translateBankDetails(value, translations) {
 
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
+    const { translations } = request.app
     const bankApiData = request.yar.get('bankDetails')
+    const translatedSortCode = translateBankDetails(
+      bankApiData.sortCode,
+      translations
+    )
+    const translatedAccountNumber = translateBankDetails(
+      bankApiData.accountNumber,
+      translations
+    )
     if (!bankApiData) {
       request.logger.error('failed to load bank details in from cookie')
       throw Boom.internal('Bank Api Data not')
@@ -90,6 +99,8 @@ export const confirmBankDetailsController = {
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
+      translatedSortCode,
+      translatedAccountNumber,
       isContinueEnabled
     })
   }
