@@ -163,7 +163,7 @@ describe('#confirmBankDetailsController', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
-      {
+      expect.objectContaining({
         pageTitle: 'Confirm Bank Details',
         isContinueEnabled: false,
         bankApiData: {
@@ -171,9 +171,12 @@ describe('#confirmBankDetailsController', () => {
           accountName: 'Foo',
           sortCode: '00-00-00',
           accountNumber: '12345678'
-        }
-      }
+        },
+        translatedSortCode: '00-00-00',
+        translatedAccountNumber: '12345678'
+      })
     )
+
     expect(result).toBe('view-rendered')
   })
 })
