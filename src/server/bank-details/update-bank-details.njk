@@ -4,6 +4,13 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% set showBackLink = true %}
+{% set previousPage = request.headers.referer or '/update-bank-details-info' %}
+
+{% if '?' in previousPage %}
+  {% set backLinkUrl = previousPage + '&lang=' + currentLang %}
+{% else %}
+  {% set backLinkUrl = previousPage + '?lang=' + currentLang %}
+{% endif %}
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">

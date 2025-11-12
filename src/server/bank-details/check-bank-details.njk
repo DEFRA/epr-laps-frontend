@@ -1,6 +1,13 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set showBackLink = true %}
+{% set previousPage = request.headers.referer or '/update-bank-details' %}
+
+{% if '?' in previousPage %}
+  {% set backLinkUrl = previousPage + '&lang=' + currentLang %}
+{% else %}
+  {% set backLinkUrl = previousPage + '?lang=' + currentLang %}
+{% endif %}
 
 {% block pageTitle %}
   Check bank details
