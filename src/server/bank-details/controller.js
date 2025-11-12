@@ -80,16 +80,38 @@ export function translateBankDetails(value, translations) {
 
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
+    const currentLang =
+      request.query.lang || request.yar.get('currentLang') || 'en'
+
     const bankApiData = request.yar.get('bankDetails')
     if (!bankApiData) {
-      request.logger.error('failed to load bank details in from cookie')
-      throw Boom.internal('Bank Api Data not')
+      request.logger.error('failed to load bank details from session')
+      throw Boom.internal('Bank Api Data not found')
+    }
+
+    // Use session-stored last page for back link
+    let previousPage = request.yar.get('lastPage') || '/'
+
+    // Prevent loop
+    if (previousPage.includes('/bank-details/confirm')) {
+      previousPage = '/bank-details'
+    }
+    // Add current language
+    try {
+      const urlObj = new URL(previousPage, `http://${request.info.host}`)
+      urlObj.searchParams.set('lang', currentLang)
+      previousPage = urlObj.pathname + urlObj.search
+    } catch (err) {
+      previousPage = '/'
     }
 
     const isContinueEnabled = false
+
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
+      previousPage, // back link always from session
+      currentLang,
       isContinueEnabled
     })
   }

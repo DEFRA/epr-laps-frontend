@@ -3,24 +3,9 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+
 {% set showBackLink = true %}
-  {% set previousPage = request.headers.referer or request.query.from or '/bank-details' %}
-
-  {% if '/' in previousPage %}
-    {% set backLinkUrl = '/' %}
-  {% elif '/bank-details' in previousPage %}
-    {% set backLinkUrl = '/bank-details' %}
-  {% else %}
-    {% set backLinkUrl = '/bank-details' %}
-  {% endif %}
-
-  {# Add lang query safely #}
-  {% if '?' in backLinkUrl %}
-    {% set backLinkUrl = backLinkUrl + '&lang=' + currentLang %}
-  {% else %}
-    {% set backLinkUrl = backLinkUrl + '?lang=' + currentLang %}
-  {% endif %}
-
+{% set backLinkUrl = previousPage %}
 
 {% block content %}
 

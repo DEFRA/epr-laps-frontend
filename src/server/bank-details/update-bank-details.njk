@@ -4,7 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% set showBackLink = true %}
-{% set previousPage = request.headers.referer or '/update-bank-details-info' %}
+{% set previousPage = '/update-bank-details-info' %}
 
 {% if '?' in previousPage %}
   {% set backLinkUrl = previousPage + '&lang=' + currentLang %}
@@ -90,6 +90,7 @@
         text: translations['continue'],
         type: "submit"
       }) }}
+      </form>
                 </div>
             </div>
         </div>

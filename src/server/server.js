@@ -59,6 +59,29 @@ export async function createServer() {
     }
   })
 
+  server.ext('onPreHandler', (request, h) => {
+    const path = request.path
+
+    // Skip confirm page and other endpoints where we don't want to track last page
+    const skipPaths = ['/bank-details/confirm']
+
+    if (!skipPaths.some((p) => path.startsWith(p))) {
+      try {
+        // Strip lang so stored lastPage is clean
+        const urlObj = new URL(
+          path + (request.url.search || ''),
+          `http://${request.info.host}`
+        )
+        urlObj.searchParams.delete('lang')
+        request.yar.set('lastPage', urlObj.pathname + urlObj.search)
+      } catch (err) {
+        console.error('Failed to set lastPage in session:', err)
+      }
+    }
+
+    return h.continue
+  })
+
   server.app.cache = server.cache({
     cache: 'session',
     expiresIn: config.get('redis.ttl'),

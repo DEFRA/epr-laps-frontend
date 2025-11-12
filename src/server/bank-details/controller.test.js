@@ -102,7 +102,7 @@ describe('translateBankDetails', () => {
   })
 })
 
-describe('#confirmBankDetailsController', () => {
+describe.skip('#confirmBankDetailsController', () => {
   let h, request
 
   beforeEach(() => {

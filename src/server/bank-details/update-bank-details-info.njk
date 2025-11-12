@@ -2,7 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set showBackLink = true %}
-{% set previousPage = request.headers.referer or '/bank-details' %}
+{% set previousPage = '/bank-details' %}
 
 {% if '?' in previousPage %}
   {% set backLinkUrl = previousPage + '&lang=' + currentLang %}
@@ -33,6 +33,7 @@
           text: translations['continue'],
           href: "/update-bank-details"
         }) }}
+        
         </div>
        </legend>
       </div>
