@@ -63,10 +63,12 @@
   "view-(opens-in-": "Gweld (yn agor mewn tab newydd)",
   "change-orga": "Newid sefydliad",
   "laNames": {
-    "Glamshire County Council": "Cyngor Sir Forgannwg",
-    "Devon County Council": "Cyngor Sir Dyfnaint",
-    "Hertfordshire County Council": "Cyngor Sir Hertfordshire",
-    "West Sussex County Council": "Cyngor Sir Gorllewin Sussex"
+    "Powys County Council": "Cyngor Sir Powys",
+    "Gwynedd Council": "Cyngor Gwynedd",
+    "Cardiff Council": "Cyngor Caerdydd",
+    "Caerphilly County Borough Council": "Logo Cyngor Bwrdeistref Sirol Caerffili",
+    "Pembrokeshire council": "Cyngor Sir Benfro",
+    "Swansea council": "cyngor Abertawe"
   },
   "you-are-now": "Rydych chi bellach wedi allgofnodi o gyfrif Taliadau Awdurdod Lleol",
   "sign-in": "Mewngofnodwch",
