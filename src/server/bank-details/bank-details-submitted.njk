@@ -5,15 +5,16 @@
 
 {% block content %}
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+<div class="govuk-body">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-    {{ govukPanel({titleText: translations['new-bank-acc']}) }}
+      {{ govukPanel({titleText: translations['new-bank-acc']}) }}
 
-    <p>{{ translations['we-will-verify'] }}<br></p>
-    <p>{{ translations['you-will-receive-a-confirmation'] }}<br></p>
-    <a href='/bank-details' class='govuk-link'> {{ translations['go-to-bank-details'] }}</a>
+      <p>{{ translations['we-will-verify'] }}<br></p>
+      <p>{{ translations['you-will-receive-a-confirmation'] }}<br></p>
+      <a href='/bank-details' class='govuk-link'> {{ translations['go-to-bank-details'] }}</a>
+    </div>
   </div>
 </div>
-
 {% endblock %}
