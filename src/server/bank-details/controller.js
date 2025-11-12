@@ -189,6 +189,7 @@ export const postBankDetailsController = {
     }
 
     // Make your API call
+    payload.sortCode = payload.sortCode.replaceAll('-', '').replaceAll(' ', '')
     await authUtils.postWithToken(request, '/bank-details', payload)
 
     request.logger.info(
