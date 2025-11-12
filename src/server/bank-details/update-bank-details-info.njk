@@ -5,31 +5,31 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-form-group">
+        <form method="post" action="/bank-details/bank-details-confirmed">
+          <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+              <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
+              <h1 class="govuk-fieldset__heading">{{ translations['how-it-works'] }}</h1>
+            </legend>
 
-      <form method="post" action="/bank-details/bank-details-confirmed">
-        <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-            <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
-            <h1 class="govuk-fieldset__heading">{{ translations['how-it-works'] }}</h1>
-          </legend>
+            <div id="confirm-bank-details" class="govuk-hint">
+              <p class="govuk-body">{{ translations['we-need-your'] }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                <li>{{ translations['submit-your'] }}</li>
+                <li>{{ translations['we-will'] }}</li>
+                <li>{{ translations['you-will-receive'] }}</li>
+              </ul>
+            </div>
 
-          <div id="confirm-bank-details" class="govuk-hint">
-            <p class="govuk-body">{{ translations['we-need-your'] }}</p>
-            <ul class="govuk-list govuk-list--bullet">
-              <li>{{ translations['submit-your'] }}</li>
-              <li>{{ translations['we-will'] }}</li>
-              <li>{{ translations['you-will-receive'] }}</li>
-            </ul>
-          </div>
-
-          {{ govukButton({
-            text: translations['continue'],
-            href: "/update-bank-details?lang=" + currentLang,
-            type: "submit"
-          }) }}
-        </fieldset>
-      </form>
-
+            {{ govukButton({
+              text: translations['continue'],
+              href: "/update-bank-details?lang=" + currentLang,
+              type: "submit"
+            }) }}
+          </fieldset>
+        </form>
+      </div>
     </div>
   </div>
 {% endblock %}
