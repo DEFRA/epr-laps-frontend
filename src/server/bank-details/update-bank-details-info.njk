@@ -3,31 +3,32 @@
 {% set showBackLink = true %}
 
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <div class="govuk-form-group">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
       <form method="post" action="/bank-details/bank-details-confirmed">
         <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
+            <h1 class="govuk-fieldset__heading">{{ translations['how-it-works'] }}</h1>
+          </legend>
 
-            <span class="govuk-caption-xl"> {{ translations['request-to'] }} </span>
-            <h1 class="govuk-fieldset__heading">
-              {{ translations['how-it-works'] }}
-            </h1><br>
-             <p class="govuk-body">{{ translations['we-need-your'] }}</p>
-          <ul class="govuk-list govuk-list--bullet">
-          <li>{{ translations['submit-your'] }}</li>
-          <li>{{ translations['we-will'] }}</li>
-          <li>{{ translations['you-will-receive'] }}</li>
-        </ul>
+          <div id="confirm-bank-details" class="govuk-hint">
+            <p class="govuk-body">{{ translations['we-need-your'] }}</p>
+            <ul class="govuk-list govuk-list--bullet">
+              <li>{{ translations['submit-your'] }}</li>
+              <li>{{ translations['we-will'] }}</li>
+              <li>{{ translations['you-will-receive'] }}</li>
+            </ul>
+          </div>
 
-        {{ govukButton({
-          text: translations['continue'],
-          href: "/update-bank-details?lang=" + currentLang
-        }) }}
-        </div>
-       </legend>
-      </div>
-     </div>
+          {{ govukButton({
+            text: translations['continue'],
+            type: "submit"
+          }) }}
+        </fieldset>
+      </form>
+
     </div>
+  </div>
 {% endblock %}
