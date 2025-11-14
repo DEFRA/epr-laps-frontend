@@ -33,6 +33,9 @@ export const bankDetailsController = {
 
     request.logger.info('successfully fetched bank details from cookie')
 
+    // Track last page
+    request.yar.set('lastPage', `/bank-details?lang=${currentLang}`)
+
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       breadcrumbs: [
@@ -79,40 +82,33 @@ export function translateBankDetails(value, translations) {
 }
 
 export const confirmBankDetailsController = {
-  handler: async (request, h) => {
+  handler: (request, h) => {
     const currentLang =
       request.query.lang || request.yar.get('currentLang') || 'en'
-
     const bankApiData = request.yar.get('bankDetails')
+
     if (!bankApiData) {
-      request.logger.error('failed to load bank details from session')
+      request.logger.error('Bank Api Data not found in session')
       throw Boom.internal('Bank Api Data not found')
     }
 
-    // Use session-stored last page for back link
-    let previousPage = request.yar.get('lastPage') || '/'
+    // Use stored last page
+    const previousPage = request.yar.get('lastPage') || '/'
 
-    // Prevent loop
-    if (previousPage.includes('/bank-details/confirm')) {
-      previousPage = '/bank-details'
-    }
-    // Add current language
-    try {
-      const urlObj = new URL(previousPage, `http://${request.info.host}`)
-      urlObj.searchParams.set('lang', currentLang)
-      previousPage = urlObj.pathname + urlObj.search
-    } catch (err) {
-      previousPage = '/'
-    }
+    // Remove any existing lang query to avoid duplicates
+    const [path, query] = previousPage.split('?')
+    const queryParams = new URLSearchParams(query || '')
+    queryParams.set('lang', currentLang)
 
-    const isContinueEnabled = false
+    // Construct the final back link URL
+    const backLinkUrl = `${path}?${queryParams.toString()}`
 
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
-      previousPage, // back link always from session
+      previousPage: backLinkUrl,
       currentLang,
-      isContinueEnabled
+      isContinueEnabled: false
     })
   }
 }
