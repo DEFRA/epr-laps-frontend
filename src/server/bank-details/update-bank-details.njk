@@ -29,25 +29,12 @@
             <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
             <h1 class="govuk-fieldset__heading">{{ translations['new-bank'] }}</h1>
           </legend>
-
-          <div class="govuk-form-group govuk-!-margin-top-4">
-            <p class="govuk-body govuk-!-font-weight-regular">
-              {{ translations['requested-by'] }}
-            </p>
-            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
-              {{ authedUser.displayName }}
-            </p>
-          </div>
-
-          <div class="govuk-form-group">
-            <p class="govuk-body govuk-!-font-weight-regular">
-              {{ translations['local-authority-name'] }}
-            </p>
-            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
-              {{ authedUser.organisationName }}
-            </p>
-          </div>
-
+          <dl class="govuk-body govuk-!-margin-top-4">
+            <dt class="govuk-!-margin-bottom-2">{{ translations['requested-by'] }}</dt>
+              <dd class="govuk-!-margin-left-0 govuk-!-font-weight-bold govuk-!-margin-bottom-6">{{ authedUser.displayName }}</dd>
+            <dt class="govuk-!-margin-bottom-2">{{ translations['local-authority-name'] }}</dt>
+              <dd class="govuk-!-margin-left-0 govuk-!-font-weight-bold"> {{ authedUser.organisationName }}</dd>
+          </dl>
           {{ govukInput({
             label: { text: translations['account-name'] },
             id: "accountName",
