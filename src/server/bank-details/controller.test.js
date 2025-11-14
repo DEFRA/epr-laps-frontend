@@ -358,8 +358,10 @@ describe('#updateBankDetailsController', () => {
 
     const result = await postUpdateBankDetailsController.handler(request, h)
 
-    expect(h.redirect).toHaveBeenCalledWith('bank-details/check-bank-details')
-    expect(result).toBe('bank-details/check-bank-details')
+    expect(h.redirect).toHaveBeenCalledWith(
+      'bank-details/check-bank-details?lang=en'
+    )
+    expect(result).toBe('bank-details/check-bank-details?lang=en')
   })
 })
 
