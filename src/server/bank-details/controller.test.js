@@ -198,7 +198,14 @@ describe('#updateBankDetailsInfoController', () => {
 
   beforeEach(() => {
     h = createH()
-    request = createRequest()
+    request = {
+      ...createRequest(),
+      query: {},
+      yar: {
+        get: vi.fn(),
+        set: vi.fn()
+      }
+    }
     vi.clearAllMocks()
   })
 
@@ -207,7 +214,12 @@ describe('#updateBankDetailsInfoController', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/update-bank-details-info.njk',
-      { pageTitle: 'How it works' }
+      {
+        pageTitle: 'How it works',
+        currentLang: 'en',
+        previousPage: '/bank-details',
+        backLinkUrl: '/bank-details?lang=en'
+      }
     )
     expect(result).toBe('view-rendered')
   })

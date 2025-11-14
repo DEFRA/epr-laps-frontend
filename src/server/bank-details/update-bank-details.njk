@@ -4,13 +4,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% set showBackLink = true %}
-{% set previousPage = '/update-bank-details-info' %}
-
-{% if '?' in previousPage %}
-  {% set backLinkUrl = previousPage + '&lang=' + currentLang %}
-{% else %}
-  {% set backLinkUrl = previousPage + '?lang=' + currentLang %}
-{% endif %}
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -58,7 +51,7 @@
           {{ govukInput({
             label: { text: translations['sort-code'] },
             hint: { text: translations['must-be'] },
-            id: "sort-code",
+            id: "sortCode",
             name: "sortCode",
             inputmode: "numeric",
             value: payload.sortCode,
@@ -72,7 +65,7 @@
           {{ govukInput({
             label: { text: translations['account-number'] },
             hint: { text: translations['must-be-between'] },
-            id: "account-number",
+            id: "accountNumber",
             name: "accountNumber",
             inputmode: "numeric",
             value: payload.accountNumber,

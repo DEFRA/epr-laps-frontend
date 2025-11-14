@@ -145,9 +145,20 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
-  handler: (_request, h) => {
+  handler: (request, h) => {
+    const currentLang =
+      request.query.lang || request.yar.get('currentLang') || 'en'
+
+    const previousPage = '/bank-details'
+    const backLinkUrl = previousPage.includes('?')
+      ? `${previousPage}&lang=${currentLang}`
+      : `${previousPage}?lang=${currentLang}`
+
     return h.view('bank-details/update-bank-details-info.njk', {
-      pageTitle: 'How it works'
+      pageTitle: 'How it works',
+      previousPage,
+      currentLang,
+      backLinkUrl
     })
   }
 }
@@ -173,6 +184,13 @@ export const bankDetailsSubmittedController = {
 
 export const checkBankDetailsController = {
   handler: (request, h) => {
+    const { currentLang } = request.app
+
+    const previousPage = '/update-bank-details'
+    const backLinkUrl = previousPage.includes('?')
+      ? `${previousPage}&lang=${currentLang}`
+      : `${previousPage}?lang=${currentLang}`
+
     const newBankDetails = request.yar.get('payload')
 
     if (!newBankDetails) {
@@ -185,7 +203,9 @@ export const checkBankDetailsController = {
     request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
-      newBankDetails
+      newBankDetails,
+      previousPage,
+      backLinkUrl
     })
   }
 }
@@ -252,6 +272,12 @@ const buildSchema = (translations) =>
 export const getUpdateBankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
+
+    const previousPage = '/update-bank-details-info'
+    const backLinkUrl = previousPage.includes('?')
+      ? `${previousPage}&lang=${currentLang}`
+      : `${previousPage}?lang=${currentLang}`
+
     const payload = request.yar.get('payload') || {}
     const errors = {}
     const aggregatedErrors = []
@@ -285,7 +311,9 @@ export const getUpdateBankDetailsController = {
       errors,
       aggregatedErrors,
       currentLang,
-      translations
+      translations,
+      previousPage,
+      backLinkUrl
     })
   }
 }
@@ -293,6 +321,12 @@ export const getUpdateBankDetailsController = {
 export const postUpdateBankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
+
+    const previousPage = '/update-bank-details-info'
+    const backLinkUrl = previousPage.includes('?')
+      ? `${previousPage}&lang=${currentLang}`
+      : `${previousPage}?lang=${currentLang}`
+
     const payload = request.payload
     const schema = buildSchema(translations)
     const { error } = schema.validate(payload, { abortEarly: false })
@@ -319,7 +353,9 @@ export const postUpdateBankDetailsController = {
           errors,
           aggregatedErrors,
           currentLang,
-          translations
+          translations,
+          previousPage,
+          backLinkUrl
         })
         .takeover()
     }
