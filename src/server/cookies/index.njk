@@ -1,0 +1,56 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set showBackLink = true %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div>
+      <h1 class="govuk-heading-l"> {{ translations['cookie-heading'] }}</h1>
+      <p class="govuk-body"> {{ translations['what-are-cookies'] }} </p>
+      <p class="govuk-body">{{ translations['why-use-cookies'] }}</p>
+
+      <h2 class="govuk-heading-m">{{ translations['essential-cookies'] }}</h2>
+      <p class="govuk-body">{{ translations['what-essential-cookies-do'] }}</p>
+
+      {{ govukTable({
+        caption: translations['essential-cookies-used'],
+        captionClasses: "govuk-table__caption--s",
+        firstCellIsHeader: false,
+        head: [
+          { text: translations['name'] },
+          { text: translations['purpose'] },
+          { text: translations['expires'] }
+        ],
+        rows: [
+          [
+            { text: translations['session']},
+            { text: translations['session-cookie-use'] },
+            { text: sessionCookieExpiry }
+          ],
+          [
+            { text: translations['user-session'] },
+            { text: translations['user-session-cookie-use'] },
+            { text: sessionCookieExpiry }
+          ],
+          [
+            { text: translations['cookie-policy'] },
+            { text: translations['cookie_policy-cookie-use'] },
+            { text: cookiePolicyExpiry }
+          ],
+          [
+            { text: translations['cookie_preferences_set'] },
+            { text: translations['cookie_preferences_set_use'] },
+            { text: cookiePolicyExpiry }
+          ]
+        ]
+      }) }}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

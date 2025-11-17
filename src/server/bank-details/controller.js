@@ -82,10 +82,19 @@ export function translateBankDetails(value, translations) {
 }
 
 export const confirmBankDetailsController = {
-  handler: (request, h) => {
+  handler: async (request, h) => {
     const currentLang = request.query.lang || 'en'
     const bankApiData = request.yar.get('bankDetails')
-
+    const { translations } = request.app
+    const bankApiData = request.yar.get('bankDetails')
+    const translatedSortCode = translateBankDetails(
+      bankApiData.sortCode,
+      translations
+    )
+    const translatedAccountNumber = translateBankDetails(
+      bankApiData.accountNumber,
+      translations
+    )
     if (!bankApiData) {
       request.logger.error('Bank Api Data not found in session')
       throw Boom.internal('Bank Api Data not found')
@@ -105,6 +114,8 @@ export const confirmBankDetailsController = {
       previousPage: backLinkUrl,
       currentLang,
       isContinueEnabled: false
+      translatedSortCode,
+      translatedAccountNumber
     })
   }
 }

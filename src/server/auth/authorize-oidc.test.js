@@ -1,10 +1,15 @@
 import { authorizeOIDCController } from './authorize-oidc.js'
 import { setUserSession } from './utils.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
+import { setDefaultCookiePolicy } from '../../server/common/helpers/cookies.js'
 
 vi.mock('../common/helpers/auth/get-oidc-config.js')
 vi.mock('./utils.js', () => ({
   setUserSession: vi.fn()
+}))
+
+vi.mock('../../server/common/helpers/cookies.js', () => ({
+  setDefaultCookiePolicy: vi.fn()
 }))
 
 describe('#authorizeOIDCController', () => {
@@ -33,6 +38,7 @@ describe('#authorizeOIDCController', () => {
 
     await authorizeOIDCController.handler(mockRequest, mockedResponse)
     expect(mockedResponse.redirect).toHaveBeenCalledWith('/get-help')
+    expect(setDefaultCookiePolicy).toHaveBeenCalled()
   })
 
   test('should call setUserSession when user is authenticated', async () => {

@@ -15,7 +15,9 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 convict.addFormats(convictFormatWithValidator)
+const daysInYear = 365
 const oneDay = 1000 * 60 * 60 * 24
+const oneYear = oneDay * daysInYear
 
 export const config = convict({
   serviceVersion: {
@@ -304,6 +306,28 @@ export const config = convict({
     format: String,
     default: 'EPRCustomerService@defra.gov.uk',
     env: 'CUSTOMER_SERVICE_EMAIL'
+  },
+  cookies: {
+    cookie_policy: {
+      ttl: {
+        doc: 'TTL for cookie_policy cookie (milliseconds)',
+        format: Number,
+        default: oneYear,
+        env: 'COOKIE_TTL'
+      },
+      secure: {
+        doc: 'Whether the cookie_policy cookie is secure (HTTPS only)',
+        format: Boolean,
+        default: isProduction,
+        env: 'COOKIE_SECURE'
+      },
+      httpOnly: {
+        doc: 'Whether the cookie_policy cookie is HTTP-only',
+        format: Boolean,
+        default: false,
+        env: 'COOKIE_HTTP_ONLY'
+      }
+    }
   }
 })
 

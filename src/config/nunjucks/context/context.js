@@ -41,6 +41,11 @@ async function context(request) {
 
   const navigation = await buildNavigation(request)
   const sessionTimer = config.get('sessionTimer') * 60 * 1000
+
+  const cookies = {
+    cookie_preferences_set: request.state.cookie_preferences_set === 'true'
+  }
+
   return {
     authedUser,
     assetPath: `${assetPath}/assets`,
@@ -52,6 +57,7 @@ async function context(request) {
     navigation,
     sessionTimer,
     showBetaBanner: config.get('showBetaBanner'),
+    cookies,
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`

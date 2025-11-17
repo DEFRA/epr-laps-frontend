@@ -42,7 +42,12 @@ const createRequest = (overrides = {}) => ({
     }
   },
   logger: { error: vi.fn(), info: vi.fn() },
-  app: { currentLang: 'en', translations: { confirm: 'Confirm' } },
+  app: {
+    currentLang: 'en',
+    translations: {
+      confirm: 'Confirm'
+    }
+  },
   yar: {
     get: vi.fn(),
     set: vi.fn(),
@@ -79,6 +84,39 @@ describe('#bankDetailsController', () => {
       isBoom: true,
       output: { statusCode: 500 }
     })
+  })
+
+  it('should translate sort code and account number correctly', () => {
+    const translations = { 'ending-with': 'terminando con' }
+
+    expect(translateBankDetails('ending with 22', translations)).toBe(
+      'terminando con 22'
+    )
+    expect(translateBankDetails(' 12-33-22 ', translations)).toBe('12-33-22')
+    expect(translateBankDetails(null, translations)).toBe('')
+  })
+
+  it('should correctly render when sort code is in dashed format (e.g. 22-44-44)', async () => {
+    request.app.translations = {
+      'laps-home': 'Home',
+      'bank-details': 'Bank Details',
+      'ending-with': 'ending with (translated)'
+    }
+
+    request.yar.get
+      .mockReturnValueOnce({
+        id: '999',
+        sortCode: '22-44-44',
+        accountNumber: '12345678'
+      })
+      .mockReturnValueOnce([])
+
+    const result = await bankDetailsController.handler(request, h)
+    const [, context] = h.view.mock.calls[0]
+
+    expect(context.translatedSortCode).toBe('22-44-44')
+    expect(context.translatedAccountNumber).toBe('12345678')
+    expect(result).toBe('view-rendered')
   })
 })
 
@@ -136,7 +174,7 @@ describe('#confirmBankDetailsController', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
-      {
+      expect.objectContaining({
         pageTitle: 'Confirm Bank Details',
         isContinueEnabled: false,
         previousPage: '/bank-details?lang=en',
@@ -146,9 +184,12 @@ describe('#confirmBankDetailsController', () => {
           accountName: 'Foo',
           sortCode: '00-00-00',
           accountNumber: '12345678'
-        }
-      }
+        },
+        translatedSortCode: '00-00-00',
+        translatedAccountNumber: '12345678'
+      })
     )
+
     expect(result).toBe('view-rendered')
   })
 })

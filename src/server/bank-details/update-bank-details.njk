@@ -14,7 +14,7 @@
                     errorList: aggregatedErrors
                 }) }}
             {% endif %}
-            <form id="update-bank-form" method="post" action="/update-bank-details" class="govuk-form-group" novalidate>
+            <form id="update-bank-form" method="post" action="/update-bank-details?lang={{currentLang}}" class="govuk-form-group" novalidate>
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
