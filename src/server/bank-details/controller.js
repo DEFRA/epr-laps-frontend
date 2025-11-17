@@ -86,7 +86,6 @@ export const confirmBankDetailsController = {
     const currentLang = request.query.lang || 'en'
     const bankApiData = request.yar.get('bankDetails')
     const { translations } = request.app
-    const bankApiData = request.yar.get('bankDetails')
     const translatedSortCode = translateBankDetails(
       bankApiData.sortCode,
       translations
@@ -113,7 +112,7 @@ export const confirmBankDetailsController = {
       bankApiData,
       previousPage: backLinkUrl,
       currentLang,
-      isContinueEnabled: false
+      isContinueEnabled: false,
       translatedSortCode,
       translatedAccountNumber
     })
