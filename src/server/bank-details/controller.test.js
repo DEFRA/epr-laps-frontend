@@ -476,7 +476,7 @@ describe('#postBankDetailsController', () => {
     expect(postWithToken).toHaveBeenCalledWith(request, '/bank-details', {
       accountNumber: '094785923',
       accountName: 'Defra Test',
-      sortCode: '09-03-023',
+      sortCode: '0903023',
       requesterName: 'Juhi',
       localAuthority: 'Defra Test'
     })
