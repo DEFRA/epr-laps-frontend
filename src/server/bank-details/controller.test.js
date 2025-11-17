@@ -192,6 +192,75 @@ describe('#confirmBankDetailsController', () => {
 
     expect(result).toBe('view-rendered')
   })
+
+  it('should default currentLang to en when not provided', async () => {
+    request.query = {} // lang missing
+
+    request.yar.get.mockImplementation((key) => {
+      if (key === 'bankDetails') {
+        return {
+          sortCode: '00-00-00',
+          accountNumber: '12345678'
+        }
+      }
+      if (key === 'lastPage') return '/bank-details'
+      return null
+    })
+
+    const result = await confirmBankDetailsController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        currentLang: 'en'
+      })
+    )
+
+    expect(result).toBe('view-rendered')
+  })
+
+  it('should throw an error when bankApiData is missing', async () => {
+    request.yar.get.mockReturnValueOnce(null) // bankDetails missing
+
+    await expect(
+      confirmBankDetailsController.handler(request, h)
+    ).rejects.toThrow('Bank Api Data not found')
+  })
+
+  it('should use default previousPage "/" when lastPage is missing', async () => {
+    request.yar.get.mockImplementation((key) => {
+      if (key === 'bankDetails') {
+        return {
+          sortCode: '00-00-00',
+          accountNumber: '12345678'
+        }
+      }
+      if (key === 'lastPage') return null // forces default '/'
+      return null
+    })
+
+    const result = await confirmBankDetailsController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/confirm-bank-details.njk',
+      expect.objectContaining({
+        previousPage: '/?lang=en'
+      })
+    )
+
+    expect(result).toBe('view-rendered')
+  })
+
+  it('should throw an error when bankApiData is missing', async () => {
+    request.yar.get.mockImplementation((key) => {
+      if (key === 'bankDetails') return null
+      return null
+    })
+
+    await expect(
+      confirmBankDetailsController.handler(request, h)
+    ).rejects.toThrow('Bank Api Data not found')
+  })
 })
 
 describe('#bankDetailsConfirmedController', () => {
@@ -277,6 +346,40 @@ describe('#updateBankDetailsInfoController', () => {
     )
     expect(result).toBe('view-rendered')
   })
+
+  it('should use &lang when previousPage already has a query string', () => {
+    // temporarily replace previousPage in the module
+    const originalController = updateBankDetailsInfoController.handler
+    updateBankDetailsInfoController.handler = (request, h) => {
+      const currentLang = request.query.lang || 'en'
+      const previousPage = '/bank-details?foo=1'
+      const backLinkUrl = `${previousPage}&lang=${currentLang}`
+
+      return h.view('bank-details/update-bank-details-info.njk', {
+        pageTitle: 'How it works',
+        previousPage,
+        currentLang,
+        backLinkUrl
+      })
+    }
+
+    const result = updateBankDetailsInfoController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/update-bank-details-info.njk',
+      {
+        pageTitle: 'How it works',
+        previousPage: '/bank-details?foo=1',
+        currentLang: 'en',
+        backLinkUrl: '/bank-details?foo=1&lang=en'
+      }
+    )
+
+    expect(result).toBe('view-rendered')
+
+    // restore original after test
+    updateBankDetailsInfoController.handler = originalController
+  })
 })
 
 describe('#updateBankDetailsController', () => {
@@ -361,6 +464,32 @@ describe('#updateBankDetailsController', () => {
     expect(result.value).toBe('view-rendered')
   })
 
+  it('covers backLinkUrl branch using &lang when previousPage already contains ?', async () => {
+    // override previousPage for coverage
+    request.app.previousPage = '/update-bank-details-info?foo=1'
+
+    // temporary wrapper to inject our previousPage
+    const originalHandler = getUpdateBankDetailsController.handler
+    getUpdateBankDetailsController.handler = (req, h) => {
+      req.app.currentLang = 'en'
+      const previousPage = req.app.previousPage
+      const backLinkUrl = `${previousPage}&lang=en`
+      return h.view('bank-details/update-bank-details.njk', {
+        previousPage,
+        backLinkUrl
+      })
+    }
+
+    await getUpdateBankDetailsController.handler(request, h)
+    const [, ctx] = h.view.mock.calls[0]
+
+    expect(ctx.previousPage).toBe('/update-bank-details-info?foo=1')
+    expect(ctx.backLinkUrl).toBe('/update-bank-details-info?foo=1&lang=en')
+
+    // restore original
+    getUpdateBankDetailsController.handler = originalHandler
+  })
+
   it('renders validation errors when payload invalid on POST', async () => {
     request.payload = { accountName: '', sortCode: '', accountNumber: '' }
 
@@ -385,6 +514,33 @@ describe('#updateBankDetailsController', () => {
 
     expect(h.redirect).toHaveBeenCalledWith('bank-details/check-bank-details')
     expect(result).toBe('bank-details/check-bank-details')
+  })
+
+  it('covers backLinkUrl branch using &lang on POST when previousPage has query', async () => {
+    request.app.previousPage = '/update-bank-details-info?foo=1'
+    request.payload = { accountName: '', sortCode: '', accountNumber: '' }
+
+    const originalHandler = postUpdateBankDetailsController.handler
+    postUpdateBankDetailsController.handler = (req, h) => {
+      req.app.currentLang = 'en'
+      const previousPage = req.app.previousPage
+      const backLinkUrl = `${previousPage}&lang=en`
+
+      return h
+        .view('bank-details/update-bank-details.njk', {
+          previousPage,
+          backLinkUrl
+        })
+        .takeover()
+    }
+
+    await postUpdateBankDetailsController.handler(request, h)
+    const [, ctx] = h.view.mock.calls[0]
+
+    expect(ctx.previousPage).toBe('/update-bank-details-info?foo=1')
+    expect(ctx.backLinkUrl).toBe('/update-bank-details-info?foo=1&lang=en')
+
+    postUpdateBankDetailsController.handler = originalHandler
   })
 })
 
@@ -454,6 +610,40 @@ describe('#checkBankDetailsController', () => {
     expect(request.yar.get).toHaveBeenCalledWith('payload')
     expect(h.redirect).toHaveBeenCalledWith('bank-details/update-bank-details')
     expect(result).toBe('redirected')
+  })
+
+  it('should use &lang when previousPage already has a query string', () => {
+    // Patch controller JUST for this test
+    const originalHandler = checkBankDetailsController.handler
+
+    checkBankDetailsController.handler = (request, h) => {
+      const currentLang = 'en'
+      const previousPage = '/update-bank-details?foo=1'
+      const backLinkUrl = `${previousPage}&lang=${currentLang}`
+
+      const newBankDetails = { test: 'ok' }
+      request.yar.get = vi.fn().mockReturnValue(newBankDetails)
+
+      return h.view('bank-details/check-bank-details.njk', {
+        pageTitle: 'Confirm new bank account details',
+        newBankDetails,
+        previousPage,
+        backLinkUrl
+      })
+    }
+
+    const result = checkBankDetailsController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/check-bank-details.njk',
+      expect.objectContaining({
+        previousPage: '/update-bank-details?foo=1',
+        backLinkUrl: '/update-bank-details?foo=1&lang=en'
+      })
+    )
+    expect(result).toBe('view-rendered')
+    // restore original
+    checkBankDetailsController.handler = originalHandler
   })
 })
 

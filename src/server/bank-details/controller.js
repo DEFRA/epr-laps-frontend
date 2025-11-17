@@ -26,9 +26,7 @@ export const bankDetailsController = {
       bankApiData.accountNumber,
       translations
     )
-    if (!bankApiData) {
-      throw Boom.internal('Bank details not found in session')
-    }
+
     const userPermissions = request.yar.get('userPermissions')
 
     request.logger.info('successfully fetched bank details from cookie')
@@ -85,6 +83,12 @@ export const confirmBankDetailsController = {
   handler: async (request, h) => {
     const currentLang = request.query.lang || 'en'
     const bankApiData = request.yar.get('bankDetails')
+
+    if (!bankApiData) {
+      request.logger.error('Bank Api Data not found in session')
+      throw Boom.internal('Bank Api Data not found')
+    }
+
     const { translations } = request.app
     const translatedSortCode = translateBankDetails(
       bankApiData.sortCode,
@@ -94,10 +98,6 @@ export const confirmBankDetailsController = {
       bankApiData.accountNumber,
       translations
     )
-    if (!bankApiData) {
-      request.logger.error('Bank Api Data not found in session')
-      throw Boom.internal('Bank Api Data not found')
-    }
 
     const previousPage = request.yar.get('lastPage') || '/'
 
