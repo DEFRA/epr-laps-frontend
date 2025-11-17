@@ -83,8 +83,7 @@ export function translateBankDetails(value, translations) {
 
 export const confirmBankDetailsController = {
   handler: (request, h) => {
-    const currentLang =
-      request.query.lang || request.yar.get('currentLang') || 'en'
+    const currentLang = request.query.lang || 'en'
     const bankApiData = request.yar.get('bankDetails')
 
     if (!bankApiData) {
@@ -92,15 +91,12 @@ export const confirmBankDetailsController = {
       throw Boom.internal('Bank Api Data not found')
     }
 
-    // Use stored last page
     const previousPage = request.yar.get('lastPage') || '/'
 
-    // Remove any existing lang query to avoid duplicates
     const [path, query] = previousPage.split('?')
     const queryParams = new URLSearchParams(query || '')
     queryParams.set('lang', currentLang)
 
-    // Construct the final back link URL
     const backLinkUrl = `${path}?${queryParams.toString()}`
 
     return h.view('bank-details/confirm-bank-details.njk', {
@@ -142,8 +138,7 @@ export const bankDetailsConfirmedController = {
 
 export const updateBankDetailsInfoController = {
   handler: (request, h) => {
-    const currentLang =
-      request.query.lang || request.yar.get('currentLang') || 'en'
+    const currentLang = request.query.lang || 'en'
 
     const previousPage = '/bank-details'
     const backLinkUrl = previousPage.includes('?')

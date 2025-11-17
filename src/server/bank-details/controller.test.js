@@ -102,24 +102,35 @@ describe('translateBankDetails', () => {
   })
 })
 
-describe.skip('#confirmBankDetailsController', () => {
+describe('#confirmBankDetailsController', () => {
   let h, request
 
   beforeEach(() => {
     h = createH()
     request = createRequest({
       payload: { sortCode: '00-00-00', accountNumber: '12345678' },
-      currentLang: 'en'
+      query: { lang: 'en' },
+      yar: {
+        get: vi.fn()
+      }
     })
     vi.clearAllMocks()
   })
 
   it('should render confirmation view', async () => {
-    request.yar.get.mockReturnValue({
-      id: '123',
-      accountName: 'Foo',
-      sortCode: '00-00-00',
-      accountNumber: '12345678'
+    request.yar.get.mockImplementation((key) => {
+      if (key === 'bankDetails') {
+        return {
+          id: '123',
+          accountName: 'Foo',
+          sortCode: '00-00-00',
+          accountNumber: '12345678'
+        }
+      }
+      if (key === 'lastPage') {
+        return '/bank-details'
+      }
+      return null
     })
     const result = await confirmBankDetailsController.handler(request, h)
 
@@ -128,6 +139,8 @@ describe.skip('#confirmBankDetailsController', () => {
       {
         pageTitle: 'Confirm Bank Details',
         isContinueEnabled: false,
+        previousPage: '/bank-details?lang=en',
+        currentLang: 'en',
         bankApiData: {
           id: '123',
           accountName: 'Foo',
