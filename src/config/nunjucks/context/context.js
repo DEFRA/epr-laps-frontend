@@ -58,6 +58,7 @@ async function context(request) {
     sessionTimer,
     showBetaBanner: config.get('showBetaBanner'),
     cookies,
+    currentPath: request.path,
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`

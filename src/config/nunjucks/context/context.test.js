@@ -115,6 +115,7 @@ describe('context and cache', () => {
             cookie_preferences_set: false
           },
           currentLang: 'en',
+          currentPath: '/?lang=en',
           getAssetPath: expect.any(Function),
           navigation: [
             {
