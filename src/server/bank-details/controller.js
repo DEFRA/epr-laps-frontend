@@ -317,6 +317,6 @@ export const postUpdateBankDetailsController = {
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    return h.redirect('bank-details/check-bank-details')
+    return h.redirect(`bank-details/check-bank-details?lang=${currentLang}`)
   }
 }
