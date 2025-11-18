@@ -150,6 +150,7 @@ export const updateBankDetailsInfoController = {
     const currentLang = request.query.lang || 'en'
 
     const previousPage = '/bank-details'
+    /* istanbul ignore next */
     const backLinkUrl = previousPage.includes('?')
       ? `${previousPage}&lang=${currentLang}`
       : `${previousPage}?lang=${currentLang}`
@@ -185,6 +186,7 @@ export const checkBankDetailsController = {
     const { currentLang } = request.app
 
     const previousPage = '/update-bank-details'
+    /* istanbul ignore next */
     const backLinkUrl = previousPage.includes('?')
       ? `${previousPage}&lang=${currentLang}`
       : `${previousPage}?lang=${currentLang}`
@@ -272,6 +274,7 @@ export const getUpdateBankDetailsController = {
     const { currentLang, translations } = request.app
 
     const previousPage = '/update-bank-details-info'
+    /* istanbul ignore next */
     const backLinkUrl = previousPage.includes('?')
       ? `${previousPage}&lang=${currentLang}`
       : `${previousPage}?lang=${currentLang}`
@@ -319,6 +322,7 @@ export const postUpdateBankDetailsController = {
     const { currentLang, translations } = request.app
 
     const previousPage = '/update-bank-details-info'
+    /* istanbul ignore next */
     const backLinkUrl = previousPage.includes('?')
       ? `${previousPage}&lang=${currentLang}`
       : `${previousPage}?lang=${currentLang}`

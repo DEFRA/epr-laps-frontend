@@ -110,4 +110,36 @@ describe('cookiesController', () => {
       currentLang: 'en'
     })
   })
+
+  it('falls back to "/" when lastPage is missing', () => {
+    request.yar.get.mockReturnValueOnce(null) // first call → lastPage
+    config.get.mockReturnValue(1000)
+    formatDuration.mockReturnValue('5 minutes')
+
+    const result = cookiesController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'cookies/index.njk',
+      expect.objectContaining({
+        backLinkUrl: '/?lang=en'
+      })
+    )
+    expect(result).toBe('view-rendered')
+  })
+
+  it('handles lastPage without query string', () => {
+    request.yar.get.mockReturnValueOnce('/cookies') // no ?query
+    config.get.mockReturnValue(1000)
+    formatDuration.mockReturnValue('5 minutes')
+
+    const result = cookiesController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'cookies/index.njk',
+      expect.objectContaining({
+        backLinkUrl: '/cookies?lang=en'
+      })
+    )
+    expect(result).toBe('view-rendered')
+  })
 })

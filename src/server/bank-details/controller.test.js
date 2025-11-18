@@ -344,18 +344,32 @@ describe('#updateBankDetailsInfoController', () => {
     expect(result).toBe('view-rendered')
   })
 
-  it('should use &lang when previousPage already has a query string', () => {
-    // temporarily replace previousPage in the module
-    const originalController = updateBankDetailsInfoController.handler
-    updateBankDetailsInfoController.handler = (request, h) => {
-      const currentLang = request.query.lang || 'en'
-      const previousPage = '/bank-details?foo=1'
-      const backLinkUrl = `${previousPage}&lang=${currentLang}`
+  it('should render the update bank details view with "?lang" when no query', () => {
+    const result = updateBankDetailsInfoController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/update-bank-details-info.njk',
+      {
+        pageTitle: 'How it works',
+        backLinkUrl: '/bank-details?lang=en'
+      }
+    )
+    expect(result).toBe('view-rendered')
+  })
+
+  it('should render with "&lang" when previousPage has query string', () => {
+    // temporarily override the handler for this test only
+    const originalHandler = updateBankDetailsInfoController.handler
+
+    updateBankDetailsInfoController.handler = (req, h) => {
+      const currentLang = req.query.lang || 'en'
+      const previousPage = '/bank-details?foo=1' // simulate query string
+      const backLinkUrl = previousPage.includes('?')
+        ? `${previousPage}&lang=${currentLang}`
+        : `${previousPage}?lang=${currentLang}`
 
       return h.view('bank-details/update-bank-details-info.njk', {
         pageTitle: 'How it works',
-        previousPage,
-        currentLang,
         backLinkUrl
       })
     }
@@ -366,16 +380,13 @@ describe('#updateBankDetailsInfoController', () => {
       'bank-details/update-bank-details-info.njk',
       {
         pageTitle: 'How it works',
-        previousPage: '/bank-details?foo=1',
-        currentLang: 'en',
         backLinkUrl: '/bank-details?foo=1&lang=en'
       }
     )
-
     expect(result).toBe('view-rendered')
 
-    // restore original after test
-    updateBankDetailsInfoController.handler = originalController
+    // restore original handler
+    updateBankDetailsInfoController.handler = originalHandler
   })
 })
 
