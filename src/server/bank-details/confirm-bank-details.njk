@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <div class="govuk-form-group">
-      <form method="post" action="/bank-details/bank-details-confirmed">
+      <form id="confirm-bank-details-form" method="post" action="/bank-details/bank-details-confirmed">
         <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
 
@@ -83,7 +83,7 @@
           summaryText: translations['change-bank-details'],
           html: detailsHtml
         }) }}
-        <button class="govuk-button" data-module="govuk-button" type="submit"
+       <button class="govuk-button" data-module="govuk-button" type="submit"
         {% if not isContinueEnabled %} disabled {% endif %}>
           {{ translations['continue'] }}
         </button>
@@ -94,11 +94,14 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const checkbox = document.getElementById('confirm-bank-details');
-    const continueButton = document.querySelector('button[type="submit"]');
+    const cb = document.getElementById('confirm-bank-details');
+    const form = document.getElementById('confirm-bank-details-form');
+    if (!form || !cb) return;
+    const submit = form.querySelector('button[type="submit"]');
+    if (!submit) return;
 
-    checkbox.addEventListener('change', function () {
-      continueButton.disabled = !checkbox.checked;
+    cb.addEventListener('change', function () {
+      submit.disabled = !cb.checked;
     });
   });
 </script>

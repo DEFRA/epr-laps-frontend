@@ -509,8 +509,10 @@ describe('#updateBankDetailsController', () => {
 
     const result = await postUpdateBankDetailsController.handler(request, h)
 
-    expect(h.redirect).toHaveBeenCalledWith('bank-details/check-bank-details')
-    expect(result).toBe('bank-details/check-bank-details')
+    expect(h.redirect).toHaveBeenCalledWith(
+      'bank-details/check-bank-details?lang=en'
+    )
+    expect(result).toBe('bank-details/check-bank-details?lang=en')
   })
 
   it('covers backLinkUrl branch using &lang on POST when previousPage has query', async () => {
@@ -686,7 +688,7 @@ describe('#postBankDetailsController', () => {
     expect(postWithToken).toHaveBeenCalledWith(request, '/bank-details', {
       accountNumber: '094785923',
       accountName: 'Defra Test',
-      sortCode: '09-03-023',
+      sortCode: '0903023',
       requesterName: 'Juhi',
       localAuthority: 'Defra Test'
     })

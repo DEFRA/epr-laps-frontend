@@ -4,42 +4,39 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% set showBackLink = true %}
+
 {% block content %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            {# Error summary placeholder at the top #}
-            {% if aggregatedErrors.length %}
-                {{ govukErrorSummary({
-                    titleText: translations['there-is'],
-                    errorList: aggregatedErrors
-                }) }}
-            {% endif %}
-            <form id="update-bank-form" method="post" action="/update-bank-details?lang={{currentLang}}" class="govuk-form-group" novalidate>
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                        <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
-                        <h1 class="govuk-fieldset__heading">{{ translations['new-bank'] }}</h1>
-                    </legend>
-                    <div class="govuk-form-group govuk-!-margin-top-4">
-                        <p class="govuk-body govuk-!-font-weight-regular">{{ translations['requested-by'] }}</p>
-                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
-                            {{ authedUser.displayName }}
-                        </p>
-                    </div>
-                    <div class="govuk-form-group">
-                        <p class="govuk-body govuk-!-font-weight-regular">{{ translations['local-authority-name'] }}</p>
-                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-4">
-                            {{ authedUser.organisationName }}
-                        </p>
-                    </div>
-        {% call govukFieldset({
-          legend: {
-            classes: "govuk-fieldset__legend--l",
-            isPageHeading: false
-          }
-        }) %}
-        {{ govukInput({
-            label: { text: translations['account-name']  },
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {# Error summary placeholder at the top #}
+      {% if aggregatedErrors.length %}
+        {{ govukErrorSummary({
+          titleText: translations['there-is'],
+          errorList: aggregatedErrors
+        }) }}
+      {% endif %}
+
+      <form
+        id="update-bank-form"
+        method="post"
+        action="/update-bank-details?lang={{ currentLang }}"
+        class="govuk-form-group"
+        novalidate
+      >
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
+            <h1 class="govuk-fieldset__heading">{{ translations['new-bank'] }}</h1>
+          </legend>
+          <dl class="govuk-body govuk-!-margin-top-4">
+            <dt class="govuk-!-margin-bottom-2">{{ translations['requested-by'] }}</dt>
+              <dd class="govuk-!-margin-left-0 govuk-!-font-weight-bold govuk-!-margin-bottom-6">{{ authedUser.displayName }}</dd>
+            <dt class="govuk-!-margin-bottom-2">{{ translations['local-authority-name'] }}</dt>
+              <dd class="govuk-!-margin-left-0 govuk-!-font-weight-bold"> {{ authedUser.organisationName }}</dd>
+          </dl>
+          {{ govukInput({
+            label: { text: translations['account-name'] },
             id: "accountName",
             name: "accountName",
             value: payload.accountName,
@@ -75,19 +72,16 @@
             attributes: { maxlength: "10" },
             autocomplete: "account-number"
           }) }}
+        </fieldset>
 
-                    {% endcall %}
-                </fieldset>
-                <div class="govuk-!-margin-top-6">
-                    {{ govukButton({
-        text: translations['continue'],
-        type: "submit"
-      }) }}
-      </form>
-                </div>
-            </div>
+        <div class="govuk-!-margin-top-6">
+          {{ govukButton({
+            text: translations['continue'],
+            type: "submit"
+          }) }}
         </div>
+      </form>
 
-
-        
-    {% endblock %}
+    </div>
+  </div>
+{% endblock %}

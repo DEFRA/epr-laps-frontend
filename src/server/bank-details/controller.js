@@ -217,6 +217,7 @@ export const postBankDetailsController = {
     }
 
     // Make your API call
+    payload.sortCode = payload.sortCode.replaceAll('-', '').replaceAll(' ', '')
     await authUtils.postWithToken(request, '/bank-details', payload)
 
     request.logger.info(
@@ -357,6 +358,6 @@ export const postUpdateBankDetailsController = {
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    return h.redirect('bank-details/check-bank-details')
+    return h.redirect(`bank-details/check-bank-details?lang=${currentLang}`)
   }
 }

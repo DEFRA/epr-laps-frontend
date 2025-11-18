@@ -34,9 +34,9 @@
           actions: {
             items: [
               {
-                href: "/update-bank-details",
+                href: "/update-bank-details?lang={{ currentLang }}#accountName",
                 text: translations['change'],
-                visuallyHiddenText: "accountName"
+                visuallyHiddenText: translations['change'] + ' ' + translations['account-name']
               }
             ]
           }
@@ -47,9 +47,9 @@
           actions: {
             items: [
               {
-                href: "/update-bank-details",
+                href: "/update-bank-details?lang={{ currentLang }}#sortCode",
                 text: translations['change'],
-                visuallyHiddenText: "sortCode"
+                visuallyHiddenText: translations['change'] + ' ' + translations['sort-code']
               }
             ]
           }
@@ -60,9 +60,9 @@
           actions: {
             items: [
               {
-                href: "/update-bank-details",
+                href: "/update-bank-details?lang={{ currentLang }}#accountNumber",
                 text: translations['change'],
-                visuallyHiddenText: "accountNumber"
+                visuallyHiddenText: translations['change'] + ' ' + translations['account-number']
               }
             ]
           }
