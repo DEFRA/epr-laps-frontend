@@ -81,8 +81,7 @@
           summaryText: translations['change-bank-details'],
           html: detailsHtml
         }) }}
-        <button class="govuk-button" data-module="govuk-button" type="submit"
-        {% if not isContinueEnabled %} disabled {% endif %}>
+        <button class="govuk-button" type="submit" {% if not isContinueEnabled %}disabled{% endif %}>
           {{ translations['continue'] }}
         </button>
       </form>
@@ -91,14 +90,25 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const checkbox = document.getElementById('confirm-bank-details');
-    const continueButton = document.querySelector('button[type="submit"]');
+document.addEventListener('DOMContentLoaded', function () {
+  const cb = document.getElementById('confirm-bank-details');
+  const form = document.querySelector('form[action="/bank-details/bank-details-confirmed"]');
+  if (!form || !cb) return;
+  const submit = form.querySelector('button[type="submit"]');
+  if (!submit) return;
 
-    checkbox.addEventListener('change', function () {
-      continueButton.disabled = !checkbox.checked;
-    });
+  {% if isContinueEnabled %}
+  var isContinueEnabled = true;
+  {% else %}
+  var isContinueEnabled = false;
+  {% endif %}
+
+  submit.disabled = !(isContinueEnabled || cb.checked);
+
+  cb.addEventListener('change', function () {
+    submit.disabled = !cb.checked;
   });
+});
 </script>
 
 {% endblock %}
