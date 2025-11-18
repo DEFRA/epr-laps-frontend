@@ -9,7 +9,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <div class="govuk-form-group">
-      <form method="post" action="/bank-details/bank-details-confirmed">
+      <form id="confirm-bank-details-form" method="post" action="/bank-details/bank-details-confirmed">
         <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
 
@@ -93,18 +93,10 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const cb = document.getElementById('confirm-bank-details');
-    const form = document.querySelector('form[action="/bank-details/bank-details-confirmed"]');
+    const form = document.querySelector('form[id="confirm-bank-details-form"]');
     if (!form || !cb) return;
     const submit = form.querySelector('button[type="submit"]');
     if (!submit) return;
-
-    {% if isContinueEnabled %}
-    var isContinueEnabled = true;
-    {% else %}
-    var isContinueEnabled = false;
-    {% endif %}
-
-    submit.disabled = !(isContinueEnabled || cb.checked);
 
     cb.addEventListener('change', function () {
       submit.disabled = !cb.checked;
