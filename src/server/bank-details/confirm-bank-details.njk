@@ -93,7 +93,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const cb = document.getElementById('confirm-bank-details');
-    const form = document.querySelector('form[id="confirm-bank-details-form"]');
+    const form = document.getElementById('confirm-bank-details-form');
     if (!form || !cb) return;
     const submit = form.querySelector('button[type="submit"]');
     if (!submit) return;
