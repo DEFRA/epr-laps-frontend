@@ -15,12 +15,17 @@ describe('cookiesController', () => {
   let h, request
 
   beforeEach(() => {
+    vi.resetAllMocks()
     h = {
       view: vi.fn().mockReturnValue('view-rendered')
     }
 
     request = {
       path: '/cookies',
+      query: {},
+      yar: {
+        get: vi.fn().mockReturnValue('/previous?page=1')
+      },
       app: {
         translations: {
           hours: 'ore',
@@ -30,8 +35,6 @@ describe('cookiesController', () => {
         }
       }
     }
-
-    vi.resetAllMocks()
   })
 
   it('renders with translated duration labels', () => {
@@ -40,7 +43,7 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
 
     expect(config.get).toHaveBeenCalledWith('session.cookie.ttl')
     expect(formatDuration).toHaveBeenCalledWith(3600000)
@@ -48,7 +51,9 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '2 hours 5 minutes 3 days 1 years',
       sessionCookieExpiry: '2 ore 5 minuti 3 giorni 1 anni',
-      currentPath: '/cookies'
+      currentPath: '/cookies',
+      backLinkUrl: '/previous?page=1&lang=en',
+      currentLang: 'en'
     })
   })
 
@@ -59,11 +64,14 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
+
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '1 hours 10 minutes 2 days 5 years',
       sessionCookieExpiry: '1 horas 10 minutes 2 days 5 years',
-      currentPath: '/cookies'
+      currentPath: '/cookies',
+      backLinkUrl: '/previous?page=1&lang=en',
+      currentLang: 'en'
     })
   })
 
@@ -74,11 +82,14 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
+
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '10 minutes',
       sessionCookieExpiry: '10 minutes',
-      currentPath: '/cookies'
+      currentPath: '/cookies',
+      backLinkUrl: '/previous?page=1&lang=en',
+      currentLang: 'en'
     })
   })
 
@@ -89,11 +100,14 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
+
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '5 minutes and 10 minutes',
       sessionCookieExpiry: '5 minutos and 10 minutos',
-      currentPath: '/cookies'
+      currentPath: '/cookies',
+      backLinkUrl: '/previous?page=1&lang=en',
+      currentLang: 'en'
     })
   })
 })

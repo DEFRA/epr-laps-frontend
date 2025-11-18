@@ -177,8 +177,7 @@ describe('#confirmBankDetailsController', () => {
       expect.objectContaining({
         pageTitle: 'Confirm Bank Details',
         isContinueEnabled: false,
-        previousPage: '/bank-details?lang=en',
-        currentLang: 'en',
+        backLinkUrl: '/bank-details?lang=en',
         bankApiData: {
           id: '123',
           accountName: 'Foo',
@@ -212,7 +211,7 @@ describe('#confirmBankDetailsController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
       expect.objectContaining({
-        currentLang: 'en'
+        backLinkUrl: '/bank-details?lang=en'
       })
     )
 
@@ -244,7 +243,7 @@ describe('#confirmBankDetailsController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
       expect.objectContaining({
-        previousPage: '/?lang=en'
+        backLinkUrl: '/?lang=en'
       })
     )
 
@@ -339,8 +338,6 @@ describe('#updateBankDetailsInfoController', () => {
       'bank-details/update-bank-details-info.njk',
       {
         pageTitle: 'How it works',
-        currentLang: 'en',
-        previousPage: '/bank-details',
         backLinkUrl: '/bank-details?lang=en'
       }
     )

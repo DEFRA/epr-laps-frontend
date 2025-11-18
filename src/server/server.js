@@ -72,6 +72,19 @@ export async function createServer() {
     segment: 'session'
   })
 
+  server.ext('onPreHandler', (request, h) => {
+    const referrer = request.info.referrer
+
+    if (referrer && !referrer.includes('/cookies')) {
+      const url = new URL(referrer)
+      const pathWithQuery = url.pathname + url.search
+
+      request.yar.set('lastPage', pathWithQuery)
+    }
+
+    return h.continue
+  })
+
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
 

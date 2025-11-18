@@ -110,11 +110,10 @@ export const confirmBankDetailsController = {
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
-      previousPage: backLinkUrl,
-      currentLang,
-      isContinueEnabled: false,
+      backLinkUrl,
       translatedSortCode,
-      translatedAccountNumber
+      translatedAccountNumber,
+      isContinueEnabled: false
     })
   }
 }
@@ -157,8 +156,6 @@ export const updateBankDetailsInfoController = {
 
     return h.view('bank-details/update-bank-details-info.njk', {
       pageTitle: 'How it works',
-      previousPage,
-      currentLang,
       backLinkUrl
     })
   }
@@ -205,7 +202,6 @@ export const checkBankDetailsController = {
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
       newBankDetails,
-      previousPage,
       backLinkUrl
     })
   }
@@ -311,9 +307,7 @@ export const getUpdateBankDetailsController = {
       payload,
       errors,
       aggregatedErrors,
-      currentLang,
       translations,
-      previousPage,
       backLinkUrl
     })
   }
@@ -353,9 +347,7 @@ export const postUpdateBankDetailsController = {
           payload,
           errors,
           aggregatedErrors,
-          currentLang,
           translations,
-          previousPage,
           backLinkUrl
         })
         .takeover()
