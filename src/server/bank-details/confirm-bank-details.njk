@@ -81,7 +81,8 @@
           summaryText: translations['change-bank-details'],
           html: detailsHtml
         }) }}
-        <button class="govuk-button" type="submit" {% if not isContinueEnabled %}disabled{% endif %}>
+       <button class="govuk-button" data-module="govuk-button" type="submit"
+        {% if not isContinueEnabled %} disabled {% endif %}>
           {{ translations['continue'] }}
         </button>
       </form>
@@ -90,25 +91,25 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const cb = document.getElementById('confirm-bank-details');
-  const form = document.querySelector('form[action="/bank-details/bank-details-confirmed"]');
-  if (!form || !cb) return;
-  const submit = form.querySelector('button[type="submit"]');
-  if (!submit) return;
+  document.addEventListener('DOMContentLoaded', function () {
+    const cb = document.getElementById('confirm-bank-details');
+    const form = document.querySelector('form[action="/bank-details/bank-details-confirmed"]');
+    if (!form || !cb) return;
+    const submit = form.querySelector('button[type="submit"]');
+    if (!submit) return;
 
-  {% if isContinueEnabled %}
-  var isContinueEnabled = true;
-  {% else %}
-  var isContinueEnabled = false;
-  {% endif %}
+    {% if isContinueEnabled %}
+    var isContinueEnabled = true;
+    {% else %}
+    var isContinueEnabled = false;
+    {% endif %}
 
-  submit.disabled = !(isContinueEnabled || cb.checked);
+    submit.disabled = !(isContinueEnabled || cb.checked);
 
-  cb.addEventListener('change', function () {
-    submit.disabled = !cb.checked;
+    cb.addEventListener('change', function () {
+      submit.disabled = !cb.checked;
+    });
   });
-});
 </script>
 
 {% endblock %}
