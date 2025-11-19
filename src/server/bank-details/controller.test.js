@@ -118,6 +118,22 @@ describe('#bankDetailsController', () => {
     expect(context.translatedAccountNumber).toBe('12345678')
     expect(result).toBe('view-rendered')
   })
+
+  it('should clear bankDetailsSubmitted when referrer is the submitted page', async () => {
+    request.info = {
+      referrer: 'https://example.com/bank-details/bank-details-submitted'
+    }
+    request.yar.get.mockReturnValue({ id: 'test', accountName: 'acc' })
+
+    const result = await bankDetailsController.handler(request, h)
+
+    expect(request.yar.clear).toHaveBeenCalledWith('bankDetailsSubmitted')
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/index.njk',
+      expect.any(Object)
+    )
+    expect(result).toBe('view-rendered')
+  })
 })
 
 describe('translateBankDetails', () => {
@@ -521,7 +537,6 @@ describe('#bankDetailsSubmittedController', () => {
     const result = await bankDetailsSubmittedController.handler(request, h)
 
     expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
-    expect(request.yar.clear).toHaveBeenCalledWith('bankDetailsSubmitted')
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/bank-details-submitted.njk',
       expect.objectContaining({
@@ -537,10 +552,7 @@ describe('#bankDetailsSubmittedController', () => {
     const result = await bankDetailsSubmittedController.handler(request, h)
 
     expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
-    expect(request.yar.clear).not.toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith(
-      '/bank-details/update-bank-details-info?lang=en'
-    )
+    expect(h.redirect).toHaveBeenCalledWith('/update-bank-details-info?lang=en')
     expect(result).toBe('redirected')
   })
 })
