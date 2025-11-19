@@ -12,9 +12,7 @@ export const bankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
 
-    if (
-      request.info?.referrer.includes('/bank-details/bank-details-submitted')
-    ) {
+    if (request.yar.get('bankDetailsSubmitted')) {
       request.yar.clear('bankDetailsSubmitted')
     }
     const bankApiData = request.yar.get('bankDetails')

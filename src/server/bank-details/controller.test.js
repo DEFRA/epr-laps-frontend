@@ -103,13 +103,11 @@ describe('#bankDetailsController', () => {
       'ending-with': 'ending with (translated)'
     }
 
-    request.yar.get
-      .mockReturnValueOnce({
-        id: '999',
-        sortCode: '22-44-44',
-        accountNumber: '12345678'
-      })
-      .mockReturnValueOnce([])
+    request.yar.get.mockReturnValue({
+      id: '999',
+      sortCode: '22-44-44',
+      accountNumber: '12345678'
+    })
 
     const result = await bankDetailsController.handler(request, h)
     const [, context] = h.view.mock.calls[0]
@@ -119,11 +117,9 @@ describe('#bankDetailsController', () => {
     expect(result).toBe('view-rendered')
   })
 
-  it('should clear bankDetailsSubmitted when referrer is the submitted page', async () => {
-    request.info = {
-      referrer: 'https://example.com/bank-details/bank-details-submitted'
-    }
-    request.yar.get.mockReturnValue({ id: 'test', accountName: 'acc' })
+  it('should clear bankDetailsSubmitted when session flag exists', async () => {
+    request.yar.get.mockReturnValue(true)
+    request.yar.get.mockReturnValueOnce({ id: 'test', accountName: 'acc' })
 
     const result = await bankDetailsController.handler(request, h)
 
