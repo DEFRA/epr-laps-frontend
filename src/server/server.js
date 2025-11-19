@@ -18,6 +18,7 @@ import { registerLanguageExtension } from './common/helpers/request-language.js'
 import { getUserSession } from './common/helpers/auth/utils.js'
 import { defraId } from './common/helpers/auth/defra-id.js'
 import { handlePostAuth } from './common/helpers/handle-post-auth.js'
+import { getBackLink } from './common/helpers/back-link.js' // adjust the path
 
 export async function createServer() {
   setupProxy()
@@ -72,21 +73,9 @@ export async function createServer() {
     segment: 'session'
   })
 
-  server.ext('onPreHandler', (request, h) => {
-    const referrer = request.info.referrer
-
-    if (referrer && !referrer.includes('/cookies')) {
-      const url = new URL(referrer)
-      const pathWithQuery = url.pathname + url.search
-
-      request.yar.set('lastPage', pathWithQuery)
-    }
-
-    return h.continue
-  })
-
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
+  getBackLink(server)
 
   await server.register([
     requestLogger,

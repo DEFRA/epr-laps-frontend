@@ -147,7 +147,6 @@ describe('#confirmBankDetailsController', () => {
     h = createH()
     request = createRequest({
       payload: { sortCode: '00-00-00', accountNumber: '12345678' },
-      query: { lang: 'en' },
       yar: {
         get: vi.fn()
       }
@@ -177,7 +176,6 @@ describe('#confirmBankDetailsController', () => {
       expect.objectContaining({
         pageTitle: 'Confirm Bank Details',
         isContinueEnabled: false,
-        backLinkUrl: '/bank-details?lang=en',
         bankApiData: {
           id: '123',
           accountName: 'Foo',
@@ -211,7 +209,14 @@ describe('#confirmBankDetailsController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
       expect.objectContaining({
-        backLinkUrl: '/bank-details?lang=en'
+        pageTitle: 'Confirm Bank Details',
+        isContinueEnabled: false,
+        bankApiData: {
+          sortCode: '00-00-00',
+          accountNumber: '12345678'
+        },
+        translatedSortCode: '00-00-00',
+        translatedAccountNumber: '12345678'
       })
     )
 
@@ -243,7 +248,14 @@ describe('#confirmBankDetailsController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/confirm-bank-details.njk',
       expect.objectContaining({
-        backLinkUrl: '/?lang=en'
+        pageTitle: 'Confirm Bank Details',
+        isContinueEnabled: false,
+        bankApiData: {
+          sortCode: '00-00-00',
+          accountNumber: '12345678'
+        },
+        translatedSortCode: '00-00-00',
+        translatedAccountNumber: '12345678'
       })
     )
 
@@ -337,8 +349,7 @@ describe('#updateBankDetailsInfoController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/update-bank-details-info.njk',
       {
-        pageTitle: 'How it works',
-        backLinkUrl: '/bank-details?lang=en'
+        pageTitle: 'How it works'
       }
     )
     expect(result).toBe('view-rendered')
@@ -350,43 +361,10 @@ describe('#updateBankDetailsInfoController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/update-bank-details-info.njk',
       {
-        pageTitle: 'How it works',
-        backLinkUrl: '/bank-details?lang=en'
+        pageTitle: 'How it works'
       }
     )
     expect(result).toBe('view-rendered')
-  })
-
-  it('should render with "&lang" when previousPage has query string', () => {
-    // temporarily override the handler for this test only
-    const originalHandler = updateBankDetailsInfoController.handler
-
-    updateBankDetailsInfoController.handler = (req, h) => {
-      const currentLang = req.query.lang || 'en'
-      const previousPage = '/bank-details?foo=1' // simulate query string
-      const backLinkUrl = previousPage.includes('?')
-        ? `${previousPage}&lang=${currentLang}`
-        : `${previousPage}?lang=${currentLang}`
-
-      return h.view('bank-details/update-bank-details-info.njk', {
-        pageTitle: 'How it works',
-        backLinkUrl
-      })
-    }
-
-    const result = updateBankDetailsInfoController.handler(request, h)
-
-    expect(h.view).toHaveBeenCalledWith(
-      'bank-details/update-bank-details-info.njk',
-      {
-        pageTitle: 'How it works',
-        backLinkUrl: '/bank-details?foo=1&lang=en'
-      }
-    )
-    expect(result).toBe('view-rendered')
-
-    // restore original handler
-    updateBankDetailsInfoController.handler = originalHandler
   })
 })
 

@@ -32,9 +32,6 @@ export const homeController = {
     request.yar.set('bankDetails', bankApiData)
     request.logger.info('successfully fetched bank details')
 
-    // Track last page
-    request.yar.set('lastPage', `/?lang=${currentLang}`)
-
     return h.view('home/index', {
       pageTitle: 'Home',
       breadcrumbs: [

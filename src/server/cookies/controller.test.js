@@ -51,9 +51,7 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '2 hours 5 minutes 3 days 1 years',
       sessionCookieExpiry: '2 ore 5 minuti 3 giorni 1 anni',
-      currentPath: '/cookies',
-      backLinkUrl: '/previous?page=1&lang=en',
-      currentLang: 'en'
+      currentPath: '/cookies'
     })
   })
 
@@ -69,9 +67,7 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '1 hours 10 minutes 2 days 5 years',
       sessionCookieExpiry: '1 horas 10 minutes 2 days 5 years',
-      currentPath: '/cookies',
-      backLinkUrl: '/previous?page=1&lang=en',
-      currentLang: 'en'
+      currentPath: '/cookies'
     })
   })
 
@@ -87,9 +83,7 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '10 minutes',
       sessionCookieExpiry: '10 minutes',
-      currentPath: '/cookies',
-      backLinkUrl: '/previous?page=1&lang=en',
-      currentLang: 'en'
+      currentPath: '/cookies'
     })
   })
 
@@ -105,9 +99,7 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '5 minutes and 10 minutes',
       sessionCookieExpiry: '5 minutos and 10 minutos',
-      currentPath: '/cookies',
-      backLinkUrl: '/previous?page=1&lang=en',
-      currentLang: 'en'
+      currentPath: '/cookies'
     })
   })
 
@@ -121,14 +113,16 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'cookies/index.njk',
       expect.objectContaining({
-        backLinkUrl: '/?lang=en'
+        cookiePolicyExpiry: '5 minutes',
+        sessionCookieExpiry: '5 minuti',
+        currentPath: '/cookies'
       })
     )
     expect(result).toBe('view-rendered')
   })
 
   it('handles lastPage without query string', () => {
-    request.yar.get.mockReturnValueOnce('/cookies') // no ?query
+    request.yar.get.mockReturnValueOnce('/cookies')
     config.get.mockReturnValue(1000)
     formatDuration.mockReturnValue('5 minutes')
 
@@ -137,7 +131,9 @@ describe('cookiesController', () => {
     expect(h.view).toHaveBeenCalledWith(
       'cookies/index.njk',
       expect.objectContaining({
-        backLinkUrl: '/cookies?lang=en'
+        cookiePolicyExpiry: '5 minutes',
+        sessionCookieExpiry: '5 minuti',
+        currentPath: '/cookies'
       })
     )
     expect(result).toBe('view-rendered')

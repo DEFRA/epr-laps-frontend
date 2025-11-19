@@ -31,9 +31,6 @@ export const bankDetailsController = {
 
     request.logger.info('successfully fetched bank details from cookie')
 
-    // Track last page
-    request.yar.set('lastPage', `/bank-details?lang=${currentLang}`)
-
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       breadcrumbs: [
@@ -81,7 +78,6 @@ export function translateBankDetails(value, translations) {
 
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
-    const currentLang = request.query.lang || 'en'
     const bankApiData = request.yar.get('bankDetails')
 
     if (!bankApiData) {
@@ -99,18 +95,9 @@ export const confirmBankDetailsController = {
       translations
     )
 
-    const previousPage = request.yar.get('lastPage') || '/'
-
-    const [path, query] = previousPage.split('?')
-    const queryParams = new URLSearchParams(query || '')
-    queryParams.set('lang', currentLang)
-
-    const backLinkUrl = `${path}?${queryParams.toString()}`
-
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
-      backLinkUrl,
       translatedSortCode,
       translatedAccountNumber,
       isContinueEnabled: false
@@ -146,18 +133,9 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
-  handler: (request, h) => {
-    const currentLang = request.query.lang || 'en'
-
-    const previousPage = '/bank-details'
-    /* istanbul ignore next */
-    const backLinkUrl = previousPage.includes('?')
-      ? `${previousPage}&lang=${currentLang}`
-      : `${previousPage}?lang=${currentLang}`
-
+  handler: (_request, h) => {
     return h.view('bank-details/update-bank-details-info.njk', {
-      pageTitle: 'How it works',
-      backLinkUrl
+      pageTitle: 'How it works'
     })
   }
 }
@@ -183,14 +161,6 @@ export const bankDetailsSubmittedController = {
 
 export const checkBankDetailsController = {
   handler: (request, h) => {
-    const { currentLang } = request.app
-
-    const previousPage = '/update-bank-details'
-    /* istanbul ignore next */
-    const backLinkUrl = previousPage.includes('?')
-      ? `${previousPage}&lang=${currentLang}`
-      : `${previousPage}?lang=${currentLang}`
-
     const newBankDetails = request.yar.get('payload')
 
     if (!newBankDetails) {
@@ -203,8 +173,7 @@ export const checkBankDetailsController = {
     request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {
       pageTitle: 'Confirm new bank account details',
-      newBankDetails,
-      backLinkUrl
+      newBankDetails
     })
   }
 }
@@ -271,14 +240,7 @@ const buildSchema = (translations) =>
 
 export const getUpdateBankDetailsController = {
   handler: async (request, h) => {
-    const { currentLang, translations } = request.app
-
-    const previousPage = '/update-bank-details-info'
-    /* istanbul ignore next */
-    const backLinkUrl = previousPage.includes('?')
-      ? `${previousPage}&lang=${currentLang}`
-      : `${previousPage}?lang=${currentLang}`
-
+    const { translations } = request.app
     const payload = request.yar.get('payload') || {}
     const errors = {}
     const aggregatedErrors = []
@@ -311,8 +273,7 @@ export const getUpdateBankDetailsController = {
       payload,
       errors,
       aggregatedErrors,
-      translations,
-      backLinkUrl
+      translations
     })
   }
 }
@@ -320,12 +281,6 @@ export const getUpdateBankDetailsController = {
 export const postUpdateBankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
-
-    const previousPage = '/update-bank-details-info'
-    /* istanbul ignore next */
-    const backLinkUrl = previousPage.includes('?')
-      ? `${previousPage}&lang=${currentLang}`
-      : `${previousPage}?lang=${currentLang}`
 
     const payload = request.payload
     const schema = buildSchema(translations)
@@ -352,8 +307,7 @@ export const postUpdateBankDetailsController = {
           payload,
           errors,
           aggregatedErrors,
-          translations,
-          backLinkUrl
+          translations
         })
         .takeover()
     }
