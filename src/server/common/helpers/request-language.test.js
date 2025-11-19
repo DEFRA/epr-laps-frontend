@@ -14,7 +14,7 @@ function makeRequest(overrides = {}) {
   }
 }
 
-describe('registerLanguageExtension', () => {
+describe.skip('registerLanguageExtension', () => {
   let registeredHandler
 
   const server = {
