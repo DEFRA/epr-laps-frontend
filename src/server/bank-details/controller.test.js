@@ -103,19 +103,31 @@ describe('#bankDetailsController', () => {
       'ending-with': 'ending with (translated)'
     }
 
-    request.yar.get
-      .mockReturnValueOnce({
-        id: '999',
-        sortCode: '22-44-44',
-        accountNumber: '12345678'
-      })
-      .mockReturnValueOnce([])
+    request.yar.get.mockReturnValue({
+      id: '999',
+      sortCode: '22-44-44',
+      accountNumber: '12345678'
+    })
 
     const result = await bankDetailsController.handler(request, h)
     const [, context] = h.view.mock.calls[0]
 
     expect(context.translatedSortCode).toBe('22-44-44')
     expect(context.translatedAccountNumber).toBe('12345678')
+    expect(result).toBe('view-rendered')
+  })
+
+  it('should clear bankDetailsSubmitted when session flag exists', async () => {
+    request.yar.get.mockReturnValue(true)
+    request.yar.get.mockReturnValueOnce({ id: 'test', accountName: 'acc' })
+
+    const result = await bankDetailsController.handler(request, h)
+
+    expect(request.yar.clear).toHaveBeenCalledWith('bankDetailsSubmitted')
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/index.njk',
+      expect.any(Object)
+    )
     expect(result).toBe('view-rendered')
   })
 })
@@ -521,7 +533,6 @@ describe('#bankDetailsSubmittedController', () => {
     const result = await bankDetailsSubmittedController.handler(request, h)
 
     expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
-    expect(request.yar.clear).toHaveBeenCalledWith('bankDetailsSubmitted')
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/bank-details-submitted.njk',
       expect.objectContaining({
@@ -537,10 +548,7 @@ describe('#bankDetailsSubmittedController', () => {
     const result = await bankDetailsSubmittedController.handler(request, h)
 
     expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
-    expect(request.yar.clear).not.toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith(
-      '/bank-details/update-bank-details-info?lang=en'
-    )
+    expect(h.redirect).toHaveBeenCalledWith('/update-bank-details-info?lang=en')
     expect(result).toBe('redirected')
   })
 })

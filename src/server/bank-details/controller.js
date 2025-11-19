@@ -12,6 +12,9 @@ export const bankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
 
+    if (request.yar.get('bankDetailsSubmitted')) {
+      request.yar.clear('bankDetailsSubmitted')
+    }
     const bankApiData = request.yar.get('bankDetails')
 
     if (!bankApiData) {
@@ -148,12 +151,8 @@ export const bankDetailsSubmittedController = {
     const validSubmission = request.yar.get('bankDetailsSubmitted')
 
     if (!validSubmission) {
-      return h.redirect(
-        `/bank-details/update-bank-details-info?lang=${currentLang}`
-      )
+      return h.redirect(`/update-bank-details-info?lang=${currentLang}`)
     }
-    // Clear the session flag to prevent refresh/back button issues
-    request.yar.clear('bankDetailsSubmitted')
     return h.view('bank-details/bank-details-submitted.njk', {
       pageTitle: 'Bank details submitted'
     })
