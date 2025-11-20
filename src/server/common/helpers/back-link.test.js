@@ -179,4 +179,137 @@ describe('getBackLink', () => {
     expect(result).toBe(h.continue)
     expect(request.yar.set).not.toHaveBeenCalled()
   })
+
+  it('falls back to pathname when href is missing', () => {
+    getBackLink(server)
+
+    const request = makeRequest({
+      pathname: '/xyz',
+      response: { variety: 'view', source: { context: {} } },
+      query: {}
+    })
+
+    delete request.url.href // force missing href
+
+    registeredHandler(request, h)
+
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('returns empty key when url is missing in history entry', () => {
+    getBackLink(server)
+
+    const request = makeRequest({
+      history: [{ key: '', full: null }],
+      response: { variety: 'view', source: { context: {} } },
+      query: { lang: 'en' },
+      href: '/next?lang=en'
+    })
+
+    registeredHandler(request, h)
+
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('handles URLs with no query parameters', () => {
+    getBackLink(server)
+
+    const request = makeRequest({
+      response: { variety: 'view', source: { context: {} } },
+      query: { lang: 'en' },
+      href: '/noquery'
+    })
+
+    registeredHandler(request, h)
+
+    expect(request.yar.set).toHaveBeenCalled()
+  })
+
+  it('returns only path when cleaned query params are empty', () => {
+    getBackLink(server)
+
+    const request = makeRequest({
+      response: { variety: 'view', source: { context: {} } },
+      query: { lang: 'en' },
+      href: '/test?lang=en'
+    })
+
+    registeredHandler(request, h)
+
+    const history = request.yar.set.mock.calls[0][1]
+    expect(history[0].key).toBe('/test') // no ?anything
+  })
+
+  it('treats null history as empty array', () => {
+    getBackLink(server)
+
+    const request = makeRequest({
+      query: { lang: 'en' },
+      response: { variety: 'view', source: { context: {} } }
+    })
+
+    request.yar.get.mockReturnValueOnce(null)
+
+    registeredHandler(request, h)
+
+    expect(request.yar.set).toHaveBeenCalled()
+  })
+
+  it('adds new entry when page does not exist in history', () => {
+    getBackLink(server)
+
+    const request = makeRequest({
+      history: [{ key: '/first', full: '/first?lang=en' }],
+      query: { lang: 'en' },
+      response: { variety: 'view', source: { context: {} } },
+      href: '/second?lang=en'
+    })
+
+    registeredHandler(request, h)
+
+    const history = request.yar.set.mock.calls[0][1]
+    expect(history.length).toBe(2)
+  })
+
+  it('shifts history when exceeding limit of 20', () => {
+    getBackLink(server)
+
+    const history = Array.from({ length: 21 }).map((_, i) => ({
+      key: `/p${i}`,
+      full: `/p${i}?lang=en`
+    }))
+
+    const request = makeRequest({
+      history,
+      query: { lang: 'en' },
+      response: { variety: 'view', source: { context: {} } },
+      href: '/new?lang=en'
+    })
+
+    registeredHandler(request, h)
+
+    const updated = request.yar.set.mock.calls[0][1]
+
+    expect(updated.length).toBe(21)
+  })
+
+  it('falls back when previous history entry has no full URL', () => {
+    getBackLink(server)
+
+    const history = [
+      { key: '/one', full: '/one?lang=en' },
+      { key: '/two', full: null }
+    ]
+
+    const request = makeRequest({
+      history,
+      query: { lang: 'en' },
+      response: { variety: 'view', source: { context: {} } },
+      href: '/three?lang=en'
+    })
+
+    registeredHandler(request, h)
+
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
 })
