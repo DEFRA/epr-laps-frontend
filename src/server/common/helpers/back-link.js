@@ -4,7 +4,9 @@ const PREVIOUS_HISTORY_INDEX = -2
 export function getBackLink(server) {
   server.ext('onPreResponse', (request, h) => {
     const response = request.response
-    if (response.variety !== 'view') return h.continue
+    if (response.variety !== 'view') {
+      return h.continue
+    }
 
     const currentUrl = getCurrentUrl(request)
     const currentLang = request.query?.lang || 'en'
@@ -54,10 +56,14 @@ function trimHistory(history) {
 }
 
 function computeBackLink(history, lang) {
-  if (history.length <= 1) return `/?lang=${lang}`
+  if (history.length <= 1) {
+    return `/?lang=${lang}`
+  }
 
   const prev = history.at(PREVIOUS_HISTORY_INDEX)
-  if (!prev?.full) return `/?lang=${lang}`
+  if (!prev?.full) {
+    return `/?lang=${lang}`
+  }
 
   const cleaned = prev.full.replace(/^https?:\/\/[^/]+/, '')
   const [path, qs] = cleaned.split('?')
