@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { getBackLink } from './back-link.js'
+import { getBackLink, stripForKey } from './back-link.js'
 
-// Mock yar session store
 function makeRequest(overrides = {}) {
   const historyStore = overrides.history || []
-
   return {
     url: { href: overrides.href, pathname: overrides.pathname || '/start' },
     query: overrides.query || {},
-    response: overrides.response,
+    response: overrides.response || {
+      variety: 'view',
+      source: { context: {} }
+    },
     yar: {
       get: vi.fn(() => historyStore),
       set: vi.fn()
@@ -17,22 +18,19 @@ function makeRequest(overrides = {}) {
   }
 }
 
-describe('getBackLink', () => {
+describe('Backlink', () => {
   let registeredHandler
-
   const server = {
     ext(event, handler) {
       expect(event).toBe('onPreResponse')
       registeredHandler = handler
     }
   }
-
   const h = { continue: Symbol('continue') }
 
   beforeEach(() => {
     registeredHandler = undefined
   })
-
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -42,274 +40,194 @@ describe('getBackLink', () => {
     expect(typeof registeredHandler).toBe('function')
   })
 
-  it('sets default backlink when no history exists', () => {
+  it('sets default backLinkUrl when no previous page exists', () => {
     getBackLink(server)
-
     const request = makeRequest({
-      query: { lang: 'en' },
-      response: {
-        variety: 'view',
-        source: { context: {} }
-      },
-      href: '/page-one?lang=en'
+      href: '/test?lang=en',
+      query: { lang: 'en' }
     })
-
-    const result = registeredHandler(request, h)
-    expect(result).toBe(h.continue)
-
-    const ctx = request.response.source.context
-    expect(ctx.backLinkUrl).toBe('/?lang=en')
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
   })
 
-  it('stores the first visited page into history', () => {
+  it('adds first page to history', () => {
     getBackLink(server)
-
     const request = makeRequest({
-      query: { lang: 'en' },
-      response: { variety: 'view', source: { context: {} } },
-      href: 'https://domain.com/step-one?lang=en'
+      href: '/step-one?lang=en',
+      query: { lang: 'en' }
     })
-
     registeredHandler(request, h)
-
     expect(request.yar.set).toHaveBeenCalledWith(
       'history',
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: '/step-one',
-          full: 'https://domain.com/step-one?lang=en'
-        })
-      ])
+      expect.arrayContaining([{ key: '/step-one', full: '/step-one?lang=en' }])
     )
   })
 
-  it('does not duplicate history entries when lang changes', () => {
+  it('avoids duplicates when page already in history', () => {
     getBackLink(server)
-
-    const existing = [{ key: '/step-one', full: '/step-one?lang=en' }]
-
     const request = makeRequest({
-      history: existing,
-      query: { lang: 'cy' },
-      response: { variety: 'view', source: { context: {} } },
-      href: '/step-one?lang=cy'
+      history: [{ key: '/step-one', full: '/step-one?lang=en' }],
+      href: '/step-one?lang=cy',
+      query: { lang: 'cy' }
     })
-
     registeredHandler(request, h)
-
-    expect(request.yar.set).toHaveBeenCalledWith(
-      'history',
-      existing // unchanged!
-    )
+    expect(request.yar.set).toHaveBeenCalledWith('history', [
+      { key: '/step-one', full: '/step-one?lang=en' }
+    ])
   })
 
-  it('creates backlink to previous page in history', () => {
+  it('sets backlink to previous page preserving current lang', () => {
     getBackLink(server)
-
     const history = [
       { key: '/step-one', full: '/step-one?lang=en' },
       { key: '/step-two', full: '/step-two?lang=en' }
     ]
-
     const request = makeRequest({
       history,
-      query: { lang: 'cy' },
-      response: { variety: 'view', source: { context: {} } },
-      href: '/step-three?lang=cy'
+      href: '/step-three?lang=cy',
+      query: { lang: 'cy' }
     })
-
     registeredHandler(request, h)
-
-    const ctx = request.response.source.context
-    expect(ctx.backLinkUrl).toBe('/step-two?lang=cy')
-  })
-
-  it('preserves current lang in back link', () => {
-    getBackLink(server)
-
-    const history = [
-      { key: '/bank/start', full: '/bank/start?lang=en' },
-      { key: '/bank/details', full: '/bank/details?lang=en' }
-    ]
-
-    const request = makeRequest({
-      history,
-      query: { lang: 'cy' },
-      response: { variety: 'view', source: { context: {} } },
-      href: '/bank/confirm?lang=cy'
-    })
-
-    registeredHandler(request, h)
-
-    const ctx = request.response.source.context
-    expect(ctx.backLinkUrl).toBe('/bank/details?lang=cy')
-  })
-
-  it('strips domain when storing key and full path values', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      query: { lang: 'en' },
-      response: { variety: 'view', source: { context: {} } },
-      href: 'https://example.com/bank/info?lang=en'
-    })
-
-    registeredHandler(request, h)
-
-    expect(request.yar.set).toHaveBeenCalledWith(
-      'history',
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: '/bank/info',
-          full: 'https://example.com/bank/info?lang=en'
-        })
-      ])
+    expect(request.response.source.context.backLinkUrl).toBe(
+      '/step-two?lang=cy'
     )
   })
 
-  it('does nothing when response is not a view', () => {
+  it('limits history to 20 entries', () => {
     getBackLink(server)
-
-    const request = makeRequest({
-      response: { variety: 'plain', source: {} }
-    })
-
-    const result = registeredHandler(request, h)
-
-    expect(result).toBe(h.continue)
-    expect(request.yar.set).not.toHaveBeenCalled()
-  })
-
-  it('falls back to pathname when href is missing', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      pathname: '/xyz',
-      response: { variety: 'view', source: { context: {} } },
-      query: {}
-    })
-
-    delete request.url.href // force missing href
-
-    registeredHandler(request, h)
-
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('returns empty key when url is missing in history entry', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      history: [{ key: '', full: null }],
-      response: { variety: 'view', source: { context: {} } },
-      query: { lang: 'en' },
-      href: '/next?lang=en'
-    })
-
-    registeredHandler(request, h)
-
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('handles URLs with no query parameters', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      response: { variety: 'view', source: { context: {} } },
-      query: { lang: 'en' },
-      href: '/noquery'
-    })
-
-    registeredHandler(request, h)
-
-    expect(request.yar.set).toHaveBeenCalled()
-  })
-
-  it('returns only path when cleaned query params are empty', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      response: { variety: 'view', source: { context: {} } },
-      query: { lang: 'en' },
-      href: '/test?lang=en'
-    })
-
-    registeredHandler(request, h)
-
-    const history = request.yar.set.mock.calls[0][1]
-    expect(history[0].key).toBe('/test') // no ?anything
-  })
-
-  it('treats null history as empty array', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      query: { lang: 'en' },
-      response: { variety: 'view', source: { context: {} } }
-    })
-
-    request.yar.get.mockReturnValueOnce(null)
-
-    registeredHandler(request, h)
-
-    expect(request.yar.set).toHaveBeenCalled()
-  })
-
-  it('adds new entry when page does not exist in history', () => {
-    getBackLink(server)
-
-    const request = makeRequest({
-      history: [{ key: '/first', full: '/first?lang=en' }],
-      query: { lang: 'en' },
-      response: { variety: 'view', source: { context: {} } },
-      href: '/second?lang=en'
-    })
-
-    registeredHandler(request, h)
-
-    const history = request.yar.set.mock.calls[0][1]
-    expect(history.length).toBe(2)
-  })
-
-  it('shifts history when exceeding limit of 20', () => {
-    getBackLink(server)
-
-    const history = Array.from({ length: 21 }).map((_, i) => ({
+    const history = Array.from({ length: 21 }, (_, i) => ({
       key: `/p${i}`,
       full: `/p${i}?lang=en`
     }))
-
     const request = makeRequest({
       history,
-      query: { lang: 'en' },
-      response: { variety: 'view', source: { context: {} } },
-      href: '/new?lang=en'
+      href: '/new?lang=en',
+      query: { lang: 'en' }
     })
-
     registeredHandler(request, h)
-
-    const updated = request.yar.set.mock.calls[0][1]
-
-    expect(updated.length).toBe(21)
+    expect(request.yar.set.mock.calls[0][1].length).toBe(20)
   })
 
-  it('falls back when previous history entry has no full URL', () => {
+  it('does nothing for non-view response', () => {
     getBackLink(server)
+    const request = makeRequest({ response: { variety: 'plain', source: {} } })
+    registeredHandler(request, h)
+    expect(request.yar.set).not.toHaveBeenCalled()
+  })
 
+  it('falls back to pathname when href missing', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      pathname: '/xyz',
+      href: undefined,
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('truncates history when revisiting an existing page', () => {
+    getBackLink(server)
+    const history = [
+      { key: '/first', full: '/first?lang=en' },
+      { key: '/second', full: '/second?lang=en' },
+      { key: '/third', full: '/third?lang=en' }
+    ]
+    const request = makeRequest({
+      history,
+      href: '/second?lang=en',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    const updated = request.yar.set.mock.calls[0][1]
+    expect(updated.length).toBe(2)
+  })
+
+  it('falls back to default backLinkUrl if previous page has no full URL', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      history: [{ key: '/only', full: null }],
+      href: '/newpage?lang=en',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('covers existingIndex slice (line 248) when revisiting a page', () => {
+    getBackLink(server)
+    const history = [
+      { key: '/page1', full: '/page1?lang=en' },
+      { key: '/page2', full: '/page2?lang=en' },
+      { key: '/page3', full: '/page3?lang=en' }
+    ]
+    const request = makeRequest({
+      history,
+      href: '/page2?lang=en',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    const updatedHistory = request.yar.set.mock.calls[0][1]
+    expect(updatedHistory).toEqual([
+      { key: '/page1', full: '/page1?lang=en' },
+      { key: '/page2', full: '/page2?lang=en' }
+    ])
+  })
+
+  it('covers history trimming (line 274) when history > 20', () => {
+    getBackLink(server)
+    const history = Array.from({ length: 22 }, (_, i) => ({
+      key: `/p${i}`,
+      full: `/p${i}?lang=en`
+    }))
+    const request = makeRequest({
+      history,
+      href: '/newpage?lang=en',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    const trimmed = request.yar.set.mock.calls[0][1]
+    expect(trimmed.length).toBe(20)
+  })
+
+  it('covers fallback when previous full is falsy (line 291)', () => {
+    getBackLink(server)
     const history = [
       { key: '/one', full: '/one?lang=en' },
       { key: '/two', full: null }
     ]
-
     const request = makeRequest({
       history,
-      query: { lang: 'en' },
-      response: { variety: 'view', source: { context: {} } },
-      href: '/three?lang=en'
+      href: '/three?lang=en',
+      query: { lang: 'en' }
     })
-
     registeredHandler(request, h)
-
     expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('sets default backLinkUrl when history is empty', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      history: [],
+      href: '/new?lang=en',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+})
+
+describe('stripForKey', () => {
+  it('removes lang query param', () => {
+    expect(stripForKey('/test?lang=en&foo=bar')).toBe('/test?foo=bar')
+  })
+
+  it('returns just path when only lang present', () => {
+    expect(stripForKey('/only-lang?lang=en')).toBe('/only-lang')
+  })
+
+  it('handles URL without query params', () => {
+    expect(stripForKey('/noparams')).toBe('/noparams')
   })
 })
