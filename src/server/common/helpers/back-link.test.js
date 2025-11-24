@@ -216,6 +216,95 @@ describe('Backlink', () => {
     registeredHandler(request, h)
     expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
   })
+
+  it('defaults lang to "en" when query.lang is missing', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      href: '/test',
+      query: {}
+    })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('handles missing history gracefully', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      history: undefined,
+      href: '/newpage',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    expect(request.yar.set).toHaveBeenCalledWith(
+      'history',
+      expect.arrayContaining([{ key: '/newpage', full: '/newpage' }])
+    )
+  })
+
+  it('sets default backlink when currentKey is empty', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      href: '/',
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('handles request with no url object', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      url: undefined,
+      query: { lang: 'en' }
+    })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('defaults lang to "en" when request.query is undefined', () => {
+    getBackLink(server)
+    const request = makeRequest({
+      href: '/some-page',
+      query: undefined
+    })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('handles undefined history from yar.get', () => {
+    getBackLink(server)
+    const request = makeRequest()
+    request.yar.get = vi.fn(() => undefined)
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+    expect(request.yar.set).toHaveBeenCalledWith(
+      'history',
+      expect.arrayContaining([{ key: '/start', full: '/start' }])
+    )
+  })
+
+  it('handles empty currentUrl safely', () => {
+    getBackLink(server)
+    const request = makeRequest({ href: undefined, pathname: undefined })
+    registeredHandler(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('covers computeBackLink qs fallback when previous full has no query string', () => {
+    getBackLink(server)
+
+    const history = [{ key: '/first', full: '/first' }]
+
+    const request = makeRequest({
+      history,
+      href: '/second?lang=cy',
+      query: { lang: 'cy' }
+    })
+
+    registeredHandler(request, h)
+
+    expect(request.response.source.context.backLinkUrl).toBe('/first?lang=cy')
+  })
 })
 
 describe('stripForKey', () => {
@@ -229,5 +318,13 @@ describe('stripForKey', () => {
 
   it('handles URL without query params', () => {
     expect(stripForKey('/noparams')).toBe('/noparams')
+  })
+
+  it('handles URL without query string in stripForKey', () => {
+    expect(stripForKey('/path-without-qs')).toBe('/path-without-qs')
+  })
+
+  it('returns empty string when stripForKey is called with undefined', () => {
+    expect(stripForKey(undefined)).toBe('')
   })
 })
