@@ -155,7 +155,7 @@ describe('Backlink', () => {
     expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
   })
 
-  it('covers existingIndex slice (line 248) when revisiting a page', () => {
+  it('covers existingIndex slice when revisiting a page', () => {
     getBackLink(server)
     const history = [
       { key: '/page1', full: '/page1?lang=en' },
@@ -175,7 +175,7 @@ describe('Backlink', () => {
     ])
   })
 
-  it('covers history trimming (line 274) when history > 20', () => {
+  it('covers history trimming when history > 20', () => {
     getBackLink(server)
     const history = Array.from({ length: 22 }, (_, i) => ({
       key: `/p${i}`,
@@ -191,7 +191,7 @@ describe('Backlink', () => {
     expect(trimmed.length).toBe(20)
   })
 
-  it('covers fallback when previous full is falsy (line 291)', () => {
+  it('covers fallback when previous full is falsy', () => {
     getBackLink(server)
     const history = [
       { key: '/one', full: '/one?lang=en' },

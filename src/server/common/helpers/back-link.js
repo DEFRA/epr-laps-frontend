@@ -1,70 +1,75 @@
 const MAX_HISTORY = 20
+const PREVIOUS_HISTORY_INDEX = -2
 
 export function getBackLink(server) {
   server.ext('onPreResponse', (request, h) => {
     const response = request.response
+    if (response.variety !== 'view') return h.continue
 
-    if (response.variety !== 'view') {
-      return h.continue
-    }
-
-    const urlObj = request.url || {}
-    const currentUrl = urlObj.href || urlObj.pathname || ''
+    const currentUrl = getCurrentUrl(request)
     const currentLang = request.query?.lang || 'en'
-
-    // Load history
     let history = request.yar.get('history') || []
-
     const currentKey = stripForKey(currentUrl)
 
-    // If key is empty → default back link only
     if (!currentKey) {
-      response.source.context = {
-        ...response.source.context,
-        backLinkUrl: `/?lang=${currentLang}`
-      }
+      setBackLink(response, `/?lang=${currentLang}`)
       return h.continue
     }
 
-    const idx = history.findIndex((x) => x.key === currentKey)
-    history =
-      idx >= 0
-        ? history.slice(0, idx + 1)
-        : [...history, { key: currentKey, full: currentUrl }]
-
-    // Keep last 20 entries
-    const over = history.length - MAX_HISTORY
-    if (over > 0) {
-      history = history.slice(over)
-    }
+    history = updateHistory(history, currentKey, currentUrl)
+    history = trimHistory(history)
 
     request.yar.set('history', history)
 
-    // Default backlink
-    let backLinkUrl = `/?lang=${currentLang}`
-
-    // Compute previous link safely (flat logic)
-    const prev = history.length > 1 ? history.at(-2) : null
-
-    if (prev?.full) {
-      const cleaned = prev.full.replace(/^https?:\/\/[^/]+/, '')
-      const [path, qs] = cleaned.split('?')
-      const params = new URLSearchParams(qs || '')
-      params.set('lang', currentLang)
-      backLinkUrl = `${path}?${params.toString()}`
-    }
-
-    response.source.context = {
-      ...response.source.context,
-      backLinkUrl
-    }
+    const backLinkUrl = computeBackLink(history, currentLang)
+    setBackLink(response, backLinkUrl)
 
     return h.continue
   })
 }
 
+// Helpers
+function getCurrentUrl(request) {
+  const urlObj = request.url || {}
+  return urlObj.href || urlObj.pathname || ''
+}
+
+function setBackLink(response, url) {
+  response.source.context = {
+    ...response.source.context,
+    backLinkUrl: url
+  }
+}
+
+function updateHistory(history, currentKey, currentUrl) {
+  const idx = history.findIndex((x) => x.key === currentKey)
+  return idx >= 0
+    ? history.slice(0, idx + 1)
+    : [...history, { key: currentKey, full: currentUrl }]
+}
+
+function trimHistory(history) {
+  const over = history.length - MAX_HISTORY
+  return over > 0 ? history.slice(over) : history
+}
+
+function computeBackLink(history, lang) {
+  if (history.length <= 1) return `/?lang=${lang}`
+
+  const prev = history.at(PREVIOUS_HISTORY_INDEX)
+  if (!prev?.full) return `/?lang=${lang}`
+
+  const cleaned = prev.full.replace(/^https?:\/\/[^/]+/, '')
+  const [path, qs] = cleaned.split('?')
+  const params = new URLSearchParams(qs || '')
+  params.set('lang', lang)
+  return `${path}?${params.toString()}`
+}
+
 export function stripForKey(url) {
-  if (!url) return ''
+  if (!url) {
+    return ''
+  }
 
   const noDomain = url.replace(/^https?:\/\/[^/]+/, '')
   const [path, qs] = noDomain.split('?')
