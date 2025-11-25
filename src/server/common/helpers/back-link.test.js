@@ -1,5 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { getBackLink, stripForKey } from './back-link.js'
+import {
+  getBackLink,
+  stripForKey,
+  getCurrentUrl,
+  setBackLink,
+  updateHistory,
+  trimHistory,
+  computeBackLink
+} from './back-link.js'
 
 function makeRequest(overrides = {}) {
   const historyStore = overrides.history || []
@@ -304,6 +312,158 @@ describe('Backlink', () => {
     registeredHandler(request, h)
 
     expect(request.response.source.context.backLinkUrl).toBe('/first?lang=cy')
+  })
+
+  describe('getBackLink', () => {
+    let registeredHandler
+    const server = {
+      ext(event, handler) {
+        registeredHandler = handler
+      }
+    }
+
+    const h = { continue: Symbol('continue') }
+
+    beforeEach(() => {
+      registeredHandler = undefined
+    })
+    afterEach(() => vi.restoreAllMocks())
+
+    it('registers onPreResponse handler', () => {
+      getBackLink(server)
+      expect(typeof registeredHandler).toBe('function')
+    })
+
+    it('sets default backlink when no previous page exists', () => {
+      getBackLink(server)
+      const req = makeRequest({ href: '/step?lang=en', query: { lang: 'en' } })
+      registeredHandler(req, h)
+      expect(req.response.source.context.backLinkUrl).toBe('/?lang=en')
+    })
+
+    it('adds first page to history', () => {
+      getBackLink(server)
+      const req = makeRequest({ href: '/page?lang=en', query: { lang: 'en' } })
+      registeredHandler(req, h)
+
+      expect(req.yar.set).toHaveBeenCalledWith(
+        'history',
+        expect.arrayContaining([{ key: '/page', full: '/page?lang=en' }])
+      )
+    })
+
+    it('uses previous page correctly', () => {
+      getBackLink(server)
+      const history = [
+        { key: '/one', full: '/one?lang=en' },
+        { key: '/two', full: '/two?lang=en' }
+      ]
+
+      const req = makeRequest({
+        history,
+        href: '/three?lang=cy',
+        query: { lang: 'cy' }
+      })
+
+      registeredHandler(req, h)
+
+      expect(req.response.source.context.backLinkUrl).toBe('/two?lang=cy')
+    })
+
+    it('ignores non-view responses', () => {
+      getBackLink(server)
+      const req = makeRequest({ response: { variety: 'plain', source: {} } })
+      registeredHandler(req, h)
+      expect(req.yar.set).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCurrentUrl', () => {
+    it('uses href when provided', () => {
+      const req = { url: { href: '/hi?x=1', pathname: '/hi' } }
+      expect(getCurrentUrl(req)).toBe('/hi?x=1')
+    })
+
+    it('falls back to pathname', () => {
+      const req = { url: { href: undefined, pathname: '/path' } }
+      expect(getCurrentUrl(req)).toBe('/path')
+    })
+
+    it('returns empty string when url missing', () => {
+      expect(getCurrentUrl({ url: undefined })).toBe('')
+    })
+  })
+
+  describe('setBackLink', () => {
+    it('sets backLinkUrl in response source context', () => {
+      const response = { source: { context: { a: 1 } } }
+      setBackLink(response, '/abc')
+      expect(response.source.context.backLinkUrl).toBe('/abc')
+      expect(response.source.context.a).toBe(1)
+    })
+  })
+
+  describe('updateHistory', () => {
+    it('adds new entry when not in history', () => {
+      const updated = updateHistory([], '/page', '/page?lang=en')
+      expect(updated).toEqual([{ key: '/page', full: '/page?lang=en' }])
+    })
+
+    it('truncates history when revisiting same page', () => {
+      const history = [
+        { key: '/one', full: '/one?lang=en' },
+        { key: '/two', full: '/two?lang=en' },
+        { key: '/three', full: '/three?lang=en' }
+      ]
+      const updated = updateHistory(history, '/two', '/two?lang=en')
+      expect(updated).toEqual([
+        { key: '/one', full: '/one?lang=en' },
+        { key: '/two', full: '/two?lang=en' }
+      ])
+    })
+  })
+
+  describe('trimHistory', () => {
+    it('keeps history under limit', () => {
+      const history = Array.from({ length: 5 }, (_, i) => ({ key: `/p${i}` }))
+      expect(trimHistory(history).length).toBe(5)
+    })
+
+    it('trims history to 20 entries', () => {
+      const history = Array.from({ length: 30 }, (_, i) => ({ key: `/p${i}` }))
+      expect(trimHistory(history).length).toBe(20)
+    })
+  })
+
+  describe('computeBackLink', () => {
+    it('returns root when only one entry', () => {
+      expect(computeBackLink([{ key: '/a', full: '/a' }], 'en')).toBe(
+        '/?lang=en'
+      )
+    })
+
+    it('builds backlink from previous item', () => {
+      const history = [
+        { key: '/one', full: '/one?foo=1' },
+        { key: '/two', full: '/two?foo=1' }
+      ]
+
+      expect(computeBackLink(history, 'cy')).toBe('/one?foo=1&lang=cy')
+    })
+
+    it('handles previous full with no query string', () => {
+      const history = [
+        { key: '/first', full: '/first' },
+        { key: '/second', full: '/second' }
+      ]
+      expect(computeBackLink(history, 'cy')).toBe('/first?lang=cy')
+    })
+
+    it('returns default if previous full missing', () => {
+      expect(computeBackLink([{ key: '/x', full: null }], 'en')).toBe(
+        '/?lang=en'
+      )
+    })
   })
 })
 

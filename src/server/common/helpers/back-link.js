@@ -31,31 +31,31 @@ export function getBackLink(server) {
 }
 
 // Helpers
-function getCurrentUrl(request) {
+export function getCurrentUrl(request) {
   const urlObj = request.url || {}
   return urlObj.href || urlObj.pathname || ''
 }
 
-function setBackLink(response, url) {
+export function setBackLink(response, url) {
   response.source.context = {
     ...response.source.context,
     backLinkUrl: url
   }
 }
 
-function updateHistory(history, currentKey, currentUrl) {
+export function updateHistory(history, currentKey, currentUrl) {
   const idx = history.findIndex((x) => x.key === currentKey)
   return idx >= 0
     ? history.slice(0, idx + 1)
     : [...history, { key: currentKey, full: currentUrl }]
 }
 
-function trimHistory(history) {
+export function trimHistory(history) {
   const over = history.length - MAX_HISTORY
   return over > 0 ? history.slice(over) : history
 }
 
-function computeBackLink(history, lang) {
+export function computeBackLink(history, lang) {
   if (history.length <= 1) {
     return `/?lang=${lang}`
   }
