@@ -41,7 +41,8 @@
  {{ govukServiceNavigation({
     serviceName: translations['service-title'],
     serviceUrl: "#",
-    navigation: navigation
+    navigation: navigation,
+    menuButtonText: translations['menu']
   }) }}
 {% if showBetaBanner %}
   {{ govukPhaseBanner({
