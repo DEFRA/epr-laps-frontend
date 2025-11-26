@@ -52,14 +52,14 @@
     html: translations['this-is-a-new-s'] | safe
   }) }}
 {% endif %}
-  
+
     <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
     <div class="govuk-grid-column-two-thirds">
       {% if showBackLink %}
         {{ govukBackLink({
           text: translations['back-link'],
-          href: "javascript:history.back()"
+           href: backLinkUrl
         }) }}
       {% else %}
         {{ govukBreadcrumbs({ items: breadcrumbs }) }}

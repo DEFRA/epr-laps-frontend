@@ -18,6 +18,7 @@ import { registerLanguageExtension } from './common/helpers/request-language.js'
 import { getUserSession } from './common/helpers/auth/utils.js'
 import { defraId } from './common/helpers/auth/defra-id.js'
 import { handlePostAuth } from './common/helpers/handle-post-auth.js'
+import { getBackLink } from './common/helpers/back-link.js' // adjust the path
 
 export async function createServer() {
   setupProxy()
@@ -74,6 +75,7 @@ export async function createServer() {
 
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
+  getBackLink(server)
 
   await server.register([
     requestLogger,

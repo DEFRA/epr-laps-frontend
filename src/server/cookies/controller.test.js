@@ -15,12 +15,17 @@ describe('cookiesController', () => {
   let h, request
 
   beforeEach(() => {
+    vi.resetAllMocks()
     h = {
       view: vi.fn().mockReturnValue('view-rendered')
     }
 
     request = {
       path: '/cookies',
+      query: {},
+      yar: {
+        get: vi.fn().mockReturnValue('/previous?page=1')
+      },
       app: {
         translations: {
           hours: 'ore',
@@ -30,8 +35,6 @@ describe('cookiesController', () => {
         }
       }
     }
-
-    vi.resetAllMocks()
   })
 
   it('renders with translated duration labels', () => {
@@ -40,7 +43,7 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
 
     expect(config.get).toHaveBeenCalledWith('session.cookie.ttl')
     expect(formatDuration).toHaveBeenCalledWith(3600000)
@@ -59,7 +62,8 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
+
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '1 hours 10 minutes 2 days 5 years',
       sessionCookieExpiry: '1 horas 10 minutes 2 days 5 years',
@@ -74,7 +78,8 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
+
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '10 minutes',
       sessionCookieExpiry: '10 minutes',
@@ -89,11 +94,48 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(result).toBeUndefined()
+    expect(result).toBe('view-rendered')
+
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
       cookiePolicyExpiry: '5 minutes and 10 minutes',
       sessionCookieExpiry: '5 minutos and 10 minutos',
       currentPath: '/cookies'
     })
+  })
+
+  it('falls back to "/" when lastPage is missing', () => {
+    request.yar.get.mockReturnValueOnce(null) // first call → lastPage
+    config.get.mockReturnValue(1000)
+    formatDuration.mockReturnValue('5 minutes')
+
+    const result = cookiesController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'cookies/index.njk',
+      expect.objectContaining({
+        cookiePolicyExpiry: '5 minutes',
+        sessionCookieExpiry: '5 minuti',
+        currentPath: '/cookies'
+      })
+    )
+    expect(result).toBe('view-rendered')
+  })
+
+  it('handles lastPage without query string', () => {
+    request.yar.get.mockReturnValueOnce('/cookies')
+    config.get.mockReturnValue(1000)
+    formatDuration.mockReturnValue('5 minutes')
+
+    const result = cookiesController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'cookies/index.njk',
+      expect.objectContaining({
+        cookiePolicyExpiry: '5 minutes',
+        sessionCookieExpiry: '5 minuti',
+        currentPath: '/cookies'
+      })
+    )
+    expect(result).toBe('view-rendered')
   })
 })
