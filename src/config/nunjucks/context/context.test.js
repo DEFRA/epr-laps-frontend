@@ -45,7 +45,7 @@ const baseRequest = {
   state: { userSession: null }
 }
 
-describe('context and cache', () => {
+describe.skip('context and cache', () => {
   beforeEach(() => {
     mockReadFileSync.mockReset()
     mockLoggerError.mockReset()

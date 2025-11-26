@@ -18,9 +18,8 @@ async function context(request) {
   const authedUser =
     (await request.getUserSession(request, request.state?.userSession)) || {}
 
-  const translations = request.app.translations || {}
-  const currentLang = request.app.currentLang || 'en'
-
+  const currentLang = request.i18n.getLocale()
+  const translations = request.i18n.getCatalog(currentLang)
   const organisationName = authedUser.organisationName
 
   // Only translate if the full organisationName exists in translations
@@ -28,9 +27,7 @@ async function context(request) {
   if (currentLang === 'cy' && translations.laNames?.[organisationName]) {
     displayOrgName = translations.laNames[organisationName]
   }
-
   authedUser.organisationName = displayOrgName
-
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
