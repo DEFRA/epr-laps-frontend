@@ -1,21 +1,39 @@
-export function registerLanguageExtension(request, h) {
+export function registerLanguageExtension(server) {
   const allowed = new Set(['en', 'cy'])
-  const raw =
-    (typeof request.query.lang === 'string' && request.query.lang.trim()) || ''
-  const lang = raw.toLowerCase()
-  const currentLang = allowed.has(lang) ? lang : 'en'
+  server.ext('onRequest', (request, h) => {
+    const raw = request.query.lang
+    if (raw) {
+      const queryLang = raw.toLowerCase()
+      if (!allowed.has(queryLang)) {
+        // invalid lang → redirect
+        const updatedQuery = { ...request.query, lang: 'en' }
+        const qs = new URLSearchParams(updatedQuery).toString()
+        const redirectTo = request.path + (qs ? `?${qs}` : '')
+        h.state('locale', 'en')
+        return h.redirect(redirectTo).takeover()
+      }
+      h.state('locale', queryLang) // update cookie
+    }
+    return h.continue
+  })
 
-  h.state('locale', currentLang)
+  // onPreHandler → set values for handler usage
+  server.ext('onPreHandler', (request, h) => {
+    const allowed = new Set(['en', 'cy'])
+    let currentLang
 
-  if (raw && !allowed.has(lang)) {
-    const query = { ...request.query, lang: currentLang }
-    const qs = new URLSearchParams(query).toString()
-    const redirectTo = request.path + (qs ? `?${qs}` : '')
-    return h.redirect(redirectTo).takeover()
-  }
+    // priority: URL → cookie → fallback
+    const raw = request.query.lang
+    if (raw && allowed.has(raw.toLowerCase())) {
+      currentLang = raw.toLowerCase()
+    } else if (allowed.has(request.state?.locale)) {
+      currentLang = request.state.locale
+    } else {
+      currentLang = 'en'
+    }
 
-  request.app.currentLang = currentLang
-  request.app.translations = request.i18n.getCatalog(currentLang) || {}
-
-  return h.continue
+    request.app.currentLang = currentLang
+    request.app.translations = request.i18n.getCatalog(currentLang) || {}
+    return h.continue
+  })
 }

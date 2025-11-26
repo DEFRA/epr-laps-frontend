@@ -59,6 +59,15 @@ export async function createServer() {
     }
   })
 
+  // server.state('locale', {
+  //   ttl: null,                // persists until changed
+  //   isSecure: process.env.NODE_ENV === 'production',
+  //   isHttpOnly: false,        // frontend reads it
+  //   path: '/',
+  //   encoding: 'none',
+  //   strictHeader: false
+  // });
+
   server.app.cache = server.cache({
     cache: 'session',
     expiresIn: config.get('redis.ttl'),
@@ -66,18 +75,18 @@ export async function createServer() {
   })
 
   server.decorate('request', 'getUserSession', getUserSession)
-
+  registerLanguageExtension(server)
   await server.register([
+    cookie,
+    hapiI18nPlugin,
     requestLogger,
     requestTracing,
     secureContext,
     pulse,
     sessionCache,
     bell,
-    cookie,
     defraId,
     nunjucksConfig,
-    hapiI18nPlugin,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
@@ -85,7 +94,7 @@ export async function createServer() {
 
   server.ext('onPreResponse', catchAll)
 
-  server.ext('onRequest', registerLanguageExtension)
+  // server.ext('onPreResponse', registerLanguageExtension)
 
   return server
 }

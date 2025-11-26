@@ -18,8 +18,7 @@ async function context(request) {
   const authedUser =
     (await request.getUserSession(request, request.state?.userSession)) || {}
 
-  const currentLang = request.i18n.getLocale()
-  const translations = request.i18n.getCatalog(currentLang)
+  const { currentLang, translations } = request.app
   const organisationName = authedUser.organisationName
 
   // Only translate if the full organisationName exists in translations

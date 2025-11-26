@@ -9,6 +9,8 @@ export const homeController = {
     let userPermissions = {}
     const { currentLang, translations } = request.app
 
+    console.log('TRANSALATIONS', translations)
+
     userPermissions = request.yar.get('userPermissions')
     if (!userPermissions) {
       request.logger.error('failed to load permission from cookie')
