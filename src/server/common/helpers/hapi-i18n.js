@@ -13,8 +13,8 @@ export const hapiI18nPlugin = {
     directory: path.join(__dirname, '../../../client/common/locales'),
     defaultLocale: 'en',
     cookieName: 'locale',
-    objectNotation: true, // required
+    objectNotation: true,
     extension: '.json',
-    queryParameter: 'lang' // required// <-- Important!
+    queryParameter: 'lang'
   }
 }
