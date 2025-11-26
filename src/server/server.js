@@ -68,16 +68,16 @@ export async function createServer() {
   server.decorate('request', 'getUserSession', getUserSession)
 
   await server.register([
-    cookie,
-    hapiI18nPlugin,
     requestLogger,
     requestTracing,
     secureContext,
     pulse,
     sessionCache,
     bell,
+    cookie,
     defraId,
     nunjucksConfig,
+    hapiI18nPlugin,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
