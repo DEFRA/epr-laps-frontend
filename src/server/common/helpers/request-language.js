@@ -2,7 +2,9 @@ const allowed = new Set(['en', 'cy'])
 const fallback = 'en'
 
 function normalizeLang(value) {
-  if (typeof value !== 'string') return null
+  if (typeof value !== 'string') {
+    return null
+  }
   const lang = value.trim().toLowerCase()
   return allowed.has(lang) ? lang : null
 }
