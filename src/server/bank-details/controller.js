@@ -168,7 +168,6 @@ export const checkBankDetailsController = {
       return h.redirect('bank-details/update-bank-details')
     }
 
-    newBankDetails.requesterName = request.auth.credentials.displayName
     newBankDetails.localAuthority = request.auth.credentials.organisationName
 
     request.yar.set('ConfirmedBankDetails', newBankDetails)
