@@ -32,7 +32,6 @@ export function extractUserOrgDetails(payload) {
     )
   }
 
-  console.log('THE PAYLOAD:', payload)
   const displayEmail = payload.email
 
   return { organisationName, displayEmail, organisationId }
