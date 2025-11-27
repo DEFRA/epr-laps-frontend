@@ -1,39 +1,38 @@
+const allowed = new Set(['en', 'cy'])
+const fallback = 'en'
+
+function normalizeLang(value) {
+  if (typeof value !== 'string') return null
+  const lang = value.trim().toLowerCase()
+  return allowed.has(lang) ? lang : null
+}
+
 export function registerLanguageExtension(server) {
-  const allowed = new Set(['en', 'cy'])
   server.ext('onRequest', (request, h) => {
-    const raw = request.query.lang
-    if (raw) {
-      const queryLang = raw.toLowerCase()
-      if (!allowed.has(queryLang)) {
-        // invalid lang → redirect
-        const updatedQuery = { ...request.query, lang: 'en' }
-        const qs = new URLSearchParams(updatedQuery).toString()
-        const redirectTo = request.path + (qs ? `?${qs}` : '')
-        h.state('locale', 'en')
-        return h.redirect(redirectTo).takeover()
-      }
-      h.state('locale', queryLang) // update cookie
+    const lang = normalizeLang(request.query.lang)
+
+    if (!lang && request.query.lang) {
+      const updatedQuery = { ...request.query, lang: fallback }
+      const qs = new URLSearchParams(updatedQuery).toString()
+      h.state('locale', fallback)
+      return h.redirect(`${request.path}?${qs}`).takeover()
     }
+
+    if (lang) {
+      h.state('locale', lang)
+    }
+
     return h.continue
   })
 
-  // onPreHandler → set values for handler usage
   server.ext('onPreHandler', (request, h) => {
-    const allowed = new Set(['en', 'cy'])
-    let currentLang
-
-    // priority: URL → cookie → fallback
-    const raw = request.query.lang
-    if (raw && allowed.has(raw.toLowerCase())) {
-      currentLang = raw.toLowerCase()
-    } else if (allowed.has(request.state?.locale)) {
-      currentLang = request.state.locale
-    } else {
-      currentLang = 'en'
-    }
+    const fromQuery = normalizeLang(request.query.lang)
+    const fromCookie = normalizeLang(request.state?.locale)
+    const currentLang = fromQuery || fromCookie || fallback
 
     request.app.currentLang = currentLang
     request.app.translations = request.i18n.getCatalog(currentLang) || {}
+
     return h.continue
   })
 }

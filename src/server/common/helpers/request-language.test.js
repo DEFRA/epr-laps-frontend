@@ -1,9 +1,8 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { registerLanguageExtension } from './request-language.js'
 
 function makeI18nMock(locale = 'en', catalog = {}) {
   return {
-    getLocale: vi.fn(() => locale),
     getCatalog: vi.fn(() => catalog)
   }
 }
@@ -13,10 +12,20 @@ function makeRequest(overrides = {}) {
     query: {},
     params: {},
     path: '/test',
+    state: {},
     app: {},
-    logger: { error: vi.fn() },
     i18n: makeI18nMock(),
     ...overrides
+  }
+}
+
+function createMockServer() {
+  const exts = {}
+  return {
+    ext: (event, fn) => {
+      exts[event] = fn
+    },
+    exts
   }
 }
 
@@ -28,21 +37,41 @@ const h = {
   continue: Symbol('continue')
 }
 
-describe.skip('registerLanguageExtension', () => {
+describe('registerLanguageExtension', () => {
+  let server
+
   afterEach(() => {
     vi.restoreAllMocks()
   })
+
+  beforeEach(() => {
+    server = createMockServer()
+    registerLanguageExtension(server)
+  })
+
+  function runOnRequest(request) {
+    return server.exts['onRequest'](request, h)
+  }
+
+  function runOnPreHandler(request) {
+    return server.exts['onPreHandler'](request, h)
+  }
+
+  // ----------------------------------------------
 
   it('defaults to en and loads translations when lang missing', () => {
     const request = makeRequest({
       i18n: makeI18nMock('en', { hello: 'world' })
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toBe(h.continue)
+    const r1 = runOnRequest(request)
+    expect(r1).toBe(h.continue)
+
+    const r2 = runOnPreHandler(request)
+    expect(r2).toBe(h.continue)
+
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ hello: 'world' })
-    expect(request.i18n.getCatalog).toHaveBeenCalledWith('en')
   })
 
   it('accepts uppercase EN and loads en translations', () => {
@@ -50,9 +79,13 @@ describe.skip('registerLanguageExtension', () => {
       query: { lang: 'EN' },
       i18n: makeI18nMock('en', { hello: 'upper' })
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toBe(h.continue)
+    const r1 = runOnRequest(request)
+    expect(r1).toBe(h.continue)
+
+    const r2 = runOnPreHandler(request)
+    expect(r2).toBe(h.continue)
+
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ hello: 'upper' })
   })
@@ -62,26 +95,28 @@ describe.skip('registerLanguageExtension', () => {
       query: { lang: 'cy' },
       i18n: makeI18nMock('cy', { hej: 'cy' })
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toBe(h.continue)
+    runOnRequest(request)
+    runOnPreHandler(request)
+
     expect(request.app.currentLang).toBe('cy')
     expect(request.app.translations).toEqual({ hej: 'cy' })
   })
 
-  it('redirects to same path with lang=en when explicit non-allowed lang provided', () => {
+  it('redirects when invalid lang is provided', () => {
     const request = makeRequest({
       query: { lang: 'xx', foo: 'bar' },
-      path: '/some/path',
-      i18n: makeI18nMock('en', { hello: 'world' })
+      path: '/some/path'
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toEqual({ redirectTo: expect.any(String), takeover: true })
-    const redirectTo = result.redirectTo
-    expect(redirectTo.startsWith(request.path)).toBe(true)
-    expect(redirectTo).toContain('lang=en')
-    expect(redirectTo).toContain('foo=bar')
+    const result = runOnRequest(request)
+
+    expect(result).toEqual({
+      redirectTo: expect.stringContaining('/some/path'),
+      takeover: true
+    })
+    expect(result.redirectTo).toContain('lang=en')
+    expect(result.redirectTo).toContain('foo=bar')
   })
 
   it('falls back to empty translations if getCatalog returns undefined', () => {
@@ -89,34 +124,42 @@ describe.skip('registerLanguageExtension', () => {
       query: { lang: 'en' },
       i18n: makeI18nMock('en', undefined)
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toBe(h.continue)
+    runOnRequest(request)
+    runOnPreHandler(request)
+
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({})
   })
 
-  it('trims whitespace around lang and normalizes to lowercase', () => {
+  it('trims whitespace and normalizes case', () => {
     const request = makeRequest({
       query: { lang: '  En  ' },
       i18n: makeI18nMock('en', { trimmed: true })
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toBe(h.continue)
+    runOnRequest(request)
+    runOnPreHandler(request)
+
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ trimmed: true })
   })
 
-  it('treats non-string lang values as missing and defaults to en', () => {
+  it('redirects when lang is non-string (invalid)', () => {
     const request = makeRequest({
-      query: { lang: ['en'] },
-      i18n: makeI18nMock('en', { ok: true })
+      query: { lang: ['en'], foo: 'bar' },
+      path: '/test'
     })
-    const result = registerLanguageExtension(request, h)
 
-    expect(result).toBe(h.continue)
-    expect(request.app.currentLang).toBe('en')
-    expect(request.app.translations).toEqual({ ok: true })
+    const result = runOnRequest(request)
+
+    expect(result).toEqual({
+      redirectTo: expect.any(String),
+      takeover: true
+    })
+
+    expect(result.redirectTo).toContain('/test')
+    expect(result.redirectTo).toContain('lang=en')
+    expect(result.redirectTo).toContain('foo=bar')
   })
 })
