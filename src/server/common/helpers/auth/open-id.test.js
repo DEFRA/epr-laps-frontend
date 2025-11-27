@@ -68,7 +68,7 @@ describe('#openIdProvider', () => {
         serviceId: 'testServiceId',
         firstName: 'Test',
         lastName: 'User',
-        displayName: 'Test User',
+        displayEmail: 'testEmail',
         email: 'testEmail',
         uniqueReference: 'testUniqueRef',
         loa: 'testLoa',

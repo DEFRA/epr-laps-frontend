@@ -49,9 +49,7 @@ export const updateUserSession = async (request, refreshedSession) => {
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
 
   const authedUser = await getUserSession(request, request.state.userSession)
-  const displayName = [payload.firstName, payload.lastName]
-    .filter((part) => part)
-    .join(' ')
+  const displayEmail = payload.email
 
   await request.server.app.cache.set(
     request.state.userSession.sessionId,
@@ -63,7 +61,7 @@ export const updateUserSession = async (request, refreshedSession) => {
       serviceId: payload.serviceId,
       firstName: payload.firstName,
       lastName: payload.lastName,
-      displayName,
+      displayEmail,
       email: payload.email,
       uniqueReference: payload.uniqueReference,
       loa: payload.loa,

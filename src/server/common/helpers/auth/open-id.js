@@ -32,11 +32,10 @@ export function extractUserOrgDetails(payload) {
     )
   }
 
-  const displayName = [payload.firstName, payload.lastName]
-    .filter(Boolean)
-    .join(' ')
+  console.log('THE PAYLOAD:', payload)
+  const displayEmail = payload.email
 
-  return { organisationName, displayName, organisationId }
+  return { organisationName, displayEmail, organisationId }
 }
 
 export const extractRoleName = (payload) => {
@@ -80,7 +79,7 @@ export const openIdProvider = (name, oidcConf) => {
 
       const payload = Jwt.token.decode(credentials.token).decoded.payload
 
-      const { organisationName, displayName, organisationId } =
+      const { organisationName, displayEmail, organisationId } =
         extractUserOrgDetails(payload)
       const { currentRole } = extractRoleName(payload)
 
@@ -93,7 +92,7 @@ export const openIdProvider = (name, oidcConf) => {
         serviceId: payload.serviceId,
         firstName: payload.firstName,
         lastName: payload.lastName,
-        displayName,
+        displayEmail,
         email: payload.email,
         uniqueReference: payload.uniqueReference,
         loa: payload.loa,

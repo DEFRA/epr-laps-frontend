@@ -214,7 +214,7 @@ describe('#utils', () => {
           serviceId: 'test-service-id',
           firstName: 'John',
           lastName: 'Doe',
-          displayName: 'John Doe',
+          displayEmail: 'john.doe@example.com',
           email: 'john.doe@example.com',
           uniqueReference: 'test-ref',
           loa: 'test-loa',
@@ -236,11 +236,10 @@ describe('#utils', () => {
       expect(result).toEqual(mockAuthedUser)
     })
 
-    test('should return no names when firstName or lastName is not in cache', async () => {
+    test('should return no displayEmail when email is not in cache', async () => {
       const payloadWithoutNames = {
         ...jwt.token.decode().decoded.payload,
-        firstName: null,
-        lastName: null
+        email: ''
       }
 
       jwt.token.decode.mockReturnValue({
@@ -254,7 +253,7 @@ describe('#utils', () => {
       expect(mockRequest.server.app.cache.set).toHaveBeenCalledWith(
         'test-id',
         expect.objectContaining({
-          displayName: ''
+          displayEmail: ''
         }),
         3600000
       )
@@ -276,7 +275,7 @@ describe('#utils', () => {
       expect(mockRequest.server.app.cache.set).toHaveBeenCalledWith(
         'test-id',
         expect.objectContaining({
-          displayName: 'John'
+          displayEmail: 'john.doe@example.com'
         }),
         3600000
       )
@@ -291,7 +290,7 @@ describe('#utils', () => {
         'test-id',
         expect.objectContaining({
           id: 'test-user-id',
-          displayName: 'John Doe'
+          displayEmail: 'john.doe@example.com'
         }),
         3600000
       )

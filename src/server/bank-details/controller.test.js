@@ -385,7 +385,7 @@ describe('#checkBankDetailsController', () => {
     request = createRequest({
       auth: {
         credentials: {
-          displayName: 'XYZ',
+          displayEmail: 'XYZ@test.com',
           organisationName: 'Defra Test'
         }
       },
@@ -417,7 +417,7 @@ describe('#checkBankDetailsController', () => {
         accountNumber: '094785923',
         accountName: 'Defra Test',
         sortCode: '09-03-023',
-        requesterName: 'XYZ',
+        requesterEmail: 'XYZ@test.com',
         localAuthority: 'Defra Test'
       })
     )
@@ -427,7 +427,7 @@ describe('#checkBankDetailsController', () => {
       expect.objectContaining({
         pageTitle: 'Confirm new bank account details',
         newBankDetails: expect.objectContaining({
-          requesterName: 'XYZ',
+          requesterEmail: 'XYZ@test.com',
           localAuthority: 'Defra Test'
         })
       })
@@ -455,7 +455,7 @@ describe('#postBankDetailsController', () => {
       app: { currentLang: 'en' },
       auth: {
         credentials: {
-          displayName: 'Juhi',
+          displayEmail: 'test@test.com',
           organisationName: 'Defra Test'
         }
       },
@@ -466,7 +466,7 @@ describe('#postBankDetailsController', () => {
               accountNumber: '094785923',
               accountName: 'Defra Test',
               sortCode: '09-03-023',
-              requesterName: 'Juhi',
+              requesterEmail: 'XYZ@test.com',
               localAuthority: 'Defra Test'
             }
           }
@@ -489,7 +489,7 @@ describe('#postBankDetailsController', () => {
       accountNumber: '094785923',
       accountName: 'Defra Test',
       sortCode: '0903023',
-      requesterName: 'Juhi',
+      requesterEmail: 'XYZ@test.com',
       localAuthority: 'Defra Test'
     })
     expect(request.logger.info).toHaveBeenCalledWith(
