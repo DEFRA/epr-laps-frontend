@@ -36,9 +36,7 @@ export function extractUserOrgDetails(payload) {
     .filter(Boolean)
     .join(' ')
 
-  const email = payload.email
-
-  return { organisationName, displayName, organisationId, email }
+  return { organisationName, displayName, organisationId }
 }
 
 export const extractRoleName = (payload) => {

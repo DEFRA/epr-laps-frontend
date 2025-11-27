@@ -124,7 +124,8 @@ export const bankDetailsConfirmedController = {
         accountName: bankApiData.accountName,
         sortCode: bankApiData.sortCode,
         accountNumber: bankApiData.accountNumber,
-        confirmed: true
+        confirmed: true,
+        requesterEmail: request.auth.credentials.email
       }
     )
 
