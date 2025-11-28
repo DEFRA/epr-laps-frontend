@@ -240,7 +240,7 @@ describe('#bankDetailsConfirmedController', () => {
 
     await bankDetailsConfirmedController.handler(request, h)
     expect(h.redirect).toHaveBeenCalledWith(
-      '/bank-details/bank-details-confirmed?lang=en'
+      '/bank-details-confirmed?lang=en'
     )
     expect(request.logger.info).toHaveBeenCalled()
   })
@@ -371,9 +371,9 @@ describe('#updateBankDetailsController', () => {
     const result = await postUpdateBankDetailsController.handler(request, h)
 
     expect(h.redirect).toHaveBeenCalledWith(
-      'bank-details/check-bank-details?lang=en'
+      '/check-bank-details?lang=en'
     )
-    expect(result).toBe('bank-details/check-bank-details?lang=en')
+    expect(result).toBe('/check-bank-details?lang=en')
   })
 })
 
@@ -497,7 +497,7 @@ describe('#postBankDetailsController', () => {
     expect(request.yar.clear).toHaveBeenCalledWith('ConfirmedBankDetails')
     expect(request.yar.clear).toHaveBeenCalledWith('payload')
     expect(h.redirect).toHaveBeenCalledWith(
-      '/bank-details/bank-details-submitted?lang=en'
+      '/bank-details-submitted?lang=en'
     )
     expect(result).toBe('redirected')
   })

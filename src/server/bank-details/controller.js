@@ -132,7 +132,7 @@ export const bankDetailsConfirmedController = {
     request.logger.info('bank details successfully confirmed')
     // Redirect on success
     return h.redirect(
-      `/bank-details/bank-details-confirmed?lang=${currentLang}`
+      `/bank-details-confirmed?lang=${currentLang}`
     )
   }
 }
@@ -204,7 +204,7 @@ export const postBankDetailsController = {
 
     // Redirect on success
     return h.redirect(
-      `/bank-details/bank-details-submitted?lang=${currentLang}`
+      `/bank-details-submitted?lang=${currentLang}`
     )
   }
 }
@@ -318,6 +318,6 @@ export const postUpdateBankDetailsController = {
     request.yar.set('formSubmitted', false)
     request.yar.set('visited', false)
 
-    return h.redirect(`bank-details/check-bank-details?lang=${currentLang}`)
+    return h.redirect(`/check-bank-details?lang=${currentLang}`)
   }
 }
