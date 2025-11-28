@@ -15,14 +15,6 @@ export const hapiI18nPlugin = {
     cookieName: 'locale',
     objectNotation: true,
     extension: '.json',
-    queryParameter: 'lang',
-    allowCookie: true, // <--- IMPORTANT: allow reading cookie
-    cookieOptions: {
-      path: '/',
-      encoding: 'none',
-      isSecure: false,
-      isHttpOnly: false,
-      ttl: null
-    }
+    queryParameter: 'lang'
   }
 }
