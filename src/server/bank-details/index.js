@@ -21,7 +21,7 @@ export const bankDetails = {
       })
       server.route({
         method: 'GET',
-        path: '/bank-details/confirm',
+        path: '/confirm',
         ...confirmBankDetailsController
       })
       server.route({
@@ -48,7 +48,7 @@ export const bankDetails = {
 
       server.route({
         method: 'GET',
-        path: '/bank-details/bank-details-confirmed',
+        path: '/bank-details-confirmed',
         handler: (_request, h) => {
           return h.view('bank-details/bank-details-confirmed.njk', {
             pageTitle: 'Bank Details Confirmed'
@@ -57,7 +57,7 @@ export const bankDetails = {
       })
       server.route({
         method: 'GET',
-        path: '/bank-details/check-bank-details',
+        path: '/check-bank-details',
         ...checkBankDetailsController
       })
       server.route({
@@ -67,7 +67,7 @@ export const bankDetails = {
       })
       server.route({
         method: 'GET',
-        path: '/bank-details/bank-details-submitted',
+        path: '/bank-details-submitted',
         ...bankDetailsSubmittedController
       })
     }

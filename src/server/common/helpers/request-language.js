@@ -1,46 +1,37 @@
-import path from 'node:path'
-import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
+const allowed = new Set(['en', 'cy'])
+const fallback = 'en'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+function normalizeLang(value) {
+  if (typeof value !== 'string') {
+    return null
+  }
+  const lang = value.trim().toLowerCase()
+  return allowed.has(lang) ? lang : null
+}
 
 export function registerLanguageExtension(server) {
-  const allowed = new Set(['en', 'cy'])
+  server.ext('onPreAuth', (request, h) => {
+    const rawLang = request.query.lang
+    const lang = normalizeLang(rawLang)
 
-  server.ext('onRequest', (request, h) => {
-    const raw =
-      request.query && typeof request.query.lang === 'string'
-        ? request.query.lang
-        : ''
-    const lang = raw.trim().toLowerCase()
-    const currentLang = allowed.has(lang) ? lang : 'en'
-
-    if (raw && !allowed.has(lang)) {
-      const query = { ...request.query, lang: currentLang }
-      const qs = new URLSearchParams(query).toString()
-      const redirectTo = request.path + (qs ? `?${qs}` : '')
-
-      return h.redirect(redirectTo).takeover()
+    if (!lang && rawLang) {
+      const updatedQuery = { ...request.query, lang: fallback }
+      const qs = new URLSearchParams(updatedQuery).toString()
+      h.state('locale', fallback)
+      return h.redirect(`${request.path}?${qs}`).takeover()
     }
 
-    const filePath = path.join(
-      __dirname,
-      '../../../client/common/locales',
-      currentLang,
-      'translation.json'
-    )
-
-    try {
-      request.app.translations = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-    } catch (err) {
-      request.logger.error(
-        `Failed to load translations for "${currentLang}" from ${filePath}: ${err.message}`
-      )
-      request.app.translations = {}
+    if (lang) {
+      h.state('locale', lang)
     }
+
+    const fromQuery = lang
+    const fromCookie = normalizeLang(request.state?.locale)
+    const currentLang = fromQuery || fromCookie || fallback
 
     request.app.currentLang = currentLang
+    request.app.translations = request.i18n.getCatalog(currentLang) || {}
+
     return h.continue
   })
 }

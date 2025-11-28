@@ -59,13 +59,6 @@ export async function createServer() {
     }
   })
 
-  server.ext('onPreHandler', (request, h) => {
-    request.app.cookies = {
-      cookie_preferences_set: request.state.cookie_preferences_set === 'true'
-    }
-    return h.continue
-  })
-
   server.app.cache = server.cache({
     cache: 'session',
     expiresIn: config.get('redis.ttl'),
@@ -74,7 +67,6 @@ export async function createServer() {
 
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
-
   await server.register([
     requestLogger,
     requestTracing,
