@@ -124,7 +124,8 @@ export const bankDetailsConfirmedController = {
         accountName: bankApiData.accountName,
         sortCode: bankApiData.sortCode,
         accountNumber: bankApiData.accountNumber,
-        confirmed: true
+        confirmed: true,
+        requesterEmail: request.auth.credentials.email
       }
     )
 
@@ -167,7 +168,6 @@ export const checkBankDetailsController = {
       return h.redirect('bank-details/update-bank-details')
     }
 
-    newBankDetails.requesterName = request.auth.credentials.displayName
     newBankDetails.localAuthority = request.auth.credentials.organisationName
 
     request.yar.set('ConfirmedBankDetails', newBankDetails)
@@ -189,6 +189,7 @@ export const postBankDetailsController = {
 
     // Make your API call
     payload.sortCode = payload.sortCode.replaceAll('-', '').replaceAll(' ', '')
+    payload.requesterEmail = request.auth.credentials.email
     await authUtils.postWithToken(request, '/bank-details', payload)
 
     request.logger.info(
