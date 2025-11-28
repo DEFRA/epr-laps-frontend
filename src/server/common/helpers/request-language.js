@@ -2,18 +2,17 @@ const allowed = new Set(['en', 'cy'])
 const fallback = 'en'
 
 function normalizeLang(value) {
-  if (typeof value !== 'string') {
-    return null
-  }
+  if (typeof value !== 'string') return null
   const lang = value.trim().toLowerCase()
   return allowed.has(lang) ? lang : null
 }
 
 export function registerLanguageExtension(server) {
-  server.ext('onRequest', (request, h) => {
-    const lang = normalizeLang(request.query.lang)
+  server.ext('onPreAuth', (request, h) => {
+    const rawLang = request.query.lang
+    const lang = normalizeLang(rawLang)
 
-    if (!lang && request.query.lang) {
+    if (!lang && rawLang) {
       const updatedQuery = { ...request.query, lang: fallback }
       const qs = new URLSearchParams(updatedQuery).toString()
       h.state('locale', fallback)
@@ -24,11 +23,7 @@ export function registerLanguageExtension(server) {
       h.state('locale', lang)
     }
 
-    return h.continue
-  })
-
-  server.ext('onPreHandler', (request, h) => {
-    const fromQuery = normalizeLang(request.query.lang)
+    const fromQuery = lang
     const fromCookie = normalizeLang(request.state?.locale)
     const currentLang = fromQuery || fromCookie || fallback
 

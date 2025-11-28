@@ -49,26 +49,17 @@ describe('registerLanguageExtension', () => {
     registerLanguageExtension(server)
   })
 
-  function runOnRequest(request) {
-    return server.exts['onRequest'](request, h)
+  function runOnPreAuth(request) {
+    return server.exts['onPreAuth'](request, h)
   }
-
-  function runOnPreHandler(request) {
-    return server.exts['onPreHandler'](request, h)
-  }
-
-  // ----------------------------------------------
 
   it('defaults to en and loads translations when lang missing', () => {
     const request = makeRequest({
       i18n: makeI18nMock('en', { hello: 'world' })
     })
 
-    const r1 = runOnRequest(request)
-    expect(r1).toBe(h.continue)
-
-    const r2 = runOnPreHandler(request)
-    expect(r2).toBe(h.continue)
+    const r = runOnPreAuth(request)
+    expect(r).toBe(h.continue)
 
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ hello: 'world' })
@@ -80,11 +71,8 @@ describe('registerLanguageExtension', () => {
       i18n: makeI18nMock('en', { hello: 'upper' })
     })
 
-    const r1 = runOnRequest(request)
-    expect(r1).toBe(h.continue)
-
-    const r2 = runOnPreHandler(request)
-    expect(r2).toBe(h.continue)
+    const r = runOnPreAuth(request)
+    expect(r).toBe(h.continue)
 
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ hello: 'upper' })
@@ -96,8 +84,7 @@ describe('registerLanguageExtension', () => {
       i18n: makeI18nMock('cy', { hej: 'cy' })
     })
 
-    runOnRequest(request)
-    runOnPreHandler(request)
+    runOnPreAuth(request)
 
     expect(request.app.currentLang).toBe('cy')
     expect(request.app.translations).toEqual({ hej: 'cy' })
@@ -109,7 +96,7 @@ describe('registerLanguageExtension', () => {
       path: '/some/path'
     })
 
-    const result = runOnRequest(request)
+    const result = runOnPreAuth(request)
 
     expect(result).toEqual({
       redirectTo: expect.stringContaining('/some/path'),
@@ -125,8 +112,7 @@ describe('registerLanguageExtension', () => {
       i18n: makeI18nMock('en', undefined)
     })
 
-    runOnRequest(request)
-    runOnPreHandler(request)
+    runOnPreAuth(request)
 
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({})
@@ -138,8 +124,7 @@ describe('registerLanguageExtension', () => {
       i18n: makeI18nMock('en', { trimmed: true })
     })
 
-    runOnRequest(request)
-    runOnPreHandler(request)
+    runOnPreAuth(request)
 
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ trimmed: true })
@@ -151,7 +136,7 @@ describe('registerLanguageExtension', () => {
       path: '/test'
     })
 
-    const result = runOnRequest(request)
+    const result = runOnPreAuth(request)
 
     expect(result).toEqual({
       redirectTo: expect.any(String),
