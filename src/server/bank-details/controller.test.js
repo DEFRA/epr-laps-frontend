@@ -417,7 +417,6 @@ describe('#checkBankDetailsController', () => {
         accountNumber: '094785923',
         accountName: 'Defra Test',
         sortCode: '09-03-023',
-        requesterName: 'XYZ',
         localAuthority: 'Defra Test'
       })
     )
@@ -427,7 +426,6 @@ describe('#checkBankDetailsController', () => {
       expect.objectContaining({
         pageTitle: 'Confirm new bank account details',
         newBankDetails: expect.objectContaining({
-          requesterName: 'XYZ',
           localAuthority: 'Defra Test'
         })
       })
@@ -466,7 +464,6 @@ describe('#postBankDetailsController', () => {
               accountNumber: '094785923',
               accountName: 'Defra Test',
               sortCode: '09-03-023',
-              requesterName: 'Juhi',
               localAuthority: 'Defra Test'
             }
           }
@@ -489,7 +486,6 @@ describe('#postBankDetailsController', () => {
       accountNumber: '094785923',
       accountName: 'Defra Test',
       sortCode: '0903023',
-      requesterName: 'Juhi',
       localAuthority: 'Defra Test'
     })
     expect(request.logger.info).toHaveBeenCalledWith(
