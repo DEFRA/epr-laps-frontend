@@ -131,9 +131,7 @@ export const bankDetailsConfirmedController = {
 
     request.logger.info('bank details successfully confirmed')
     // Redirect on success
-    return h.redirect(
-      `/bank-details-confirmed?lang=${currentLang}`
-    )
+    return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
   }
 }
 
@@ -203,9 +201,7 @@ export const postBankDetailsController = {
     request.yar.clear('payload')
 
     // Redirect on success
-    return h.redirect(
-      `/bank-details-submitted?lang=${currentLang}`
-    )
+    return h.redirect(`/bank-details-submitted?lang=${currentLang}`)
   }
 }
 
