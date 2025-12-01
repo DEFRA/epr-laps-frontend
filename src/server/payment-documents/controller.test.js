@@ -180,26 +180,27 @@ describe('paymentDocumentsController', () => {
       expectedFile1Name,
       expectedFile2Name
     }) => {
+      let updatedRequest = request
+      beforeEach(() => {
+        updatedRequest = {
+          ...request,
+          app: {
+            ...request.app,
+            currentLang
+          },
+          auth: {
+            credentials: {
+              organisationName: givenOrganisationName
+            }
+          }
+        }
+      })
       it(`should return file in ${ExpectedfileLanguage} language`, async () => {
         request.yar.flash
           .mockReturnValueOnce(['2024 to 2025'])
           .mockReturnValue()
 
-        await paymentDocumentsController.handler(
-          {
-            ...request,
-            app: {
-              ...request.app,
-              currentLang
-            },
-            auth: {
-              credentials: {
-                organisationName: givenOrganisationName
-              }
-            }
-          },
-          h
-        )
+        await paymentDocumentsController.handler(updatedRequest, h)
 
         const viewArg = h.view.mock.calls[0][1]
         const doc1Html = viewArg.rows[0][2].html
