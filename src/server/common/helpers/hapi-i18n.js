@@ -9,9 +9,12 @@ const __dirname = path.dirname(__filename)
 export const hapiI18nPlugin = {
   plugin: HapiI18n,
   options: {
-    locales: ['en', 'cy'], // English and Welsh
+    locales: ['en', 'cy'],
     directory: path.join(__dirname, '../../../client/common/locales'),
     defaultLocale: 'en',
-    cookieName: 'locale'
+    cookieName: 'locale',
+    objectNotation: true,
+    extension: '.json',
+    queryParameter: 'lang'
   }
 }

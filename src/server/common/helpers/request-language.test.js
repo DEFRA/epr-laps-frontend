@@ -1,192 +1,150 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import fs from 'node:fs'
-import path from 'node:path'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { registerLanguageExtension } from './request-language.js'
+
+function makeI18nMock(locale = 'en', catalog = {}) {
+  return {
+    getCatalog: vi.fn(() => catalog)
+  }
+}
 
 function makeRequest(overrides = {}) {
   return {
     query: {},
+    params: {},
     path: '/test',
+    state: {},
     app: {},
-    log: vi.fn(),
-    logger: { error: vi.fn() },
+    i18n: makeI18nMock(),
     ...overrides
   }
 }
 
+function createMockServer() {
+  const exts = {}
+  return {
+    ext: (event, fn) => {
+      exts[event] = fn
+    },
+    exts
+  }
+}
+
+const h = {
+  state: vi.fn(),
+  redirect: (url) => ({
+    takeover: () => ({ redirectTo: url, takeover: true })
+  }),
+  continue: Symbol('continue')
+}
+
 describe('registerLanguageExtension', () => {
-  let registeredHandler
-
-  const server = {
-    ext(event, handler) {
-      expect(event).toBe('onRequest')
-      registeredHandler = handler
-    }
-  }
-
-  const h = {
-    redirect: (url) => ({
-      takeover: () => ({ redirectTo: url, takeover: true })
-    }),
-    continue: Symbol('continue')
-  }
-
-  beforeEach(() => {
-    registeredHandler = undefined
-  })
+  let server
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('registers the handler on the server', () => {
+  beforeEach(() => {
+    server = createMockServer()
     registerLanguageExtension(server)
-    expect(typeof registeredHandler).toBe('function')
   })
 
+  function runOnPreAuth(request) {
+    return server.exts['onPreAuth'](request, h)
+  }
+
   it('defaults to en and loads translations when lang missing', () => {
-    registerLanguageExtension(server)
+    const request = makeRequest({
+      i18n: makeI18nMock('en', { hello: 'world' })
+    })
 
-    const fakeJson = JSON.stringify({ hello: 'world' })
-    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
+    const r = runOnPreAuth(request)
+    expect(r).toBe(h.continue)
 
-    const request = { query: {}, path: '/test', app: {}, log: vi.fn() }
-    const result = registeredHandler(request, h)
-
-    expect(result).toBe(h.continue)
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ hello: 'world' })
-    expect(spy).toHaveBeenCalled()
-    expect(spy).toHaveBeenCalledWith(
-      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
-      'utf8'
-    )
   })
 
   it('accepts uppercase EN and loads en translations', () => {
-    registerLanguageExtension(server)
+    const request = makeRequest({
+      query: { lang: 'EN' },
+      i18n: makeI18nMock('en', { hello: 'upper' })
+    })
 
-    const fakeJson = JSON.stringify({ hello: 'upper' })
-    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
+    const r = runOnPreAuth(request)
+    expect(r).toBe(h.continue)
 
-    const request = { query: { lang: 'EN' }, path: '/p', app: {}, log: vi.fn() }
-    const result = registeredHandler(request, h)
-
-    expect(result).toBe(h.continue)
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ hello: 'upper' })
-    expect(spy).toHaveBeenCalledWith(
-      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
-      'utf8'
-    )
   })
 
   it('accepts cy and loads cy translations', () => {
-    registerLanguageExtension(server)
-
-    const fakeJson = JSON.stringify({ hej: 'cy' })
-    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
-
-    const request = {
+    const request = makeRequest({
       query: { lang: 'cy' },
-      path: '/cy',
-      app: {},
-      log: vi.fn()
-    }
-    const result = registeredHandler(request, h)
-
-    expect(result).toBe(h.continue)
-    expect(request.app.currentLang).toBe('cy')
-    expect(request.app.translations).toEqual({ hej: 'cy' })
-    expect(spy).toHaveBeenCalledWith(
-      expect.stringContaining(`${path.sep}cy${path.sep}translation.json`),
-      'utf8'
-    )
-  })
-
-  it('redirects to same path with lang=en when explicit non-allowed lang provided and preserves other query params', () => {
-    registerLanguageExtension(server)
-
-    const spy = vi.spyOn(fs, 'readFileSync')
-
-    const request = {
-      query: { lang: 'xx', foo: 'bar' },
-      path: '/some/path',
-      app: {},
-      log: vi.fn()
-    }
-
-    const result = registeredHandler(request, h)
-
-    expect(result).toEqual({ redirectTo: expect.any(String), takeover: true })
-    const redirectTo = result.redirectTo
-
-    expect(redirectTo.startsWith(request.path)).toBe(true)
-    expect(redirectTo).toContain('lang=en')
-    expect(redirectTo).toContain('foo=bar')
-    expect(spy).not.toHaveBeenCalled()
-  })
-
-  it('falls back to empty translations when readFileSync throws', () => {
-    registerLanguageExtension(server)
-
-    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => {
-      throw new Error('no file')
+      i18n: makeI18nMock('cy', { hej: 'cy' })
     })
 
-    const request = makeRequest({ query: { lang: 'en' }, path: '/x' })
-    const result = registeredHandler(request, h)
+    runOnPreAuth(request)
 
-    expect(result).toBe(h.continue)
+    expect(request.app.currentLang).toBe('cy')
+    expect(request.app.translations).toEqual({ hej: 'cy' })
+  })
+
+  it('redirects when invalid lang is provided', () => {
+    const request = makeRequest({
+      query: { lang: 'xx', foo: 'bar' },
+      path: '/some/path'
+    })
+
+    const result = runOnPreAuth(request)
+
+    expect(result).toEqual({
+      redirectTo: expect.stringContaining('/some/path'),
+      takeover: true
+    })
+    expect(result.redirectTo).toContain('lang=en')
+    expect(result.redirectTo).toContain('foo=bar')
+  })
+
+  it('falls back to empty translations if getCatalog returns undefined', () => {
+    const request = makeRequest({
+      query: { lang: 'en' },
+      i18n: makeI18nMock('en', undefined)
+    })
+
+    runOnPreAuth(request)
+
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({})
-    expect(spy).toHaveBeenCalled()
-    expect(request.logger.error).toHaveBeenCalled()
   })
 
-  it('treats non-string lang values as missing and defaults to en', () => {
-    registerLanguageExtension(server)
-
-    const fakeJson = JSON.stringify({ ok: true })
-    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
-
-    const request = {
-      query: { lang: ['en'] },
-      path: '/arr',
-      app: {},
-      log: vi.fn()
-    }
-    const result = registeredHandler(request, h)
-
-    expect(result).toBe(h.continue)
-    expect(request.app.currentLang).toBe('en')
-    expect(request.app.translations).toEqual({ ok: true })
-    expect(spy).toHaveBeenCalledWith(
-      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
-      'utf8'
-    )
-  })
-
-  it('trims whitespace around lang and normalizes to lowercase', () => {
-    registerLanguageExtension(server)
-
-    const fakeJson = JSON.stringify({ trimmed: true })
-    const spy = vi.spyOn(fs, 'readFileSync').mockImplementation(() => fakeJson)
-
-    const request = {
+  it('trims whitespace and normalizes case', () => {
+    const request = makeRequest({
       query: { lang: '  En  ' },
-      path: '/t',
-      app: {},
-      log: vi.fn()
-    }
-    const result = registeredHandler(request, h)
+      i18n: makeI18nMock('en', { trimmed: true })
+    })
 
-    expect(result).toBe(h.continue)
+    runOnPreAuth(request)
+
     expect(request.app.currentLang).toBe('en')
     expect(request.app.translations).toEqual({ trimmed: true })
-    expect(spy).toHaveBeenCalledWith(
-      expect.stringContaining(`${path.sep}en${path.sep}translation.json`),
-      'utf8'
-    )
+  })
+
+  it('redirects when lang is non-string (invalid)', () => {
+    const request = makeRequest({
+      query: { lang: ['en'], foo: 'bar' },
+      path: '/test'
+    })
+
+    const result = runOnPreAuth(request)
+
+    expect(result).toEqual({
+      redirectTo: expect.any(String),
+      takeover: true
+    })
+
+    expect(result.redirectTo).toContain('/test')
+    expect(result.redirectTo).toContain('lang=en')
+    expect(result.redirectTo).toContain('foo=bar')
   })
 })

@@ -42,7 +42,15 @@ const baseRequest = {
   getUserSession: vi
     .fn()
     .mockResolvedValue({ organisationName: EN_NAME, relationships: [] }),
-  state: { userSession: null }
+  state: { userSession: null },
+  i18n: {
+    getLocale: vi.fn().mockReturnValue('en'),
+    getCatalog: vi.fn().mockReturnValue({
+      laNames: { [EN_NAME]: CY_NAME },
+      'sign-out': 'Sign out',
+      'your-defra-acco': 'Your Defra account'
+    })
+  }
 }
 
 describe('context and cache', () => {
