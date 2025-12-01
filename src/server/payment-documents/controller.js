@@ -41,7 +41,6 @@ export const paymentDocumentsController = {
 
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
-    console.log(translations, '==translations')
 
     const welshCouncils = langKey === 'CY' ? (translations.laNames ?? {}) : {}
     const isWelshCouncil =
