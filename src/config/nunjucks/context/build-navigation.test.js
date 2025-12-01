@@ -12,7 +12,8 @@ function mockRequest(options) {
         'your-defra-acco': 'Your Defra account',
         'sign-out': 'Sign out',
         'change-orga': 'Change organisation'
-      }
+      },
+      currentLang: options?.query?.lang || 'en'
     }
   }
 }

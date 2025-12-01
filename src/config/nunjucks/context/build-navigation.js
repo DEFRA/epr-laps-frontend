@@ -3,7 +3,7 @@ const ONE_ORGANIZATION = 1
 
 export async function buildNavigation(request) {
   const translations = request?.app?.translations || {}
-  const currentLang = request.query?.lang || 'en'
+  const currentLang = request?.app?.currentLang
   const defraAccountUrl = config.get('defraId.manageAccountUrl')
   const userSession = await request.getUserSession(
     request,
