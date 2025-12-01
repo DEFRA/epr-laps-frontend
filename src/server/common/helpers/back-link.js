@@ -1,4 +1,3 @@
-const COOKIE = 'nav'
 const MAX_HISTORY = 20
 
 export async function getBackLink(request, h) {
@@ -12,26 +11,25 @@ export async function getBackLink(request, h) {
   const currentUrl = getUrl(request)
   const currentKey = stripLang(currentUrl)
 
-  // Get or create navigation ID cookie
-  let navid = request.state?.[COOKIE]
-  if (!isValidId(navid)) {
-    navid = generateId()
-    h.state(COOKIE, navid, {
-      path: '/',
-      isHttpOnly: true,
-      isSameSite: 'Lax',
-      isSecure: false
-    })
+  // Use existing session ID (assumes request.state.session or request.auth.credentials)
+  const sessionId = request.state?.session?.id || request.auth?.credentials?.id
+  if (!sessionId) {
+    // If no session, just skip history tracking
+    response.source.context = {
+      ...response.source.context,
+      backLinkUrl: `/?lang=${currentLang}`
+    }
+    return h.continue
   }
 
-  // Load or initialize history
+  // Load or initialize history from cache
   const cache = request.server.app.cache
-  let history = (await cache.get(navid)) || []
+  let history = (await cache.get(sessionId)) || []
 
   // Update history (push or trim if revisiting)
   history = updateHistory(history, currentKey, currentUrl)
   if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY)
-  await cache.set(navid, history)
+  await cache.set(sessionId, history)
 
   // Compute previous page URL (back link)
   const backUrl = getPrevious(history, currentLang)
@@ -76,14 +74,4 @@ export function getPrevious(history, lang) {
   const params = new URLSearchParams(qs || '')
   params.set('lang', lang)
   return `${path}?${params.toString()}`
-}
-
-// Generate a random small ID
-export function generateId() {
-  return Math.random().toString(36).slice(2, 10)
-}
-
-// Validate cookie ID
-export function isValidId(id) {
-  return typeof id === 'string' && /^[a-z0-9]{6,16}$/i.test(id)
 }

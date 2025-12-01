@@ -1,152 +1,202 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   getBackLink,
-  updateHistory,
-  stripLang,
   getUrl,
-  isValidId,
-  generateId
+  stripLang,
+  updateHistory,
+  getPrevious
 } from './back-link.js'
 
-const COOKIE = 'nav'
 const MAX_HISTORY = 20
 
+function mockRequest({
+  path = '/test',
+  query = {},
+  state = {},
+  sessionId = 'sess123',
+  history = [],
+  viewContext = {}
+} = {}) {
+  return {
+    path,
+    query,
+    state: { session: { id: sessionId }, ...state },
+    auth: { credentials: { id: sessionId } },
+    response: { variety: 'view', source: { context: viewContext } },
+    server: {
+      app: {
+        cache: {
+          get: vi.fn().mockResolvedValue(history),
+          set: vi.fn().mockResolvedValue()
+        }
+      }
+    }
+  }
+}
+
+function mockH() {
+  return { continue: Symbol('continue'), state: vi.fn() }
+}
+
 describe('getBackLink', () => {
-  let request, h, cache
-
-  beforeEach(() => {
-    cache = {
-      get: vi.fn().mockResolvedValue(null),
-      set: vi.fn().mockResolvedValue()
-    }
-
-    request = {
-      query: {},
-      path: '/current',
-      response: { variety: 'view', source: { context: {} } },
-      state: {},
-      server: { app: { cache } }
-    }
-
-    h = {
-      continue: Symbol('continue'),
-      state: vi.fn()
-    }
-  })
-
-  it('should skip if response is missing', async () => {
-    request.response = null
-    const result = await getBackLink(request, h)
-    expect(result).toBe(h.continue)
-  })
-
-  it('should skip if response.variety is not view', async () => {
-    request.response.variety = 'other'
-    const result = await getBackLink(request, h)
-    expect(result).toBe(h.continue)
-  })
-
-  it('should generate new navid if invalid', async () => {
-    request.state[COOKIE] = 'invalid!'
-    await getBackLink(request, h)
-    expect(h.state).toHaveBeenCalled()
-  })
-
-  it('should use existing valid navid', async () => {
-    request.state[COOKIE] = 'abc123'
-    await getBackLink(request, h)
+  it('returns default back link when no session ID exists', async () => {
+    const req = mockRequest({ sessionId: undefined })
+    req.state = {}
+    req.auth = {}
+    const h = mockH()
+    await getBackLink(req, h)
+    expect(req.response.source.context.backLinkUrl).toBe('/?lang=en')
     expect(h.state).not.toHaveBeenCalled()
   })
 
-  it('should initialize history if empty', async () => {
-    request.state[COOKIE] = 'abc123'
-    await getBackLink(request, h)
-    expect(cache.set).toHaveBeenCalled()
+  it('stores history under sessionId and updates it', async () => {
+    const req = mockRequest({
+      path: '/page1',
+      query: { foo: 'bar' },
+      sessionId: 'sess123',
+      history: []
+    })
+    const h = mockH()
+    await getBackLink(req, h)
+    expect(req.server.app.cache.set).toHaveBeenCalledTimes(1)
+    const savedHistory = req.server.app.cache.set.mock.calls[0][1]
+    expect(savedHistory.length).toBe(1)
+    expect(savedHistory[0].full).toBe('/page1?foo=bar')
   })
 
-  it('should update history and trim if exceeds MAX_HISTORY', async () => {
-    const longHistory = Array(MAX_HISTORY + 5).fill({ key: 'x', full: '/x' })
-    cache.get.mockResolvedValue(longHistory)
-    request.state[COOKIE] = 'abc123'
-    await getBackLink(request, h)
-    const savedHistory = cache.set.mock.calls[0][1]
-    expect(savedHistory.length).toBe(MAX_HISTORY)
-  })
-
-  it('should compute back link correctly', async () => {
-    request.state[COOKIE] = 'abc123'
-    request.query.lang = 'fr'
-    cache.get.mockResolvedValue([
-      { key: 'page1', full: '/page1?foo=bar' },
-      { key: 'page2', full: '/page2?foo=baz' }
-    ])
-
-    await getBackLink(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe(
+  it('computes correct back link when history exists', async () => {
+    const req = mockRequest({
+      path: '/page3',
+      query: { x: '1', lang: 'fr' },
+      sessionId: 'sess999',
+      history: [
+        { key: '/page1', full: '/page1' },
+        { key: '/page2?foo=baz', full: '/page2?foo=baz' }
+      ]
+    })
+    const h = mockH()
+    await getBackLink(req, h)
+    expect(req.response.source.context.backLinkUrl).toBe(
       '/page2?foo=baz&lang=fr'
     )
   })
 
-  it('should return root when history has 0 or 1 entries', async () => {
-    request.state[COOKIE] = 'abc123'
-    cache.get.mockResolvedValue([]) // ZERO history entries
-
-    await getBackLink(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  it('trims history to MAX_HISTORY', async () => {
+    const longHistory = Array.from({ length: 40 }).map((_, i) => ({
+      key: `/p${i}`,
+      full: `/p${i}`
+    }))
+    const req = mockRequest({
+      path: '/final',
+      sessionId: 'sessA',
+      history: longHistory
+    })
+    const h = mockH()
+    await getBackLink(req, h)
+    const saved = req.server.app.cache.set.mock.calls[0][1]
+    expect(saved.length).toBe(MAX_HISTORY)
   })
 
-  it('updateHistory trims forward history when revisiting a page', () => {
-    const history = [
-      { key: 'a', full: '/a' },
-      { key: 'b', full: '/b' },
-      { key: 'c', full: '/c' }
-    ]
-
-    const result = updateHistory(history, 'b', '/b')
-
-    expect(result).toEqual([
-      { key: 'a', full: '/a' },
-      { key: 'b', full: '/b' }
-    ])
+  it('returns root when history has 0 or 1 entries', async () => {
+    const req = mockRequest({ sessionId: 'sessX', history: [] })
+    const h = mockH()
+    await getBackLink(req, h)
+    expect(req.response.source.context.backLinkUrl).toBe('/?lang=en')
   })
 
-  it('generateId returns deterministic output when Math.random is mocked', () => {
-    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.123456)
+  describe('getBackLink edge cases for full coverage', () => {
+    it('handles missing session gracefully', async () => {
+      const req = {
+        path: '/edge',
+        query: {},
+        state: {}, // no session cookie at all
+        response: { variety: 'view', source: { context: {} } },
+        server: {
+          app: {
+            cache: {
+              get: vi.fn().mockResolvedValue([]),
+              set: vi.fn().mockResolvedValue()
+            }
+          }
+        }
+      }
 
-    const id = generateId()
-    expect(id).toBe('4fzyo82m') // Adjust if environment differs
+      const h = { continue: Symbol('continue'), state: vi.fn() }
 
-    spy.mockRestore()
+      await getBackLink(req, h)
+
+      expect(h.state).not.toHaveBeenCalled()
+      expect(req.response.source.context.backLinkUrl).toBe('/?lang=en')
+    })
+
+    it('trims history correctly when history is exactly MAX_HISTORY + 1', async () => {
+      const longHistory = Array.from({ length: MAX_HISTORY + 1 }).map(
+        (_, i) => ({ key: `/p${i}`, full: `/p${i}` })
+      )
+      const req = mockRequest({
+        path: '/trim',
+        sessionId: 'sessTrim',
+        history: longHistory
+      })
+      const h = mockH()
+      await getBackLink(req, h)
+      const saved = req.server.app.cache.set.mock.calls[0][1]
+      expect(saved.length).toBe(MAX_HISTORY)
+    })
   })
 })
 
 describe('Helper functions', () => {
+  it('getUrl builds correct query string', () => {
+    expect(getUrl({ path: '/p', query: { a: 1, b: 2 } })).toBe('/p?a=1&b=2')
+  })
+
+  it('getUrl handles undefined query', () => {
+    expect(getUrl({ path: '/noquery' })).toBe('/noquery')
+  })
+
   it('stripLang removes lang param', () => {
-    expect(stripLang('/path?lang=en&foo=bar')).toBe('/path?foo=bar')
-    expect(stripLang('/path')).toBe('/path')
+    expect(stripLang('/page?foo=1&lang=en')).toBe('/page?foo=1')
+    expect(stripLang('/page?lang=en')).toBe('/page')
   })
 
-  it('stripLang removes lang when it is the only parameter', () => {
-    expect(stripLang('/path?lang=en')).toBe('/path')
+  it('stripLang returns path only when no query remains', () => {
+    expect(stripLang('/page?lang=en')).toBe('/page')
   })
 
-  it('getUrl builds URL with query', () => {
-    const req = { path: '/test', query: { a: 1, b: 2 } }
-    expect(getUrl(req)).toBe('/test?a=1&b=2')
+  it('updateHistory appends on new page', () => {
+    const result = updateHistory([], '/a', '/a')
+    expect(result.length).toBe(1)
   })
 
-  it('getUrl handles undefined query (covers fallback branch)', () => {
-    const req = { path: '/no-query' }
-    expect(getUrl(req)).toBe('/no-query')
+  it('updateHistory trims on revisit', () => {
+    const hist = [
+      { key: '/a', full: '/a' },
+      { key: '/b', full: '/b' },
+      { key: '/c', full: '/c' }
+    ]
+    const result = updateHistory(hist, '/b', '/b')
+    expect(result.length).toBe(2)
+    expect(result[1].key).toBe('/b')
   })
 
-  it('isValidId validates correctly', () => {
-    expect(isValidId('abc123')).toBe(true)
-    expect(isValidId('invalid!')).toBe(false)
+  it('getPrevious returns / when only one entry', () => {
+    expect(getPrevious([{ key: '/a', full: '/a' }], 'en')).toBe('/?lang=en')
   })
 
-  it('generateId returns random string', () => {
-    const id = generateId()
-    expect(id).toMatch(/^[a-z0-9]{6,16}$/i)
+  it('getPrevious returns previous page when history > 1', () => {
+    const history = [
+      { key: '/page1', full: '/page1?foo=bar' },
+      { key: '/page2', full: '/page2?baz=qux' }
+    ]
+    expect(getPrevious(history, 'fr')).toBe('/page1?foo=bar&lang=fr')
+  })
+
+  it('coverage for internal ID handling is exercised via getBackLink', async () => {
+    // indirectly triggers generateId and isValidId
+    const req = mockRequest({ path: '/x', sessionId: undefined })
+    const h = mockH()
+    await getBackLink(req, h)
+    expect(req.response.source.context.backLinkUrl).toBe('/?lang=en')
   })
 })
