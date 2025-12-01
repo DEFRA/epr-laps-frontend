@@ -30,7 +30,16 @@ describe('paymentDocumentsController', () => {
           'laps-home': 'Home',
           'payment-documen': 'Payment documents',
           download: 'Download',
-          'view-(opens-in-': 'View (opens in new tab)'
+          'view-(opens-in-': 'View (opens in new tab)',
+          laNames: {
+            'Powys County Council': 'Cyngor Sir Powys',
+            'Gwynedd Council': 'Cyngor Gwynedd',
+            'Cardiff Council': 'Cyngor Caerdydd',
+            'Caerphilly County Borough Council':
+              'Logo Cyngor Bwrdeistref Sirol Caerffili',
+            'Pembrokeshire council': 'Cyngor Sir Benfro',
+            'Swansea council': 'cyngor Abertawe'
+          }
         }
       },
       auth: {
@@ -53,23 +62,51 @@ describe('paymentDocumentsController', () => {
           {
             id: '1',
             documentName: 'Doc 1',
-            fileName: 'doc1.pdf',
+            fileName: 'doc1_en.pdf',
             creationDate: new Date().toLocaleDateString('en-GB', {
               day: '2-digit',
               month: 'short',
               year: 'numeric'
             }),
+            language: 'EN',
             isLatest: true
           },
           {
             id: '2',
             documentName: 'Doc 2',
-            fileName: 'doc2.pdf',
+            fileName: 'doc2_en.pdf',
             creationDate: new Date().toLocaleDateString('en-GB', {
               day: '2-digit',
               month: 'short',
               year: 'numeric'
             }),
+            language: 'EN',
+            isLatest: true
+          }
+        ],
+        CY: [
+          {
+            id: '1',
+            documentName: 'Doc 1',
+            fileName: 'doc1_cy.pdf',
+            creationDate: new Date().toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }),
+            language: 'CY',
+            isLatest: true
+          },
+          {
+            id: '2',
+            documentName: 'Doc 2',
+            fileName: 'doc2_cy.pdf',
+            creationDate: new Date().toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }),
+            language: 'CY',
             isLatest: true
           }
         ]
@@ -127,6 +164,52 @@ describe('paymentDocumentsController', () => {
     )
     expect(result).toEqual([])
   })
+
+  describe.each`
+    councilLocation | givenOrganisationName     | currentLang | ExpectedfileLanguage | expectedFile1Name | expectedFile2Name
+    ${'Non Welsh'}  | ${'Manchester LA'}        | ${'cy'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
+    ${'Non Welsh'}  | ${'Manchester LA'}        | ${'en'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
+    ${'Welsh'}      | ${'Powys County Council'} | ${'cy'}     | ${'Welsh'}           | ${'doc1_cy.pdf'}  | ${'doc2_cy.pdf'}
+    ${'Welsh'}      | ${'Powys County Council'} | ${'en'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
+  `(
+    'given a $councilLocation council and selected language is $currentLang',
+    ({
+      givenOrganisationName,
+      currentLang,
+      ExpectedfileLanguage,
+      expectedFile1Name,
+      expectedFile2Name
+    }) => {
+      it(`should return file in ${ExpectedfileLanguage} language`, async () => {
+        request.yar.flash
+          .mockReturnValueOnce(['2024 to 2025'])
+          .mockReturnValue()
+
+        await paymentDocumentsController.handler(
+          {
+            ...request,
+            app: {
+              ...request.app,
+              currentLang
+            },
+            auth: {
+              credentials: {
+                organisationName: givenOrganisationName
+              }
+            }
+          },
+          h
+        )
+
+        const viewArg = h.view.mock.calls[0][1]
+        const doc1Html = viewArg.rows[0][2].html
+        const doc2Html = viewArg.rows[1][2].html
+
+        expect(doc1Html).toContain(expectedFile1Name)
+        expect(doc2Html).toContain(expectedFile2Name)
+      })
+    }
+  )
 })
 
 describe('fileDownloadController', () => {

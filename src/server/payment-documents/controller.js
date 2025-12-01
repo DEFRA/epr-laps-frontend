@@ -41,9 +41,14 @@ export const paymentDocumentsController = {
 
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
+    console.log(translations, '==translations')
+
+    const welshCouncils = langKey === 'CY' ? (translations.laNames ?? {}) : {}
+    const isWelshCouncil =
+      langKey === 'CY' && Object.keys(welshCouncils).includes(organisationName)
 
     const docsByYear = documentApiData[yearToShow] || {}
-    const docsToShow = docsByYear[langKey] || []
+    const docsToShow = docsByYear[isWelshCouncil ? langKey : 'EN'] || []
 
     rows = buildTableRows(docsToShow, translations)
     request.yar.flash('selectedYear', selectedYear)
