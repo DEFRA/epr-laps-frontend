@@ -75,7 +75,6 @@ export async function createServer() {
 
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
-  getBackLink(server)
 
   await server.register([
     requestLogger,
@@ -92,7 +91,7 @@ export async function createServer() {
   ])
 
   server.ext('onPostAuth', handlePostAuth)
-
+  server.ext('onPreResponse', getBackLink)
   server.ext('onPreResponse', catchAll)
 
   return server

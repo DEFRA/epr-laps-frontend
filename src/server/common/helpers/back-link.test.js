@@ -1,490 +1,152 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   getBackLink,
-  stripForKey,
-  getCurrentUrl,
-  setBackLink,
   updateHistory,
-  trimHistory,
-  computeBackLink
+  stripLang,
+  getUrl,
+  isValidId,
+  generateId
 } from './back-link.js'
 
-function makeRequest(overrides = {}) {
-  const historyStore = overrides.history || []
-  return {
-    url: { href: overrides.href, pathname: overrides.pathname || '/start' },
-    query: overrides.query || {},
-    response: overrides.response || {
-      variety: 'view',
-      source: { context: {} }
-    },
-    yar: {
-      get: vi.fn(() => historyStore),
-      set: vi.fn()
-    },
-    ...overrides
-  }
-}
+const COOKIE = 'nav'
+const MAX_HISTORY = 20
 
-describe('Backlink', () => {
-  let registeredHandler
-  const server = {
-    ext(event, handler) {
-      expect(event).toBe('onPreResponse')
-      registeredHandler = handler
-    }
-  }
-  const h = { continue: Symbol('continue') }
+describe('getBackLink', () => {
+  let request, h, cache
 
   beforeEach(() => {
-    registeredHandler = undefined
-  })
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('registers the onPreResponse handler', () => {
-    getBackLink(server)
-    expect(typeof registeredHandler).toBe('function')
-  })
-
-  it('sets default backLinkUrl when no previous page exists', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      href: '/test?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('adds first page to history', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      href: '/step-one?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.yar.set).toHaveBeenCalledWith(
-      'history',
-      expect.arrayContaining([{ key: '/step-one', full: '/step-one?lang=en' }])
-    )
-  })
-
-  it('avoids duplicates when page already in history', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      history: [{ key: '/step-one', full: '/step-one?lang=en' }],
-      href: '/step-one?lang=cy',
-      query: { lang: 'cy' }
-    })
-    registeredHandler(request, h)
-    expect(request.yar.set).toHaveBeenCalledWith('history', [
-      { key: '/step-one', full: '/step-one?lang=en' }
-    ])
-  })
-
-  it('sets backlink to previous page preserving current lang', () => {
-    getBackLink(server)
-    const history = [
-      { key: '/step-one', full: '/step-one?lang=en' },
-      { key: '/step-two', full: '/step-two?lang=en' }
-    ]
-    const request = makeRequest({
-      history,
-      href: '/step-three?lang=cy',
-      query: { lang: 'cy' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe(
-      '/step-two?lang=cy'
-    )
-  })
-
-  it('limits history to 20 entries', () => {
-    getBackLink(server)
-    const history = Array.from({ length: 21 }, (_, i) => ({
-      key: `/p${i}`,
-      full: `/p${i}?lang=en`
-    }))
-    const request = makeRequest({
-      history,
-      href: '/new?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.yar.set.mock.calls[0][1].length).toBe(20)
-  })
-
-  it('does nothing for non-view response', () => {
-    getBackLink(server)
-    const request = makeRequest({ response: { variety: 'plain', source: {} } })
-    registeredHandler(request, h)
-    expect(request.yar.set).not.toHaveBeenCalled()
-  })
-
-  it('falls back to pathname when href missing', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      pathname: '/xyz',
-      href: undefined,
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('truncates history when revisiting an existing page', () => {
-    getBackLink(server)
-    const history = [
-      { key: '/first', full: '/first?lang=en' },
-      { key: '/second', full: '/second?lang=en' },
-      { key: '/third', full: '/third?lang=en' }
-    ]
-    const request = makeRequest({
-      history,
-      href: '/second?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    const updated = request.yar.set.mock.calls[0][1]
-    expect(updated.length).toBe(2)
-  })
-
-  it('falls back to default backLinkUrl if previous page has no full URL', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      history: [{ key: '/only', full: null }],
-      href: '/newpage?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('covers existingIndex slice when revisiting a page', () => {
-    getBackLink(server)
-    const history = [
-      { key: '/page1', full: '/page1?lang=en' },
-      { key: '/page2', full: '/page2?lang=en' },
-      { key: '/page3', full: '/page3?lang=en' }
-    ]
-    const request = makeRequest({
-      history,
-      href: '/page2?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    const updatedHistory = request.yar.set.mock.calls[0][1]
-    expect(updatedHistory).toEqual([
-      { key: '/page1', full: '/page1?lang=en' },
-      { key: '/page2', full: '/page2?lang=en' }
-    ])
-  })
-
-  it('covers history trimming when history > 20', () => {
-    getBackLink(server)
-    const history = Array.from({ length: 22 }, (_, i) => ({
-      key: `/p${i}`,
-      full: `/p${i}?lang=en`
-    }))
-    const request = makeRequest({
-      history,
-      href: '/newpage?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    const trimmed = request.yar.set.mock.calls[0][1]
-    expect(trimmed.length).toBe(20)
-  })
-
-  it('covers fallback when previous full is falsy', () => {
-    getBackLink(server)
-    const history = [
-      { key: '/one', full: '/one?lang=en' },
-      { key: '/two', full: null }
-    ]
-    const request = makeRequest({
-      history,
-      href: '/three?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('sets default backLinkUrl when history is empty', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      history: [],
-      href: '/new?lang=en',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('defaults lang to "en" when query.lang is missing', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      href: '/test',
-      query: {}
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('handles missing history gracefully', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      history: undefined,
-      href: '/newpage',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.yar.set).toHaveBeenCalledWith(
-      'history',
-      expect.arrayContaining([{ key: '/newpage', full: '/newpage' }])
-    )
-  })
-
-  it('sets default backlink when currentKey is empty', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      href: '/',
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('handles request with no url object', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      url: undefined,
-      query: { lang: 'en' }
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('defaults lang to "en" when request.query is undefined', () => {
-    getBackLink(server)
-    const request = makeRequest({
-      href: '/some-page',
-      query: undefined
-    })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('handles undefined history from yar.get', () => {
-    getBackLink(server)
-    const request = makeRequest()
-    request.yar.get = vi.fn(() => undefined)
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-    expect(request.yar.set).toHaveBeenCalledWith(
-      'history',
-      expect.arrayContaining([{ key: '/start', full: '/start' }])
-    )
-  })
-
-  it('handles empty currentUrl safely', () => {
-    getBackLink(server)
-    const request = makeRequest({ href: undefined, pathname: undefined })
-    registeredHandler(request, h)
-    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
-  })
-
-  it('covers computeBackLink qs fallback when previous full has no query string', () => {
-    getBackLink(server)
-
-    const history = [{ key: '/first', full: '/first' }]
-
-    const request = makeRequest({
-      history,
-      href: '/second?lang=cy',
-      query: { lang: 'cy' }
-    })
-
-    registeredHandler(request, h)
-
-    expect(request.response.source.context.backLinkUrl).toBe('/first?lang=cy')
-  })
-
-  describe('getBackLink', () => {
-    let registeredHandler
-    const server = {
-      ext(event, handler) {
-        registeredHandler = handler
-      }
+    cache = {
+      get: vi.fn().mockResolvedValue(null),
+      set: vi.fn().mockResolvedValue()
     }
 
-    const h = { continue: Symbol('continue') }
+    request = {
+      query: {},
+      path: '/current',
+      response: { variety: 'view', source: { context: {} } },
+      state: {},
+      server: { app: { cache } }
+    }
 
-    beforeEach(() => {
-      registeredHandler = undefined
-    })
-    afterEach(() => vi.restoreAllMocks())
-
-    it('registers onPreResponse handler', () => {
-      getBackLink(server)
-      expect(typeof registeredHandler).toBe('function')
-    })
-
-    it('sets default backlink when no previous page exists', () => {
-      getBackLink(server)
-      const req = makeRequest({ href: '/step?lang=en', query: { lang: 'en' } })
-      registeredHandler(req, h)
-      expect(req.response.source.context.backLinkUrl).toBe('/?lang=en')
-    })
-
-    it('adds first page to history', () => {
-      getBackLink(server)
-      const req = makeRequest({ href: '/page?lang=en', query: { lang: 'en' } })
-      registeredHandler(req, h)
-
-      expect(req.yar.set).toHaveBeenCalledWith(
-        'history',
-        expect.arrayContaining([{ key: '/page', full: '/page?lang=en' }])
-      )
-    })
-
-    it('uses previous page correctly', () => {
-      getBackLink(server)
-      const history = [
-        { key: '/one', full: '/one?lang=en' },
-        { key: '/two', full: '/two?lang=en' }
-      ]
-
-      const req = makeRequest({
-        history,
-        href: '/three?lang=cy',
-        query: { lang: 'cy' }
-      })
-
-      registeredHandler(req, h)
-
-      expect(req.response.source.context.backLinkUrl).toBe('/two?lang=cy')
-    })
-
-    it('ignores non-view responses', () => {
-      getBackLink(server)
-      const req = makeRequest({ response: { variety: 'plain', source: {} } })
-      registeredHandler(req, h)
-      expect(req.yar.set).not.toHaveBeenCalled()
-    })
+    h = {
+      continue: Symbol('continue'),
+      state: vi.fn()
+    }
   })
 
-  describe('getCurrentUrl', () => {
-    it('uses href when provided', () => {
-      const req = { url: { href: '/hi?x=1', pathname: '/hi' } }
-      expect(getCurrentUrl(req)).toBe('/hi?x=1')
-    })
-
-    it('falls back to pathname', () => {
-      const req = { url: { href: undefined, pathname: '/path' } }
-      expect(getCurrentUrl(req)).toBe('/path')
-    })
-
-    it('returns empty string when url missing', () => {
-      expect(getCurrentUrl({ url: undefined })).toBe('')
-    })
+  it('should skip if response is missing', async () => {
+    request.response = null
+    const result = await getBackLink(request, h)
+    expect(result).toBe(h.continue)
   })
 
-  describe('setBackLink', () => {
-    it('sets backLinkUrl in response source context', () => {
-      const response = { source: { context: { a: 1 } } }
-      setBackLink(response, '/abc')
-      expect(response.source.context.backLinkUrl).toBe('/abc')
-      expect(response.source.context.a).toBe(1)
-    })
+  it('should skip if response.variety is not view', async () => {
+    request.response.variety = 'other'
+    const result = await getBackLink(request, h)
+    expect(result).toBe(h.continue)
   })
 
-  describe('updateHistory', () => {
-    it('adds new entry when not in history', () => {
-      const updated = updateHistory([], '/page', '/page?lang=en')
-      expect(updated).toEqual([{ key: '/page', full: '/page?lang=en' }])
-    })
-
-    it('truncates history when revisiting same page', () => {
-      const history = [
-        { key: '/one', full: '/one?lang=en' },
-        { key: '/two', full: '/two?lang=en' },
-        { key: '/three', full: '/three?lang=en' }
-      ]
-      const updated = updateHistory(history, '/two', '/two?lang=en')
-      expect(updated).toEqual([
-        { key: '/one', full: '/one?lang=en' },
-        { key: '/two', full: '/two?lang=en' }
-      ])
-    })
+  it('should generate new navid if invalid', async () => {
+    request.state[COOKIE] = 'invalid!'
+    await getBackLink(request, h)
+    expect(h.state).toHaveBeenCalled()
   })
 
-  describe('trimHistory', () => {
-    it('keeps history under limit', () => {
-      const history = Array.from({ length: 5 }, (_, i) => ({ key: `/p${i}` }))
-      expect(trimHistory(history).length).toBe(5)
-    })
-
-    it('trims history to 20 entries', () => {
-      const history = Array.from({ length: 30 }, (_, i) => ({ key: `/p${i}` }))
-      expect(trimHistory(history).length).toBe(20)
-    })
+  it('should use existing valid navid', async () => {
+    request.state[COOKIE] = 'abc123'
+    await getBackLink(request, h)
+    expect(h.state).not.toHaveBeenCalled()
   })
 
-  describe('computeBackLink', () => {
-    it('returns root when only one entry', () => {
-      expect(computeBackLink([{ key: '/a', full: '/a' }], 'en')).toBe(
-        '/?lang=en'
-      )
-    })
+  it('should initialize history if empty', async () => {
+    request.state[COOKIE] = 'abc123'
+    await getBackLink(request, h)
+    expect(cache.set).toHaveBeenCalled()
+  })
 
-    it('builds backlink from previous item', () => {
-      const history = [
-        { key: '/one', full: '/one?foo=1' },
-        { key: '/two', full: '/two?foo=1' }
-      ]
+  it('should update history and trim if exceeds MAX_HISTORY', async () => {
+    const longHistory = Array(MAX_HISTORY + 5).fill({ key: 'x', full: '/x' })
+    cache.get.mockResolvedValue(longHistory)
+    request.state[COOKIE] = 'abc123'
+    await getBackLink(request, h)
+    const savedHistory = cache.set.mock.calls[0][1]
+    expect(savedHistory.length).toBe(MAX_HISTORY)
+  })
 
-      expect(computeBackLink(history, 'cy')).toBe('/one?foo=1&lang=cy')
-    })
+  it('should compute back link correctly', async () => {
+    request.state[COOKIE] = 'abc123'
+    request.query.lang = 'fr'
+    cache.get.mockResolvedValue([
+      { key: 'page1', full: '/page1?foo=bar' },
+      { key: 'page2', full: '/page2?foo=baz' }
+    ])
 
-    it('handles previous full with no query string', () => {
-      const history = [
-        { key: '/first', full: '/first' },
-        { key: '/second', full: '/second' }
-      ]
-      expect(computeBackLink(history, 'cy')).toBe('/first?lang=cy')
-    })
+    await getBackLink(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe(
+      '/page2?foo=baz&lang=fr'
+    )
+  })
 
-    it('returns default if previous full missing', () => {
-      expect(computeBackLink([{ key: '/x', full: null }], 'en')).toBe(
-        '/?lang=en'
-      )
-    })
+  it('should return root when history has 0 or 1 entries', async () => {
+    request.state[COOKIE] = 'abc123'
+    cache.get.mockResolvedValue([]) // ZERO history entries
+
+    await getBackLink(request, h)
+    expect(request.response.source.context.backLinkUrl).toBe('/?lang=en')
+  })
+
+  it('updateHistory trims forward history when revisiting a page', () => {
+    const history = [
+      { key: 'a', full: '/a' },
+      { key: 'b', full: '/b' },
+      { key: 'c', full: '/c' }
+    ]
+
+    const result = updateHistory(history, 'b', '/b')
+
+    expect(result).toEqual([
+      { key: 'a', full: '/a' },
+      { key: 'b', full: '/b' }
+    ])
+  })
+
+  it('generateId returns deterministic output when Math.random is mocked', () => {
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.123456)
+
+    const id = generateId()
+    expect(id).toBe('4fzyo82m') // Adjust if environment differs
+
+    spy.mockRestore()
   })
 })
 
-describe('stripForKey', () => {
-  it('removes lang query param', () => {
-    expect(stripForKey('/test?lang=en&foo=bar')).toBe('/test?foo=bar')
+describe('Helper functions', () => {
+  it('stripLang removes lang param', () => {
+    expect(stripLang('/path?lang=en&foo=bar')).toBe('/path?foo=bar')
+    expect(stripLang('/path')).toBe('/path')
   })
 
-  it('returns just path when only lang present', () => {
-    expect(stripForKey('/only-lang?lang=en')).toBe('/only-lang')
+  it('stripLang removes lang when it is the only parameter', () => {
+    expect(stripLang('/path?lang=en')).toBe('/path')
   })
 
-  it('handles URL without query params', () => {
-    expect(stripForKey('/noparams')).toBe('/noparams')
+  it('getUrl builds URL with query', () => {
+    const req = { path: '/test', query: { a: 1, b: 2 } }
+    expect(getUrl(req)).toBe('/test?a=1&b=2')
   })
 
-  it('handles URL without query string in stripForKey', () => {
-    expect(stripForKey('/path-without-qs')).toBe('/path-without-qs')
+  it('getUrl handles undefined query (covers fallback branch)', () => {
+    const req = { path: '/no-query' }
+    expect(getUrl(req)).toBe('/no-query')
   })
 
-  it('returns empty string when stripForKey is called with undefined', () => {
-    expect(stripForKey(undefined)).toBe('')
+  it('isValidId validates correctly', () => {
+    expect(isValidId('abc123')).toBe(true)
+    expect(isValidId('invalid!')).toBe(false)
+  })
+
+  it('generateId returns random string', () => {
+    const id = generateId()
+    expect(id).toMatch(/^[a-z0-9]{6,16}$/i)
   })
 })

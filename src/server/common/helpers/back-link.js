@@ -1,88 +1,89 @@
+const COOKIE = 'nav'
 const MAX_HISTORY = 20
-const PREVIOUS_HISTORY_INDEX = -2
 
-export function getBackLink(server) {
-  server.ext('onPreResponse', (request, h) => {
-    const response = request.response
-    if (response.variety !== 'view') {
-      return h.continue
-    }
+export async function getBackLink(request, h) {
+  const response = request.response
 
-    const currentUrl = getCurrentUrl(request)
-    const currentLang = request.query?.lang || 'en'
-    let history = request.yar.get('history') || []
-    const currentKey = stripForKey(currentUrl)
+  // Only attach back link for HTML views
+  if (!response || response.variety !== 'view') return h.continue
 
-    if (!currentKey) {
-      setBackLink(response, `/?lang=${currentLang}`)
-      return h.continue
-    }
+  // Current URL and key (without 'lang')
+  const currentLang = request.query?.lang || 'en'
+  const currentUrl = getUrl(request)
+  const currentKey = stripLang(currentUrl)
 
-    history = updateHistory(history, currentKey, currentUrl)
-    history = trimHistory(history)
+  // Get or create navigation ID cookie
+  let navid = request.state?.[COOKIE]
+  if (!isValidId(navid)) {
+    navid = generateId()
+    h.state(COOKIE, navid, {
+      path: '/',
+      isHttpOnly: true,
+      isSameSite: 'Lax',
+      isSecure: false
+    })
+  }
 
-    request.yar.set('history', history)
+  // Load or initialize history
+  const cache = request.server.app.cache
+  let history = (await cache.get(navid)) || []
 
-    const backLinkUrl = computeBackLink(history, currentLang)
-    setBackLink(response, backLinkUrl)
+  // Update history (push or trim if revisiting)
+  history = updateHistory(history, currentKey, currentUrl)
+  if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY)
+  await cache.set(navid, history)
 
-    return h.continue
-  })
-}
+  // Compute previous page URL (back link)
+  const backUrl = getPrevious(history, currentLang)
 
-// Helpers
-export function getCurrentUrl(request) {
-  const urlObj = request.url || {}
-  return urlObj.href || urlObj.pathname || ''
-}
-
-export function setBackLink(response, url) {
+  // Attach back link to template context
   response.source.context = {
     ...response.source.context,
-    backLinkUrl: url
-  }
-}
-
-export function updateHistory(history, currentKey, currentUrl) {
-  const idx = history.findIndex((x) => x.key === currentKey)
-  return idx >= 0
-    ? history.slice(0, idx + 1)
-    : [...history, { key: currentKey, full: currentUrl }]
-}
-
-export function trimHistory(history) {
-  const over = history.length - MAX_HISTORY
-  return over > 0 ? history.slice(over) : history
-}
-
-export function computeBackLink(history, lang) {
-  if (history.length <= 1) {
-    return `/?lang=${lang}`
+    backLinkUrl: backUrl
   }
 
-  const prev = history.at(PREVIOUS_HISTORY_INDEX)
-  if (!prev?.full) {
-    return `/?lang=${lang}`
-  }
+  return h.continue
+}
 
-  const cleaned = prev.full.replace(/^https?:\/\/[^/]+/, '')
-  const [path, qs] = cleaned.split('?')
+// Build full URL (path + sorted query)
+export function getUrl(request) {
+  const qs = new URLSearchParams(request.query || {})
+  const queryString = qs.toString()
+  return queryString ? `${request.path}?${queryString}` : request.path
+}
+
+// Remove 'lang' from URL to create a stable key
+export function stripLang(url) {
+  const [path, qs] = url.split('?')
+  const params = new URLSearchParams(qs || '')
+  params.delete('lang')
+  const cleaned = params.toString()
+  return cleaned ? `${path}?${cleaned}` : path
+}
+
+// Update history: add new page or trim forward history if revisiting
+export function updateHistory(history, key, full) {
+  const idx = history.findIndex((h) => h.key === key)
+  return idx >= 0 ? history.slice(0, idx + 1) : [...history, { key, full }]
+}
+
+// Compute back link (previous page) and ensure correct 'lang'
+export function getPrevious(history, lang) {
+  if (history.length <= 1) return `/?lang=${lang}`
+
+  const prevUrl = history[history.length - 2].full
+  const [path, qs] = prevUrl.split('?')
   const params = new URLSearchParams(qs || '')
   params.set('lang', lang)
   return `${path}?${params.toString()}`
 }
 
-export function stripForKey(url) {
-  if (!url) {
-    return ''
-  }
+// Generate a random small ID
+export function generateId() {
+  return Math.random().toString(36).slice(2, 10)
+}
 
-  const noDomain = url.replace(/^https?:\/\/[^/]+/, '')
-  const [path, qs] = noDomain.split('?')
-  const params = new URLSearchParams(qs || '')
-
-  params.delete('lang')
-
-  const q = params.toString()
-  return q ? `${path}?${q}` : path
+// Validate cookie ID
+export function isValidId(id) {
+  return typeof id === 'string' && /^[a-z0-9]{6,16}$/i.test(id)
 }
