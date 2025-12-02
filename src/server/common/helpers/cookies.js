@@ -29,13 +29,3 @@ export function setCookiePreference(response) {
   })
   return response
 }
-
-export function setLocaleCookie(response, locale) {
-  return response.state('locale', locale, {
-    ttl: config.get('cookies.cookie_policy.ttl'),
-    isSecure: config.get('cookies.cookie_policy.secure'),
-    isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
-    isSameSite: config.get('cookies.cookie_policy.sameSite'),
-    path: '/'
-  })
-}

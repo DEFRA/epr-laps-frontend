@@ -326,12 +326,6 @@ export const config = convict({
         format: Boolean,
         default: false,
         env: 'COOKIE_HTTP_ONLY'
-      },
-      sameSite: {
-        doc: 'SameSite policy for the locale cookie',
-        format: ['Strict', 'Lax', 'None'],
-        default: 'Lax',
-        env: 'COOKIE_SAME_SITE'
       }
     }
   }

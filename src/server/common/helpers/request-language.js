@@ -1,5 +1,3 @@
-import { setLocaleCookie } from './cookies.js'
-
 const allowed = new Set(['en', 'cy'])
 const fallback = 'en'
 
@@ -19,12 +17,12 @@ export function registerLanguageExtension(server) {
     if (!lang && rawLang) {
       const updatedQuery = { ...request.query, lang: fallback }
       const qs = new URLSearchParams(updatedQuery).toString()
-      setLocaleCookie(h, fallback)
+      h.state('locale', fallback)
       return h.redirect(`${request.path}?${qs}`).takeover()
     }
 
     if (lang) {
-      setLocaleCookie(h, lang)
+      h.state('locale', lang)
     }
 
     const fromQuery = lang
