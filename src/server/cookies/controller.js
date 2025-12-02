@@ -7,19 +7,19 @@ const cookiesController = {
     const translationMap = {
       hours: translations['hours'] || 'hours',
       days: translations['days'] || 'days',
-      years: translations['years'] || 'years',
+      year: translations['year'] || 'year',
       minutes: translations['minutes'] || 'minutes'
     }
 
     let sessionCookieExpiry = formatDuration(config.get('session.cookie.ttl'))
+    let cookiePolicyExpiry = formatDuration(
+      config.get('cookies.cookie_policy.ttl')
+    )
     for (const [en, translated] of Object.entries(translationMap)) {
       const regex = new RegExp(`\\b${en}\\b`, 'g')
       sessionCookieExpiry = sessionCookieExpiry.replace(regex, translated)
+      cookiePolicyExpiry = cookiePolicyExpiry.replace(regex, translated)
     }
-
-    const cookiePolicyExpiry = formatDuration(
-      config.get('cookies.cookie_policy.ttl')
-    )
 
     return h.view('cookies/index.njk', {
       sessionCookieExpiry,

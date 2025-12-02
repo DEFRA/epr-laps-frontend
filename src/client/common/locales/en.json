@@ -186,8 +186,10 @@
   "hours": "hours",
   "days": "days",
   "years": "years",
+  "year": "year",
   "minutes": "minutes",
   "ending-with": "ending with",
   "hide-cookie-message": "Hide cookie message",
-  "menu": "Menu"
+  "menu": "Menu",
+  "locale-cookie-use": "Used to set your language preference"
 }

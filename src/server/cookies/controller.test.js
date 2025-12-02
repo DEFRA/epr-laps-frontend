@@ -49,8 +49,8 @@ describe('cookiesController', () => {
     expect(formatDuration).toHaveBeenCalledWith(3600000)
 
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
-      cookiePolicyExpiry: '2 hours 5 minutes 3 days 1 years',
-      sessionCookieExpiry: '2 ore 5 minuti 3 giorni 1 anni',
+      cookiePolicyExpiry: '2 ore 5 minuti 3 giorni 1 years',
+      sessionCookieExpiry: '2 ore 5 minuti 3 giorni 1 years',
       currentPath: '/cookies'
     })
   })
@@ -65,7 +65,7 @@ describe('cookiesController', () => {
     expect(result).toBe('view-rendered')
 
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
-      cookiePolicyExpiry: '1 hours 10 minutes 2 days 5 years',
+      cookiePolicyExpiry: '1 horas 10 minutes 2 days 5 years',
       sessionCookieExpiry: '1 horas 10 minutes 2 days 5 years',
       currentPath: '/cookies'
     })
@@ -97,7 +97,7 @@ describe('cookiesController', () => {
     expect(result).toBe('view-rendered')
 
     expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
-      cookiePolicyExpiry: '5 minutes and 10 minutes',
+      cookiePolicyExpiry: '5 minutos and 10 minutos',
       sessionCookieExpiry: '5 minutos and 10 minutos',
       currentPath: '/cookies'
     })
@@ -110,14 +110,11 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(h.view).toHaveBeenCalledWith(
-      'cookies/index.njk',
-      expect.objectContaining({
-        cookiePolicyExpiry: '5 minutes',
-        sessionCookieExpiry: '5 minuti',
-        currentPath: '/cookies'
-      })
-    )
+    expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
+      cookiePolicyExpiry: '5 minuti',
+      sessionCookieExpiry: '5 minuti',
+      currentPath: '/cookies'
+    })
     expect(result).toBe('view-rendered')
   })
 
@@ -128,14 +125,11 @@ describe('cookiesController', () => {
 
     const result = cookiesController.handler(request, h)
 
-    expect(h.view).toHaveBeenCalledWith(
-      'cookies/index.njk',
-      expect.objectContaining({
-        cookiePolicyExpiry: '5 minutes',
-        sessionCookieExpiry: '5 minuti',
-        currentPath: '/cookies'
-      })
-    )
+    expect(h.view).toHaveBeenCalledWith('cookies/index.njk', {
+      cookiePolicyExpiry: '5 minuti',
+      sessionCookieExpiry: '5 minuti',
+      currentPath: '/cookies'
+    })
     expect(result).toBe('view-rendered')
   })
 })
