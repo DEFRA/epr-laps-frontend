@@ -65,6 +65,14 @@ export async function createServer() {
     segment: 'session'
   })
 
+  server.state('locale', {
+    ttl: null,
+    isSecure: true,
+    isHttpOnly: false,
+    isSameSite: 'Lax',
+    path: '/'
+  })
+
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
   await server.register([
