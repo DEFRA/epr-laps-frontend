@@ -66,6 +66,13 @@ export async function createServer() {
     segment: 'session'
   })
 
+  server.state('locale', {
+    ttl: config.get('cookies.cookie_policy.ttl'),
+    isSecure: config.get('cookies.cookie_policy.secure'),
+    isHttpOnly: config.get('cookies.cookie_policy.httpOnly'),
+    isSameSite: 'None'
+  })
+
   server.decorate('request', 'getUserSession', getUserSession)
   registerLanguageExtension(server)
   await server.register([
