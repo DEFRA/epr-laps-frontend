@@ -4,7 +4,9 @@ export async function getBackLink(request, h) {
   const response = request.response
 
   // Only attach back link for HTML views
-  if (!response || response.variety !== 'view') return h.continue
+  if (response?.variety !== 'view') {
+    return h.continue
+  }
 
   // Current URL and key (without 'lang')
   const currentLang = request.query?.lang || 'en'
@@ -28,7 +30,9 @@ export async function getBackLink(request, h) {
 
   // Update history (push or trim if revisiting)
   history = updateHistory(history, currentKey, currentUrl)
-  if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY)
+  if (history.length > MAX_HISTORY) {
+    history = history.slice(-MAX_HISTORY)
+  }
   await cache.set(sessionId, history)
 
   // Compute previous page URL (back link)
@@ -67,8 +71,9 @@ export function updateHistory(history, key, full) {
 
 // Compute back link (previous page) and ensure correct 'lang'
 export function getPrevious(history, lang) {
-  if (history.length <= 1) return `/?lang=${lang}`
-
+  if (history.length <= 1) {
+    return `/?lang=${lang}`
+  }
   const prevUrl = history[history.length - 2].full
   const [path, qs] = prevUrl.split('?')
   const params = new URLSearchParams(qs || '')

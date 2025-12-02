@@ -143,6 +143,113 @@ describe('getBackLink', () => {
       const saved = req.server.app.cache.set.mock.calls[0][1]
       expect(saved.length).toBe(MAX_HISTORY)
     })
+
+    it('uses sessionId from request.state.session.id', async () => {
+      const req = {
+        path: '/test',
+        query: {},
+        state: { session: { id: 'fromState' } }, // **** hits request.state.session.id
+        auth: { credentials: { id: 'fromAuth' } },
+        response: { variety: 'view', source: { context: {} } },
+        server: {
+          app: { cache: { get: vi.fn().mockResolvedValue([]), set: vi.fn() } }
+        }
+      }
+
+      const h = { continue: Symbol('continue') }
+
+      await getBackLink(req, h)
+
+      expect(req.server.app.cache.get).toHaveBeenCalledWith('fromState')
+    })
+
+    it('falls back to auth.credentials.id when session.id is missing', async () => {
+      const req = {
+        path: '/fallback',
+        query: {},
+        state: { session: {} }, // no id here
+        auth: { credentials: { id: 'authId' } }, // fallback path
+        response: { variety: 'view', source: { context: {} } },
+        server: {
+          app: { cache: { get: vi.fn().mockResolvedValue([]), set: vi.fn() } }
+        }
+      }
+
+      const h = { continue: Symbol('continue') }
+
+      await getBackLink(req, h)
+
+      expect(req.server.app.cache.get).toHaveBeenCalledWith('authId')
+    })
+
+    it('uses auth.credentials.id when request.state is missing', async () => {
+      const req = {
+        path: '/nocookie',
+        query: {},
+        state: undefined, // *** tests optional chaining on state
+        auth: { credentials: { id: 'authOnly' } },
+        response: { variety: 'view', source: { context: {} } },
+        server: {
+          app: { cache: { get: vi.fn().mockResolvedValue([]), set: vi.fn() } }
+        }
+      }
+
+      const h = { continue: Symbol('continue') }
+
+      await getBackLink(req, h)
+
+      expect(req.server.app.cache.get).toHaveBeenCalledWith('authOnly')
+    })
+
+    it('falls back to empty history when cache returns null', async () => {
+      const req = {
+        path: '/emptyHistory',
+        query: {},
+        state: { session: { id: 'sess1' } },
+        auth: { credentials: { id: 'sess1' } },
+        response: { variety: 'view', source: { context: {} } },
+        server: {
+          app: { cache: { get: vi.fn().mockResolvedValue(null), set: vi.fn() } }
+        }
+      }
+
+      const h = { continue: Symbol('continue') }
+
+      await getBackLink(req, h)
+
+      // updateHistory([]) → becomes length 1
+      const saved = req.server.app.cache.set.mock.calls[0][1]
+      expect(saved.length).toBe(1)
+    })
+
+    it('loads history from cache when available', async () => {
+      const existingHistory = [
+        { key: '/a', full: '/a' },
+        { key: '/b', full: '/b' }
+      ]
+
+      const req = {
+        path: '/c',
+        query: {},
+        state: { session: { id: 'sess2' } },
+        auth: { credentials: { id: 'sess2' } },
+        response: { variety: 'view', source: { context: {} } },
+        server: {
+          app: {
+            cache: {
+              get: vi.fn().mockResolvedValue(existingHistory),
+              set: vi.fn()
+            }
+          }
+        }
+      }
+
+      const h = { continue: Symbol('continue') }
+
+      await getBackLink(req, h)
+
+      expect(req.server.app.cache.get).toHaveBeenCalledWith('sess2')
+    })
   })
 })
 
