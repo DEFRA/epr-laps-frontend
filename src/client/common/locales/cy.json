@@ -195,8 +195,10 @@
   "hours": "oriau",
   "days": "dyddiau",
   "years": "mlynedd",
+  "year": "blwyddyn",
   "minutes": "munudau",
   "ending-with": "yn gorffen gyda",
   "hide-cookie-message": "Cuddio neges cwci",
-  "menu": "Bwydlen"
+  "menu": "Bwydlen",
+  "locale-cookie-use": "Wedi'i ddefnyddio i osod eich dewis iaith"
 }
