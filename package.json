@@ -72,9 +72,9 @@
     "uuid": "13.0.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "7.27.2",
+    "@babel/preset-env": "7.28.5",
     "@vitest/coverage-v8": "3.2.4",
-    "autoprefixer": "10.4.21",
+    "autoprefixer": "10.4.22",
     "babel-loader": "10.0.0",
     "cheerio": "1.1.2",
     "clean-webpack-plugin": "4.0.0",
@@ -95,8 +95,8 @@
     "terser-webpack-plugin": "5.3.14",
     "vitest": "3.2.4",
     "vitest-fetch-mock": "0.4.5",
-    "webpack": "5.99.9",
-    "webpack-assets-manifest": "6.2.1",
+    "webpack": "5.103.0",
+    "webpack-assets-manifest": "6.4.0",
     "webpack-cli": "6.0.1"
   }
 }
