@@ -70,7 +70,7 @@
       ]
     }) }}
 
-    <form id="update-bank-details-form" method="post" action="/bank-details">
+    <form id="update-bank-details-form" method="post" action="/bank-details?lang={{ currentLang }}">
       <input type="hidden" name="id" value="{{ newBankDetails.id }}">
       <input type="hidden" name="accountNumber" value="{{ newBankDetails.accountNumber }}">
       <input type="hidden" name="accountName" value="{{ newBankDetails.accountName }}">

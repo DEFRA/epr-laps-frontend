@@ -29,9 +29,7 @@ export const bankDetailsController = {
       bankApiData.accountNumber,
       translations
     )
-    if (!bankApiData) {
-      throw Boom.internal('Bank details not found in session')
-    }
+
     const userPermissions = request.yar.get('userPermissions')
 
     request.logger.info('successfully fetched bank details from cookie')
@@ -83,8 +81,14 @@ export function translateBankDetails(value, translations) {
 
 export const confirmBankDetailsController = {
   handler: async (request, h) => {
-    const { translations } = request.app
     const bankApiData = request.yar.get('bankDetails')
+
+    if (!bankApiData) {
+      request.logger.error('Bank Api Data not found in session')
+      throw Boom.internal('Bank Api Data not found')
+    }
+
+    const { translations } = request.app
     const translatedSortCode = translateBankDetails(
       bankApiData.sortCode,
       translations
@@ -93,18 +97,13 @@ export const confirmBankDetailsController = {
       bankApiData.accountNumber,
       translations
     )
-    if (!bankApiData) {
-      request.logger.error('failed to load bank details in from cookie')
-      throw Boom.internal('Bank Api Data not')
-    }
 
-    const isContinueEnabled = false
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
       translatedSortCode,
       translatedAccountNumber,
-      isContinueEnabled
+      isContinueEnabled: false
     })
   }
 }
@@ -237,7 +236,7 @@ const buildSchema = (translations) =>
 
 export const getUpdateBankDetailsController = {
   handler: async (request, h) => {
-    const { currentLang, translations } = request.app
+    const { translations } = request.app
     const payload = request.yar.get('payload') || {}
     const errors = {}
     const aggregatedErrors = []
@@ -270,7 +269,6 @@ export const getUpdateBankDetailsController = {
       payload,
       errors,
       aggregatedErrors,
-      currentLang,
       translations
     })
   }
@@ -279,6 +277,7 @@ export const getUpdateBankDetailsController = {
 export const postUpdateBankDetailsController = {
   handler: async (request, h) => {
     const { currentLang, translations } = request.app
+
     const payload = request.payload
     const schema = buildSchema(translations)
     const { error } = schema.validate(payload, { abortEarly: false })
@@ -304,7 +303,6 @@ export const postUpdateBankDetailsController = {
           payload,
           errors,
           aggregatedErrors,
-          currentLang,
           translations
         })
         .takeover()

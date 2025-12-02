@@ -20,6 +20,7 @@ const cookiesController = {
     const cookiePolicyExpiry = formatDuration(
       config.get('cookies.cookie_policy.ttl')
     )
+
     return h.view('cookies/index.njk', {
       sessionCookieExpiry,
       cookiePolicyExpiry,
