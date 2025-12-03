@@ -15,7 +15,7 @@ vi.mock('../../server/auth/utils.js', () => ({
 }))
 
 describe('paymentDocumentsController', () => {
-  let h, request
+  let h, request, fetchWithTokenMockData
 
   beforeEach(() => {
     h = {
@@ -53,9 +53,7 @@ describe('paymentDocumentsController', () => {
         flash: vi.fn()
       }
     }
-
-    // Mock fetchWithToken to return two documents
-    fetchWithToken.mockResolvedValue({
+    fetchWithTokenMockData = {
       currentFiscalYear: '2023-to-2024',
       '2023-to-2024': {
         EN: [
@@ -111,7 +109,10 @@ describe('paymentDocumentsController', () => {
           }
         ]
       }
-    })
+    }
+
+    // Mock fetchWithToken to return two documents
+    fetchWithToken.mockResolvedValue(fetchWithTokenMockData)
   })
 
   it('renders payment documents with correct rows', async () => {
@@ -170,6 +171,7 @@ describe('paymentDocumentsController', () => {
     ${'Non Welsh'}  | ${'Manchester LA'}        | ${'cy'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
     ${'Non Welsh'}  | ${'Manchester LA'}        | ${'en'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
     ${'Welsh'}      | ${'Powys County Council'} | ${'cy'}     | ${'Welsh'}           | ${'doc1_cy.pdf'}  | ${'doc2_cy.pdf'}
+    ${'Welsh'}      | ${'Some other Council'}   | ${'cy'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
     ${'Welsh'}      | ${'Powys County Council'} | ${'en'}     | ${'English'}         | ${'doc1_en.pdf'}  | ${'doc2_en.pdf'}
   `(
     'given a $councilLocation council and selected language is $currentLang',
@@ -211,6 +213,65 @@ describe('paymentDocumentsController', () => {
       })
     }
   )
+
+  describe.only('when translations.laNames is undefined and currentLang is EN', () => {
+    let updatedRequest
+    beforeEach(() => {
+      updatedRequest = {
+        method: 'get',
+        app: {
+          currentLang: 'en',
+          translations: {
+            'laps-home': 'Home',
+            'payment-documen': 'Payment documents',
+            download: 'Download',
+            'view-(opens-in-': 'View (opens in new tab)'
+          }
+        },
+        auth: {
+          credentials: {
+            organisationName: 'MyOrg'
+          }
+        },
+        logger: { info: vi.fn() },
+        payload: {},
+        yar: {
+          flash: vi.fn()
+        }
+      }
+    })
+    it('should return file in english language', async () => {
+      updatedRequest.yar.flash
+        .mockReturnValueOnce(['2024 to 2025'])
+        .mockReturnValue()
+
+      await paymentDocumentsController.handler(updatedRequest, h)
+
+      const viewArg = h.view.mock.calls[0][1]
+      const doc1Html = viewArg.rows[0][2].html
+      const doc2Html = viewArg.rows[1][2].html
+
+      expect(doc1Html).toContain('doc1_en.pdf')
+      expect(doc2Html).toContain('doc2_en.pdf')
+    })
+
+    describe('and when selectedYear file is not present', () => {
+      it('should return no file', async () => {
+        fetchWithToken.mockResolvedValue({
+          ...fetchWithTokenMockData,
+          currentFiscalYear: 'Some year'
+        })
+        request.yar.flash
+          .mockReturnValueOnce(['2024 to 2025'])
+          .mockReturnValue()
+
+        await paymentDocumentsController.handler(request, h)
+
+        const viewArg = h.view.mock.calls[0][1]
+        console.log(viewArg, '==viewArg')
+      })
+    })
+  })
 })
 
 describe('fileDownloadController', () => {
