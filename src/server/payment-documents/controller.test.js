@@ -257,18 +257,16 @@ describe('paymentDocumentsController', () => {
 
     describe('and when selectedYear file is not present', () => {
       it('should return no file', async () => {
-        fetchWithToken.mockResolvedValue({
-          ...fetchWithTokenMockData,
+        fetchWithToken.mockResolvedValueOnce({
           currentFiscalYear: 'Some year'
         })
-        request.yar.flash
-          .mockReturnValueOnce(['2024 to 2025'])
-          .mockReturnValue()
+        request.yar.flash.mockReturnValueOnce(['Some year']).mockReturnValue()
 
         await paymentDocumentsController.handler(request, h)
 
-        // const viewArg = h.view.mock.calls[0][1]
-        expect(true).toBe(true)
+        const viewArg = h.view.mock.calls[0][1]
+
+        expect(viewArg.rows.length).toBe(0)
       })
     })
   })

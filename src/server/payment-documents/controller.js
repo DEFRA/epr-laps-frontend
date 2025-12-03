@@ -24,6 +24,7 @@ export const paymentDocumentsController = {
 
     // Build financial year dropdown
     const selectedYear = findSelectedOption(isPost, request, documentApiData)
+
     warningText = translations['fy-warning-text']
       ? translations['fy-warning-text'].replace('{year}', selectedYear)
       : `For the ${selectedYear} financial year, there will be a single payment covering quarters 1 and 2.`
@@ -39,6 +40,7 @@ export const paymentDocumentsController = {
         ? selectedYear
         : Object.keys(documentApiData).find((key) => key.includes('to'))
 
+    console.log(selectedYear, yearToShow, '==selectedYear')
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
 
