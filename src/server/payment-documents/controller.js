@@ -2,6 +2,7 @@
  * A GDS styled Payment documents controller
  */
 import { fetchWithToken } from '../../server/auth/utils.js'
+import { languageKeys } from '../common/constants/laguages.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
 export const paymentDocumentsController = {
@@ -40,16 +41,20 @@ export const paymentDocumentsController = {
         ? selectedYear
         : Object.keys(documentApiData).find((key) => key.includes('to'))
 
-    console.log(selectedYear, yearToShow, '==selectedYear')
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
 
-    const welshCouncils = langKey === 'CY' ? (translations.laNames ?? {}) : {}
+    const welshCouncils =
+      langKey === languageKeys.cy.toUpperCase()
+        ? (translations.laNames ?? {})
+        : {}
     const isWelshCouncil =
-      langKey === 'CY' && Object.keys(welshCouncils).includes(organisationName)
+      langKey === languageKeys.cy.toUpperCase() &&
+      Object.keys(welshCouncils).includes(organisationName)
 
     const docsByYear = documentApiData[yearToShow] || {}
-    const docsToShow = docsByYear[isWelshCouncil ? langKey : 'EN'] || []
+    const docsToShow =
+      docsByYear[isWelshCouncil ? langKey : languageKeys.en.toUpperCase()] || []
 
     rows = buildTableRows(docsToShow, translations)
     request.yar.flash('selectedYear', selectedYear)
