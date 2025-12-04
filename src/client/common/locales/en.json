@@ -191,5 +191,6 @@
   "ending-with": "ending with",
   "hide-cookie-message": "Hide cookie message",
   "menu": "Menu",
-  "locale-cookie-use": "Used to set your language preference"
+  "locale-cookie-use": "Used to set your language preference",
+  "no-payment-docs": "You have no payment documents to view"
 }
