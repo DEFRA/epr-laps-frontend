@@ -4,54 +4,62 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% block content %}
-{{ appHeading({
-    text: authedUser.organisationName,
-    caption: translations['payment-documen'] 
-  }) }}
-{% set selectedOption = financialYearOptions | selectattr('selected') | first %}
 
-{% if selectedOption and selectedOption.value == currentFY %}
+{{ appHeading({
+  text: authedUser.organisationName,
+  caption: translations['payment-documen']
+}) }}
+
+{% if rows.length > 0 %}
+
+  {# compute selected option only when needed #}
+  {% set selectedOption = financialYearOptions | selectattr('selected') | first %}
+
+  {% if selectedOption and selectedOption.value == currentFY %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukWarningText({
+          text: warningText
+        }) }}
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" id="yearFilterForm">
+    {{ govukSelect({
+      id: "sort",
+      name: "sort",
+      label: {
+        text: translations['financial-year']
+      },
+      items: financialYearOptions,
+      attributes: {
+          onchange: "document.getElementById('yearFilterForm').submit();"
+        }
+    }) }}
+  </form>
+
+  {{ govukTable({
+    caption: "Financial documents",
+    captionClasses: "govuk-visually-hidden",
+    firstCellIsHeader: false,
+    head: [
+      { text: translations['date'] },
+      { text: translations['document-name'] },
+      { html: "<span class='govuk-visually-hidden'>Download document</span>" },
+      { html: "<span class='govuk-visually-hidden'>View document</span>" }
+    ],
+    rows: rows
+  }) }}
+
+{% else %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      {{ govukWarningText({
-        text: warningText
-      }) }}
+      <p class="govuk-body">
+        {{translations['no-payment-documents-desc']}}
+      </p>
     </div>
   </div>
 {% endif %}
-
-<form method="post" id="yearFilterForm">
-  {{ govukSelect({
-    id: "sort",
-    name: "sort",
-    label: {
-      text: translations['financial-year']
-    },
-    items: financialYearOptions,
-    attributes: {
-        onchange: "document.getElementById('yearFilterForm').submit();"
-      }
-  }) }}
-</form>
-{{ govukTable({
-  caption: "Financial documents",
-  captionClasses: "govuk-visually-hidden",
-  firstCellIsHeader: false,
-  head: [
-    {
-      text: translations['date']
-    },
-    {
-      text: translations['document-name']
-    },
-    {
-      html: "<span class='govuk-visually-hidden'>Download document</span>"
-    },
-    {
-      html: "<span class='govuk-visually-hidden'>View document</span>"
-    }
-  ],
-  rows: rows
-}) }}
 
 {% endblock %}
