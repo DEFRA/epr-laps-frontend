@@ -16,7 +16,7 @@ export const paymentDocumentsController = {
     let rows = []
     let financialYearOptions = []
     let warningText = ''
-    const documentPath = `/documents/${request.auth.credentials.organisationName}`
+    const documentPath = `/documents/${request.auth.credentials.organisationId}`
     documentApiData = await fetchWithToken(request, documentPath)
 
     request.logger.info(
