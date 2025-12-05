@@ -237,19 +237,32 @@ const buildSchema = (translations) =>
 export const getUpdateBankDetailsController = {
   handler: async (request, h) => {
     const { translations } = request.app
-    const payload = request.yar.get('payload') || {}
+
+    const languageSwitched = request.yar.get('languageSwitched') || false
+
+    let payload = {}
     const errors = {}
     const aggregatedErrors = []
 
-    const referrer = request.headers.referer || ''
-    const cameFromPost = referrer.includes(request.path)
-
-    if (!cameFromPost) {
+    if (languageSwitched) {
+      // Language toggle used → retain payload
+      payload = request.yar.get('payload') || {}
+    } else if (!request.headers.referer?.includes('/check-bank-details')) {
+      // User came from a previous page (back link) → clear payload
       request.yar.clear('payload')
       request.yar.set('formSubmitted', false)
+    } else {
+      // User came from next page → retain payload
+      payload = request.yar.get('payload') || {}
     }
 
-    if (request.yar.get('formSubmitted') === true) {
+    request.yar.set('languageSwitched', false)
+
+    // Rebuild errors if form was previously submitted during language switch
+    if (
+      request.yar.get('formSubmitted') === true &&
+      Object.keys(payload).length
+    ) {
       const { error } = buildSchema(translations).validate(payload, {
         abortEarly: false
       })
@@ -313,5 +326,22 @@ export const postUpdateBankDetailsController = {
     request.yar.set('visited', false)
 
     return h.redirect(`/check-bank-details?lang=${currentLang}`)
+  }
+}
+
+export const switchLanguageController = {
+  handler: async (request, h) => {
+    // Save form fields into yar
+    request.yar.set('updateBankPayload', {
+      accountName: request.payload.accountName,
+      sortCode: request.payload.sortCode,
+      accountNumber: request.payload.accountNumber
+    })
+
+    request.yar.set('formSubmitted', false)
+
+    const newLang = request.payload.currentLang === 'en' ? 'cy' : 'en'
+
+    return h.redirect(`/update-bank-details?lang=${newLang}`)
   }
 }

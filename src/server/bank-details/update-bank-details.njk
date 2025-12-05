@@ -85,35 +85,36 @@
     </div>
   </div>
 
-<script>
-  document.getElementById('language-switch').addEventListener('click', function() {
-    const form = document.getElementById('update-bank-form');
-    
-    // Save current form values to localStorage
-    const payload = {
-      accountName: form.accountName.value,
-      sortCode: form.sortCode.value,
-      accountNumber: form.accountNumber.value
-    };
-    localStorage.setItem('updateBankPayload', JSON.stringify(payload));
-
-    // Switch language in the URL
-    const currentLang = "{{ currentLang }}";
-    const newLang = currentLang === 'en' ? 'cy' : 'en';
-    const url = new URL(window.location.href);
-    url.searchParams.set('lang', newLang);
-    window.location.href = url.toString();
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.dwp-language-toggle a').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+ 
+      const form = document.getElementById('update-bank-form');
+      const hiddenForm = document.createElement('form');
+      hiddenForm.method = 'POST';
+      hiddenForm.action = '/switch-language';
+ 
+      // copy current form values
+      ['accountName', 'sortCode', 'accountNumber'].forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field;
+        input.value = form[field]?.value || '';
+        hiddenForm.appendChild(input);
+      });
+ 
+      const langInput = document.createElement('input');
+      langInput.type = 'hidden';
+      langInput.name = 'currentLang';
+      langInput.value = "{{ currentLang }}";
+      hiddenForm.appendChild(langInput);
+ 
+      document.body.appendChild(hiddenForm);
+      hiddenForm.submit();
+    });
   });
-
-  // Restore form values on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    const savedPayload = JSON.parse(localStorage.getItem('updateBankPayload') || '{}');
-    if (savedPayload.accountName) document.getElementById('accountName').value = savedPayload.accountName;
-    if (savedPayload.sortCode) document.getElementById('sortCode').value = savedPayload.sortCode;
-    if (savedPayload.accountNumber) document.getElementById('accountNumber').value = savedPayload.accountNumber;
-
-    // Clear localStorage after restore
-    localStorage.removeItem('updateBankPayload');
-  });
+});
 </script>
 {% endblock %}
