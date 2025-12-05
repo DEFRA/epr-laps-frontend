@@ -6,6 +6,7 @@
     <div class="govuk-grid-column-two-thirds">
       <div class="govuk-form-group">
         <form method="post" action="/bank-details/bank-details-confirmed">
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}">
           <fieldset class="govuk-fieldset" aria-describedby="confirm-bank-details">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
               <span class="govuk-caption-xl">{{ translations['request-to'] }}</span>
