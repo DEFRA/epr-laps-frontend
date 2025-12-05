@@ -82,4 +82,37 @@
 
     </div>
   </div>
+
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.dwp-language-toggle a').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+ 
+      const form = document.getElementById('update-bank-form');
+      const hiddenForm = document.createElement('form');
+      hiddenForm.method = 'POST';
+      hiddenForm.action = '/switch-language';
+ 
+      // copy current form values
+      ['accountName', 'sortCode', 'accountNumber'].forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field;
+        input.value = form[field]?.value || '';
+        hiddenForm.appendChild(input);
+      });
+ 
+      const langInput = document.createElement('input');
+      langInput.type = 'hidden';
+      langInput.name = 'currentLang';
+      langInput.value = "{{ currentLang }}";
+      hiddenForm.appendChild(langInput);
+ 
+      document.body.appendChild(hiddenForm);
+      hiddenForm.submit();
+    });
+  });
+});
+</script>
 {% endblock %}
