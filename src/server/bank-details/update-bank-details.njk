@@ -5,6 +5,8 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% set showBackLink = true %}
 
+
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -82,4 +84,29 @@
 
     </div>
   </div>
+<script> (function () {
+    const form = document.getElementById("update-bank-form");
+    let isFormFilled = false;
+
+    // Detect changes in ANY input field
+    form.addEventListener("input", () => {
+      isFormFilled = true;
+    });
+
+    // Reset dirty state after submitting the form
+    form.addEventListener("submit", () => {
+      isFormFilled = false;
+    });
+
+    // Warn before leaving page
+    window.addEventListener("beforeunload", function (e) {
+      if (isFormFilled) {
+        e.preventDefault();
+        e.returnValue = ""; // Required for Chrome + Firefox
+        return "";
+      }
+    });
+  })(); 
+</script>
+
 {% endblock %}
