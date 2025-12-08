@@ -19,6 +19,7 @@ import { getUserSession } from './common/helpers/auth/utils.js'
 import { defraId } from './common/helpers/auth/defra-id.js'
 import { handlePostAuth } from './common/helpers/handle-post-auth.js'
 import { getBackLink } from './common/helpers/back-link.js' // adjust the path
+import { csrf } from './common/helpers/csrfToken.js'
 
 export async function createServer() {
   setupProxy()
@@ -86,6 +87,7 @@ export async function createServer() {
     defraId,
     nunjucksConfig,
     hapiI18nPlugin,
+    csrf,
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 

@@ -35,6 +35,7 @@
             <dt class="govuk-!-margin-bottom-2">{{ translations['local-authority-name'] }}</dt>
               <dd class="govuk-!-margin-left-0 govuk-!-font-weight-bold"> {{ authedUser.organisationName }}</dd>
           </dl>
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}">
           {{ govukInput({
             label: { text: translations['account-name'] },
             id: "accountName",
