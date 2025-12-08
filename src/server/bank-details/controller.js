@@ -185,7 +185,8 @@ export const postBankDetailsController = {
     }
 
     // Make your API call
-    payload.sortCode = payload.sortCode.replaceAll('-', '').replaceAll(' ', '')
+    payload.sortCode =
+      payload.sortCode?.replaceAll('-', '')?.replaceAll(' ', '') || ''
     payload.requesterEmail = request.auth.credentials.email
     await authUtils.postWithToken(request, '/bank-details', payload)
 
@@ -216,8 +217,7 @@ const buildSchema = (translations) =>
       .max(8)
       .messages({
         'string.empty': translations['sortCodeEmpty'],
-        'string.pattern.base': translations['sortCodePattern'],
-        'string.lengthSix': translations['sortCodeLength']
+        'string.pattern.base': translations['sortCodePattern']
       }),
     accountNumber: joi
       .string()
@@ -244,15 +244,15 @@ export const getUpdateBankDetailsController = {
     const errors = {}
     const aggregatedErrors = []
 
+    const cameFromNextPage = request.headers.referer?.includes(
+      '/check-bank-details'
+    )
     if (languageSwitched) {
-      // Language toggle used → retain payload
       payload = request.yar.get('payload') || {}
-    } else if (!request.headers.referer?.includes('/check-bank-details')) {
-      // User came from a previous page (back link) → clear payload
+    } else if (!cameFromNextPage) {
       request.yar.clear('payload')
       request.yar.set('formSubmitted', false)
     } else {
-      // User came from next page → retain payload
       payload = request.yar.get('payload') || {}
     }
 
@@ -310,15 +310,13 @@ export const postUpdateBankDetailsController = {
       request.yar.set('payload', payload)
       request.yar.set('formSubmitted', true)
 
-      return h
-        .view('bank-details/update-bank-details.njk', {
-          pageTitle: 'Update Bank Details',
-          payload,
-          errors,
-          aggregatedErrors,
-          translations
-        })
-        .takeover()
+      return h.view('bank-details/update-bank-details.njk', {
+        pageTitle: 'Update Bank Details',
+        payload,
+        errors,
+        aggregatedErrors,
+        translations
+      })
     }
 
     request.yar.set('payload', payload)
