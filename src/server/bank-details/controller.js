@@ -4,7 +4,7 @@
 import * as authUtils from '../../server/auth/utils.js'
 import joi from 'joi'
 import Boom from '@hapi/boom'
-
+import requirePermission from '../auth/permissionCheck.js'
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
 
@@ -32,6 +32,7 @@ export const bankDetailsController = {
 
     const userPermissions = request.yar.get('userPermissions')
 
+    console.log('THE user permissions ::', userPermissions)
     request.logger.info('successfully fetched bank details from cookie')
 
     return h.view('bank-details/index.njk', {
@@ -135,6 +136,9 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: (_request, h) => {
     return h.view('bank-details/update-bank-details-info.njk', {
       pageTitle: 'How it works'
@@ -158,6 +162,9 @@ export const bankDetailsSubmittedController = {
 }
 
 export const checkBankDetailsController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: (request, h) => {
     const newBankDetails = request.yar.get('payload')
 
@@ -235,6 +242,9 @@ const buildSchema = (translations) =>
   })
 
 export const getUpdateBankDetailsController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: async (request, h) => {
     const { translations } = request.app
     const payload = request.yar.get('payload') || {}
