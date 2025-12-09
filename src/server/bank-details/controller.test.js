@@ -716,6 +716,7 @@ describe('#UpdateBankDetails index.js route coverage', () => {
   })
 
   it('should execute all routes to achieve full coverage', () => {
+    // Register plugin routes
     bankDetails.plugin.register(mockServer)
 
     const h = {
@@ -732,7 +733,11 @@ describe('#UpdateBankDetails index.js route coverage', () => {
       },
       query: { lang: 'en' },
       headers: { referer: '/previous-page' },
-      yar: { set: vi.fn(), get: vi.fn().mockReturnValue({}), clear: vi.fn() },
+      yar: {
+        set: vi.fn(),
+        get: vi.fn().mockReturnValue({}),
+        clear: vi.fn()
+      },
       app: {
         currentLang: 'en',
         translations: {
@@ -749,13 +754,14 @@ describe('#UpdateBankDetails index.js route coverage', () => {
       logger: { info: vi.fn(), error: vi.fn() }
     }
 
+    // Execute each registered route handler
     mockServer.route.mock.calls.forEach((call) => {
       const route = call[0]
       if (typeof route.handler === 'function') {
         const req = { ...baseReq }
 
         if (route.path === '/switch-language') {
-          // test both 'en' and 'cy' branches
+          // test both 'en' and 'cy'
           ;['en', 'cy'].forEach((lang) => {
             route.handler(
               { ...req, payload: { ...req.payload, currentLang: lang } },
@@ -767,6 +773,8 @@ describe('#UpdateBankDetails index.js route coverage', () => {
         }
       }
     })
+
+    expect(mockServer.route).toHaveBeenCalled()
   })
 })
 
