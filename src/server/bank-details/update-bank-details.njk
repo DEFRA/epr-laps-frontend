@@ -83,29 +83,77 @@
 
     </div>
   </div>
-<script> 
-(function () {
-    const form = document.getElementById("update-bank-form");
-    let isFormFilled = false;
 
-    // Detect changes in ANY input field
-    form.addEventListener("input", () => {
-      isFormFilled = true;
-    });
+ <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('update-bank-form');
+  if (!form) return;
 
-    // Reset dirty state after submitting the form
-    form.addEventListener("submit", () => {
-      isFormFilled = false;
-    });
+  let suppressBeforeUnload = false; 
 
-    // Warn before leaving page
-    window.addEventListener("beforeunload", function (e) {
-      if (isFormFilled) {
-        e.preventDefault();
-        e.returnValue = ""; // Required for Chrome + Firefox
-        return "";
-      }
-    });
-  })(); 
+  // check if form has any values 
+  const formHasValues = () => {
+    return ['accountName', 'sortCode', 'accountNumber'].some(
+      field => form[field]?.value && form[field].value.trim() !== ''
+    );
+  };
+
+  // Track changes in form to mark as dirty 
+  const markDirty = () => {
+    // Only set dirty if there is any value in fields
+    suppressBeforeUnload = false; // reset suppression if user modifies the form
+  };
+  form.addEventListener('input', markDirty, { passive: true });
+  form.addEventListener('change', markDirty, { passive: true });
+
+  // Reset dirty state on submit 
+  form.addEventListener('submit', function () {
+    suppressBeforeUnload = true; 
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (suppressBeforeUnload) return;
+    if (formHasValues()) { // Only warn if at least one field has a value
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  });
+
+  document.querySelectorAll('.dwp-language-toggle a').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      suppressBeforeUnload = true; // skip popup for language toggle
+
+      const hiddenForm = document.createElement('form');
+      hiddenForm.method = 'POST';
+      hiddenForm.action = '/switch-language';
+
+      ['accountName', 'sortCode', 'accountNumber'].forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field;
+        input.value = form[field]?.value || '';
+        hiddenForm.appendChild(input);
+      });
+
+      const langInput = document.createElement('input');
+      langInput.type = 'hidden';
+      langInput.name = 'currentLang';
+      langInput.value = "{{ currentLang }}";
+      hiddenForm.appendChild(langInput);
+
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrfToken';
+      csrfInput.value = form.querySelector('[name="csrfToken"]').value || '';
+      hiddenForm.appendChild(csrfInput);
+
+      document.body.appendChild(hiddenForm);
+      hiddenForm.submit();
+    }, { passive: false });
+  });
+});
 </script>
+
 {% endblock %}

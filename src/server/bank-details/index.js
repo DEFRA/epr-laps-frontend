@@ -47,6 +47,26 @@ export const bankDetails = {
       })
 
       server.route({
+        method: 'POST',
+        path: '/switch-language',
+        handler: (req, h) => {
+          // Save current form values before language switch
+          req.yar.set('payload', {
+            accountName: req.payload.accountName || '',
+            sortCode: req.payload.sortCode || '',
+            accountNumber: req.payload.accountNumber || ''
+          })
+
+          // Flag that indicates language toggle was used
+          req.yar.set('languageSwitched', true)
+
+          const newLang = req.payload.currentLang === 'en' ? 'cy' : 'en'
+
+          return h.redirect(`/update-bank-details?lang=${newLang}`)
+        }
+      })
+
+      server.route({
         method: 'GET',
         path: '/bank-details-confirmed',
         handler: (_request, h) => {
