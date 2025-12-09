@@ -249,11 +249,11 @@ export const getUpdateBankDetailsController = {
     )
     if (languageSwitched) {
       payload = request.yar.get('payload') || {}
-    } else if (!cameFromNextPage) {
+    } else if (cameFromNextPage) {
+      payload = request.yar.get('payload') || {}
+    } else {
       request.yar.clear('payload')
       request.yar.set('formSubmitted', false)
-    } else {
-      payload = request.yar.get('payload') || {}
     }
 
     request.yar.set('languageSwitched', false)

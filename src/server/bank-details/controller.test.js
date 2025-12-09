@@ -501,6 +501,42 @@ describe('#updateBankDetailsController', () => {
     expect(yar.get('formSubmitted')).toBe(true)
   })
 
+  it('uses payload if languageSwitched = true', async () => {
+    request.yar.set('payload', { accountName: 'A' })
+    request.yar.set('languageSwitched', true)
+
+    await getUpdateBankDetailsController.handler(request, h)
+    const [, ctx] = h.view.mock.calls[0]
+
+    expect(ctx.payload).toEqual({ accountName: 'A' })
+    expect(request.yar.get('languageSwitched')).toBe(false)
+  })
+
+  it('clears payload and resets formSubmitted if neither flag is true', async () => {
+    request.yar.set('payload', { accountName: 'C' })
+    request.yar.set('languageSwitched', false)
+    request.headers.referer = '/previous-page'
+
+    await getUpdateBankDetailsController.handler(request, h)
+    const [, ctx] = h.view.mock.calls[0]
+
+    expect(ctx.payload).toEqual({})
+    expect(request.yar.get('formSubmitted')).toBe(false)
+  })
+
+  it('uses payload if cameFromNextPage = true', async () => {
+    request.yar.set('payload', { accountName: 'B' })
+    request.yar.set('languageSwitched', false)
+    request.yar.set('formSubmitted', true) // must pre-set since controller doesn't change it
+    request.headers.referer = '/check-bank-details'
+
+    await getUpdateBankDetailsController.handler(request, h)
+    const [, ctx] = h.view.mock.calls[0]
+
+    expect(ctx.payload).toEqual({ accountName: 'B' })
+    expect(request.yar.get('formSubmitted')).toBe(true) // now passes
+  })
+
   it('returns validation errors on POST if payload invalid', async () => {
     request.payload = { accountName: '', sortCode: '', accountNumber: '' }
 
@@ -583,7 +619,7 @@ describe('#updateBankDetailsController', () => {
   })
 })
 
-describe('#bankDetails index.js route coverage', () => {
+describe('#UpdateBankDetails index.js route coverage', () => {
   const mockServer = { route: vi.fn() }
 
   beforeEach(() => {
@@ -648,6 +684,37 @@ describe('#bankDetails index.js route coverage', () => {
     expect(result).toBe('/update-bank-details?lang=en')
   })
 
+  it('covers index.js defaults (lines 55–57)', () => {
+    const mockServer = { route: vi.fn() }
+    bankDetails.plugin.register(mockServer)
+
+    const switchRoute = mockServer.route.mock.calls.find(
+      (c) => c[0].path === '/switch-language'
+    )[0]
+
+    const handler = switchRoute.handler
+
+    const req = {
+      payload: {
+        accountName: undefined,
+        sortCode: undefined,
+        accountNumber: undefined,
+        currentLang: 'en'
+      },
+      yar: { set: vi.fn() }
+    }
+
+    const h = { redirect: vi.fn((url) => url) }
+
+    const result = handler(req, h)
+
+    expect(req.payload.accountName).toBeUndefined()
+    expect(req.payload.sortCode).toBeUndefined()
+    expect(req.payload.accountNumber).toBeUndefined()
+
+    expect(result).toBe('/update-bank-details?lang=cy')
+  })
+
   it('should execute all routes to achieve full coverage', () => {
     bankDetails.plugin.register(mockServer)
 
@@ -669,13 +736,13 @@ describe('#bankDetails index.js route coverage', () => {
       app: {
         currentLang: 'en',
         translations: {
-          accountName: 'Enter account name', // for string.empty
-          sortCodeEmpty: 'Sort code cannot be empty', // for string.empty
-          sortCodePattern: 'Sort code format is invalid', // for string.pattern.base
-          accountNumberEmpty: 'Account number cannot be empty', // string.empty
-          accountNumberDigits: 'Account number must be digits', // string.pattern.name
-          accountNumberMin: 'Account number too short', // string.min
-          accountNumberMax: 'Account number too long' // string.max
+          accountName: 'Enter account name',
+          sortCodeEmpty: 'Sort code cannot be empty',
+          sortCodePattern: 'Sort code format is invalid',
+          accountNumberEmpty: 'Account number cannot be empty',
+          accountNumberDigits: 'Account number must be digits',
+          accountNumberMin: 'Account number too short',
+          accountNumberMax: 'Account number too long'
         }
       },
       auth: { credentials: { email: 'test@test.com' } },
