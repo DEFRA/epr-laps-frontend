@@ -26,6 +26,7 @@
   {% endif %}
 
   <form method="post" id="yearFilterForm">
+  <input type="hidden" name="csrfToken" value="{{csrfToken}}">
     {{ govukSelect({
       id: "sort",
       name: "sort",
