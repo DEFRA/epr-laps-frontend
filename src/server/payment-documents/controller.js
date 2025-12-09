@@ -2,6 +2,7 @@
  * A GDS styled Payment documents controller
  */
 import { fetchWithToken } from '../../server/auth/utils.js'
+import { languageKeys } from '../common/constants/laguages.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
 export const paymentDocumentsController = {
@@ -15,7 +16,7 @@ export const paymentDocumentsController = {
     let rows = []
     let financialYearOptions = []
     let warningText = ''
-    const documentPath = `/documents/${request.auth.credentials.organisationId}`
+    const documentPath = `/documents/${request.auth.credentials.organisationName}`
     documentApiData = await fetchWithToken(request, documentPath)
 
     request.logger.info(
@@ -24,6 +25,7 @@ export const paymentDocumentsController = {
 
     // Build financial year dropdown
     const selectedYear = findSelectedOption(isPost, request, documentApiData)
+
     warningText = translations['fy-warning-text']
       ? translations['fy-warning-text'].replace('{year}', selectedYear)
       : `For the ${selectedYear} financial year, there will be a single payment covering quarters 1 and 2.`
@@ -42,8 +44,17 @@ export const paymentDocumentsController = {
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
 
+    const welshCouncils =
+      langKey === languageKeys.cy.toUpperCase()
+        ? (translations.laNames ?? {})
+        : {}
+    const isWelshCouncil =
+      langKey === languageKeys.cy.toUpperCase() &&
+      Object.keys(welshCouncils).includes(organisationName)
+
     const docsByYear = documentApiData[yearToShow] || {}
-    const docsToShow = docsByYear[langKey] || []
+    const docsToShow =
+      docsByYear[isWelshCouncil ? langKey : languageKeys.en.toUpperCase()] || []
 
     rows = buildTableRows(docsToShow, translations)
     request.yar.flash('selectedYear', selectedYear)

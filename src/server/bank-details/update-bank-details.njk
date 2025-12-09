@@ -35,6 +35,7 @@
             <dt class="govuk-!-margin-bottom-2">{{ translations['local-authority-name'] }}</dt>
               <dd class="govuk-!-margin-left-0 govuk-!-font-weight-bold"> {{ authedUser.organisationName }}</dd>
           </dl>
+          <input type="hidden" name="csrfToken" value="{{csrfToken}}">
           {{ govukInput({
             label: { text: translations['account-name'] },
             id: "accountName",
@@ -55,8 +56,7 @@
             errorMessage: errors.sortCode,
             spellcheck: false,
             classes: "govuk-input--width-5 govuk-input--extra-letter-spacing",
-            attributes: { maxlength: "8" },
-            autocomplete: "sort-code"
+            attributes: { maxlength: "8" }
           }) }}
 
           {{ govukInput({
@@ -69,8 +69,7 @@
             errorMessage: errors.accountNumber,
             spellcheck: false,
             classes: "govuk-input--width-10",
-            attributes: { maxlength: "10" },
-            autocomplete: "account-number"
+            attributes: { maxlength: "10" }
           }) }}
         </fieldset>
 
@@ -86,17 +85,50 @@
   </div>
 
  <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('update-bank-form');
+  if (!form) return;
+
+  let suppressBeforeUnload = false; 
+
+  // check if form has any values 
+  const formHasValues = () => {
+    return ['accountName', 'sortCode', 'accountNumber'].some(
+      field => form[field]?.value && form[field].value.trim() !== ''
+    );
+  };
+
+  // Track changes in form to mark as dirty 
+  const markDirty = () => {
+    // Only set dirty if there is any value in fields
+    suppressBeforeUnload = false; // reset suppression if user modifies the form
+  };
+  form.addEventListener('input', markDirty, { passive: true });
+  form.addEventListener('change', markDirty, { passive: true });
+
+  // Reset dirty state on submit 
+  form.addEventListener('submit', function () {
+    suppressBeforeUnload = true; 
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (suppressBeforeUnload) return;
+    if (formHasValues()) { // Only warn if at least one field has a value
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  });
+
   document.querySelectorAll('.dwp-language-toggle a').forEach(link => {
     link.addEventListener('click', function (e) {
       e.preventDefault();
- 
-      const form = document.getElementById('update-bank-form');
+      suppressBeforeUnload = true; // skip popup for language toggle
+
       const hiddenForm = document.createElement('form');
       hiddenForm.method = 'POST';
       hiddenForm.action = '/switch-language';
- 
-      // copy current form values
+
       ['accountName', 'sortCode', 'accountNumber'].forEach(field => {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -104,17 +136,24 @@ document.addEventListener("DOMContentLoaded", function () {
         input.value = form[field]?.value || '';
         hiddenForm.appendChild(input);
       });
- 
+
       const langInput = document.createElement('input');
       langInput.type = 'hidden';
       langInput.name = 'currentLang';
       langInput.value = "{{ currentLang }}";
       hiddenForm.appendChild(langInput);
- 
+
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrfToken';
+      csrfInput.value = form.querySelector('[name="csrfToken"]').value || '';
+      hiddenForm.appendChild(csrfInput);
+
       document.body.appendChild(hiddenForm);
       hiddenForm.submit();
-    });
+    }, { passive: false });
   });
 });
 </script>
+
 {% endblock %}

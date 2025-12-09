@@ -4,41 +4,47 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% block content %}
+
 {{ appHeading({
-    text: authedUser.organisationName,
-    caption: translations['payment-documen'] 
-  }) }}
-{% set selectedOption = financialYearOptions | selectattr('selected') | first %}
+  text: authedUser.organisationName,
+  caption: translations['payment-documen']
+}) }}
 
-{% if selectedOption and selectedOption.value == currentFY %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {{ govukWarningText({
-        text: warningText
-      }) }}
+{% if rows.length > 0 %}
+
+  {# compute selected option only when needed #}
+  {% set selectedOption = financialYearOptions | selectattr('selected') | first %}
+
+  {% if selectedOption and selectedOption.value == currentFY %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukWarningText({
+          text: warningText
+        }) }}
+      </div>
     </div>
-  </div>
-{% endif %}
+  {% endif %}
 
-<form method="post" id="yearFilterForm">
-  {{ govukSelect({
-    id: "sort",
-    name: "sort",
-    label: {
-      text: translations['financial-year']
-    },
-    items: financialYearOptions,
-    attributes: {
-        onchange: "document.getElementById('yearFilterForm').submit();"
-      }
-  }) }}
-</form>
-{{ govukTable({
-  caption: "Financial documents",
-  captionClasses: "govuk-visually-hidden",
-  firstCellIsHeader: false,
-  head: [
-    {
+  <form method="post" id="yearFilterForm">
+    {{ govukSelect({
+      id: "sort",
+      name: "sort",
+      label: {
+        text: translations['financial-year']
+      },
+      items: financialYearOptions,
+      attributes: {
+          onchange: "document.getElementById('yearFilterForm').submit();"
+        }
+    }) }}
+  </form>
+
+  {{ govukTable({
+    caption: "Financial documents",
+    captionClasses: "govuk-visually-hidden",
+    firstCellIsHeader: false,
+    head: [
+      {
       text: translations['date']
     },
     {
@@ -50,8 +56,18 @@
     {
       html: "<span class='govuk-visually-hidden'>View document</span>"
     }
-  ],
-  rows: rows
-}) }}
+    ],
+    rows: rows
+  }) }}
+
+{% else %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">
+        {{translations['no-payment-docs']}}
+      </p>
+    </div>
+  </div>
+{% endif %}
 
 {% endblock %}
