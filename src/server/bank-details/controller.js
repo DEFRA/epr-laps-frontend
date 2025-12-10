@@ -4,7 +4,9 @@
 import * as authUtils from '../../server/auth/utils.js'
 import joi from 'joi'
 import Boom from '@hapi/boom'
+import { fetchWithToken } from '../auth/utils.js'
 import requirePermission from '../auth/permissionCheck.js'
+
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
 
@@ -15,7 +17,9 @@ export const bankDetailsController = {
     if (request.yar.get('bankDetailsSubmitted')) {
       request.yar.clear('bankDetailsSubmitted')
     }
-    const bankApiData = request.yar.get('bankDetails')
+
+    const bankPath = `/bank-details/${request.auth.credentials.organisationName}`
+    const bankApiData = await fetchWithToken(request, bankPath)
 
     if (!bankApiData) {
       throw Boom.internal('Bank details not found in session')
