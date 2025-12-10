@@ -16,7 +16,9 @@ export const bankDetailsController = {
     if (request.yar.get('bankDetailsSubmitted')) {
       request.yar.clear('bankDetailsSubmitted')
     }
-    const bankApiData = request.yar.get('bankDetails')
+
+    const bankPath = `/bank-details/${request.auth.credentials.organisationName}`
+    const bankApiData = await fetchWithToken(request, bankPath)
 
     if (!bankApiData) {
       throw Boom.internal('Bank details not found in session')
@@ -35,9 +37,6 @@ export const bankDetailsController = {
 
     request.logger.info('successfully fetched bank details from cookie')
 
-    const bankPath = `/bank-details/${request.auth.credentials.organisationName}`
-    const bankDetailsApiData = await fetchWithToken(request, bankPath)
-
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       breadcrumbs: [
@@ -50,7 +49,7 @@ export const bankDetailsController = {
           href: `/bank-details?lang=${currentLang}`
         }
       ],
-      bankApiData: bankDetailsApiData,
+      bankApiData,
       userPermissions,
       translatedSortCode,
       translatedAccountNumber
