@@ -9,6 +9,7 @@ import {
   getUpdateBankDetailsController,
   bankDetailsSubmittedController
 } from './controller.js'
+
 export const bankDetails = {
   plugin: {
     name: 'bankDetails',
