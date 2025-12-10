@@ -1,22 +1,20 @@
+import Boom from '@hapi/boom'
 export default function requirePermission(permissionKey) {
   return {
     assign: 'permission',
     method: (request, h) => {
       const sessionPermissions = request.yar.get('userPermissions')
 
-      // Safety check
       if (!sessionPermissions) {
-        return h.redirect('/bank-details').takeover()
+        throw Boom.notFound()
       }
 
       const allowed = sessionPermissions[permissionKey]
 
-      // If the permission is not true → redirect
       if (!allowed) {
-        return h.redirect('/bank-details').takeover()
+        throw Boom.notFound()
       }
 
-      // otherwise allow route to continue
       return true
     }
   }

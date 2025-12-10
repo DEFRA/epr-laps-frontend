@@ -81,6 +81,9 @@ export function translateBankDetails(value, translations) {
 }
 
 export const confirmBankDetailsController = {
+  options: {
+    pre: [requirePermission('confirmBankDetails')]
+  },
   handler: async (request, h) => {
     const bankApiData = request.yar.get('bankDetails')
 
@@ -110,6 +113,9 @@ export const confirmBankDetailsController = {
 }
 
 export const bankDetailsConfirmedController = {
+  options: {
+    pre: [requirePermission('confirmBankDetails')]
+  },
   handler: async (request, h) => {
     const localAuthority = request.auth.credentials.organisationId
     const { currentLang } = request.app
@@ -147,6 +153,9 @@ export const updateBankDetailsInfoController = {
 }
 
 export const bankDetailsSubmittedController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: async (request, h) => {
     const { currentLang } = request.app
     // Check if user arrived from a valid submission (check for specific session flag)
