@@ -4,6 +4,7 @@
 import * as authUtils from '../../server/auth/utils.js'
 import joi from 'joi'
 import Boom from '@hapi/boom'
+import { fetchWithToken } from '../auth/utils.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
@@ -34,6 +35,9 @@ export const bankDetailsController = {
 
     request.logger.info('successfully fetched bank details from cookie')
 
+    const bankPath = `/bank-details/${request.auth.credentials.organisationName}`
+    const bankDetailsApiData = await fetchWithToken(request, bankPath)
+
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
       breadcrumbs: [
@@ -46,7 +50,7 @@ export const bankDetailsController = {
           href: `/bank-details?lang=${currentLang}`
         }
       ],
-      bankApiData,
+      bankApiData: bankDetailsApiData,
       userPermissions,
       translatedSortCode,
       translatedAccountNumber

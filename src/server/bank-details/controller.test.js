@@ -13,7 +13,7 @@ import {
   translateBankDetails
 } from './controller.js'
 import Boom from '@hapi/boom'
-import { postWithToken, putWithToken } from '../auth/utils.js'
+import { fetchWithToken, postWithToken, putWithToken } from '../auth/utils.js'
 import { bankDetails } from './index.js'
 
 vi.mock('../auth/utils.js', () => ({
@@ -130,6 +130,48 @@ describe('#bankDetailsController', () => {
       'bank-details/index.njk',
       expect.any(Object)
     )
+    expect(result).toBe('view-rendered')
+  })
+
+  it('should call fetchWithToken with correct organisationName and render view with fetched data', async () => {
+    // Mock session bank details to avoid "not found" error
+    request.yar.get.mockImplementation((key) => {
+      if (key === 'bankDetails') {
+        return {
+          id: 'i22',
+          accountName: 'Account One',
+          sortCode: '12-34-56',
+          accountNumber: '12345678'
+        }
+      }
+      return {}
+    })
+
+    // Mock fetchWithToken to return some data
+    fetchWithToken.mockResolvedValue({
+      id: 'i22',
+      accountName: 'Fetched Account',
+      sortCode: '12-34-56',
+      accountNumber: '12345678'
+    })
+
+    const result = await bankDetailsController.handler(request, h)
+
+    // Assert fetchWithToken was called with correct path
+    expect(fetchWithToken).toHaveBeenCalledWith(
+      request,
+      `/bank-details/${request.auth.credentials.organisationName}`
+    )
+
+    // Assert view is called with the fetched bankApiData
+    const [, context] = h.view.mock.calls[0]
+    expect(context.bankApiData).toEqual({
+      id: 'i22',
+      accountName: 'Fetched Account',
+      sortCode: '12-34-56',
+      accountNumber: '12345678'
+    })
+
     expect(result).toBe('view-rendered')
   })
 })
