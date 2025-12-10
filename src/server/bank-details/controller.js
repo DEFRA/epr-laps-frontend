@@ -244,8 +244,8 @@ const buildSchema = (translations) =>
       .messages({
         'string.empty': translations['accountNumberEmpty'],
         'string.pattern.name': translations['accountNumberDigits'],
-        'string.min': translations['accountNumberMin'],
-        'string.max': translations['accountNumberMax']
+        'string.min': translations['accountNumberRange'],
+        'string.max': translations['accountNumberRange']
       })
   })
 
