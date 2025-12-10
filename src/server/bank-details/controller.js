@@ -32,7 +32,6 @@ export const bankDetailsController = {
 
     const userPermissions = request.yar.get('userPermissions')
 
-    console.log('THE user permissions ::', userPermissions)
     request.logger.info('successfully fetched bank details from cookie')
 
     return h.view('bank-details/index.njk', {
