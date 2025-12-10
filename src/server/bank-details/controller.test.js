@@ -421,8 +421,7 @@ describe('#updateBankDetailsController', () => {
           sortCodeLength: 'Sort code must be 6 digits long',
           accountNumberEmpty: 'Enter the account number',
           accountNumberDigits: 'Enter a valid account number like 12345678',
-          accountNumberMin: 'Account number must be at least 6 digits long',
-          accountNumberMax: 'Account number must be no more than 8 digits long'
+          accountNumberRange: 'Account number must be between 6 and 8 digits'
         }
       }
     }
