@@ -2,7 +2,7 @@ import Boom from '@hapi/boom'
 export default function requirePermission(permissionKey) {
   return {
     assign: 'permission',
-    method: (request, h) => {
+    method: (request, _h) => {
       const sessionPermissions = request.yar.get('userPermissions')
 
       if (!sessionPermissions) {
