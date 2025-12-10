@@ -746,7 +746,8 @@ describe('#UpdateBankDetails index.js route coverage', () => {
           accountNumberEmpty: 'Account number cannot be empty',
           accountNumberDigits: 'Account number must be digits',
           accountNumberMin: 'Account number too short',
-          accountNumberMax: 'Account number too long'
+          accountNumberMax: 'Account number too long',
+          accountNumberRange: 'Account number must be between 6 and 8 digits'
         }
       },
       auth: { credentials: { email: 'test@test.com' } },
