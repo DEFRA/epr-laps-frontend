@@ -5,6 +5,7 @@ import * as authUtils from '../../server/auth/utils.js'
 import joi from 'joi'
 import Boom from '@hapi/boom'
 import { fetchWithToken } from '../auth/utils.js'
+import requirePermission from '../auth/permissionCheck.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
@@ -83,6 +84,9 @@ export function translateBankDetails(value, translations) {
 }
 
 export const confirmBankDetailsController = {
+  options: {
+    pre: [requirePermission('confirmBankDetails')]
+  },
   handler: async (request, h) => {
     const bankApiData = request.yar.get('bankDetails')
 
@@ -112,6 +116,9 @@ export const confirmBankDetailsController = {
 }
 
 export const bankDetailsConfirmedController = {
+  options: {
+    pre: [requirePermission('confirmBankDetails')]
+  },
   handler: async (request, h) => {
     const localAuthority = request.auth.credentials.organisationId
     const { currentLang } = request.app
@@ -138,6 +145,9 @@ export const bankDetailsConfirmedController = {
 }
 
 export const updateBankDetailsInfoController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: (_request, h) => {
     return h.view('bank-details/update-bank-details-info.njk', {
       pageTitle: 'How it works'
@@ -146,6 +156,9 @@ export const updateBankDetailsInfoController = {
 }
 
 export const bankDetailsSubmittedController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: async (request, h) => {
     const { currentLang } = request.app
     // Check if user arrived from a valid submission (check for specific session flag)
@@ -161,6 +174,9 @@ export const bankDetailsSubmittedController = {
 }
 
 export const checkBankDetailsController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: (request, h) => {
     const newBankDetails = request.yar.get('payload')
 
@@ -238,6 +254,9 @@ const buildSchema = (translations) =>
   })
 
 export const getUpdateBankDetailsController = {
+  options: {
+    pre: [requirePermission('createBankDetails')]
+  },
   handler: async (request, h) => {
     const { translations } = request.app
 
