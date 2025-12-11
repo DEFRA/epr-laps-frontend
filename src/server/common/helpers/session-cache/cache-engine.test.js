@@ -9,11 +9,35 @@ import { config } from '../../../../config/config.js'
 const mockLoggerInfo = vi.fn()
 const mockLoggerError = vi.fn()
 
-vi.mock('ioredis', () => ({
-  ...vi.importActual('ioredis'),
-  Cluster: vi.fn().mockReturnValue({ on: () => ({}) }),
-  Redis: vi.fn().mockReturnValue({ on: () => ({}) })
-}))
+vi.mock('ioredis', async () => {
+  const actual = await vi.importActual('ioredis')
+
+  class RedisMock {
+    constructor(options) {
+      this.options = options
+    }
+    on() {
+      return {}
+    }
+  }
+
+  class ClusterMock {
+    constructor(nodes, options) {
+      this.nodes = nodes
+      this.options = options
+    }
+    on() {
+      return {}
+    }
+  }
+
+  return {
+    ...actual,
+    Redis: RedisMock,
+    Cluster: ClusterMock
+  }
+})
+
 vi.mock('@hapi/catbox-redis')
 vi.mock('@hapi/catbox-memory')
 vi.mock('../logging/logger.js', () => ({
