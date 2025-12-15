@@ -41,7 +41,7 @@
   "we-aim-to-respo": "Byddwn yn gwneud ein gorau i ymateb i’ch cais o fewn 5 diwrnod gwaith ond gall ymholiadau cymhleth gymryd hyd at 20 diwrnod",
   "telephone": "Ffôn",
   "0300-060-0002": "eprcustomerservice@defra.gov.uk",
-  "monday-to-frida": "Dydd Llun i ddydd Gwener, rhwng 8am a 4:30pm (ar gau ar benwythnosau a gwyliau banc)",
+  "monday-to-frida": "Dydd Llun i ddydd Gwener, rhwng 8am a 4:30pm, (ar gau ar benwythnosau a gwyliau banc).",
   "confirm-your-lo": "Mae angen i chi gadarnhau manylion banc eich awdurdod lleol",
   "name-of-account": "Enw’r cyfrif",
   "change-your-loc": "Newid manylion banc eich awdurdod lleol",
@@ -120,7 +120,7 @@
   "service-unavailable": "Yn anffodus, dydy'r gwasanaeth ddim ar gael ar hyn o bryd",
   "you-will-be": "Byddwch yn gallu defnyddio’r gwasanaeth cyn bo hir.",
   "page-not found": "Heb ddod o hyd i'r dudalen",
-  "you-can-return": "Gallwch ddychwelyd i wefa <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a>.",
+  "you-can-return": "Gallwch ddychwelyd i wefan <a class=\"govuk-link\" href=\"https://www.gov.uk/\">GOV.UK</a>.",
   "to": "i",
   "you-do-not": "Does gennych chi ddim rôl gwasanaeth",
   "to-access-this": "I gael gafael ar y cynnwys hwn, rhaid i weinyddwr eich cyfrif Defra neilltuo rôl gwasanaeth i chi yn y gwasanaeth Taliadau Awdurdodau Lleol.",
@@ -201,5 +201,5 @@
   "menu": "Bwydlen",
   "locale-cookie-use": "Wedi'i ddefnyddio i osod eich dewis iaith",
   "csrf-token": "Storio tocynnau Ffugiad Cais Traws-Safle (CSRF)",
-  "no-payment-docs": "Does gennych chi ddim dogfennau talu i'w gweld"
+  "no-payment-docs": "Does gennych chi ddim dogfennau talu i'w gweld."
 }
