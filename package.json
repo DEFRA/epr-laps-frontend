@@ -51,7 +51,7 @@
     "@hapi/vision": "7.0.3",
     "@hapi/wreck": "18.1.0",
     "@hapi/yar": "11.0.3",
-    "aws-embedded-metrics": "4.2.0",
+    "aws-embedded-metrics": "4.2.1",
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
     "cssnano": "7.0.7",
