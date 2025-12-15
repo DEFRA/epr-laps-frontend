@@ -37,7 +37,7 @@
     "@defra/cdp-auditing": "0.6.0",
     "@defra/hapi-secure-context": "0.4.0",
     "@defra/hapi-tracing": "1.30.0",
-    "@dwp/dwp-frontend": "3.3.0",
+    "@dwp/dwp-frontend": "3.4.0",
     "@elastic/ecs-pino-format": "1.5.0",
     "@hapi/bell": "13.1.0",
     "@hapi/boom": "10.0.1",
