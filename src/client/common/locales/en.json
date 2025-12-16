@@ -40,7 +40,7 @@
   "we-aim-to-respo": "We aim to respond to your request within 5 working days but complex queries may take up to 20 days.",
   "telephone": "Telephone",
   "0300-060-0002": "0300 060 0002",
-  "monday-to-frida": "Monday to Friday 8am to 4:30pm (closed on weekends and bank holidays)",
+  "monday-to-frida": "Monday to Friday, 8am to 4:30pm (closed on weekends and bank holidays).",
   "confirm-your-lo": "Confirm your local authority's bank details",
   "name-of-account": "Name of account",
   "change-your-loc": "Change your local authority's bank details",
@@ -55,7 +55,7 @@
   "raise-a-help-re": "Raise a help request or view open requests",
   "contact-us": "Contact us",
   "raise-a-query": "Raise a query, make a complaint, or request communication in alternative formats",
-  "fy-warning-text": "For the {year} financial year, there will be a single payment covering quarters 1 and 2.",
+  "fy-warning-text": "For the 2025 to 2026 financial year, there will be a single payment covering quarters 1 and 2.",
   "financial-year": "Financial year",
   "date": "Date",
   "document-name": "Document name",
@@ -121,7 +121,7 @@
   "when-and-how": "when and how you will receive payments and payment information",
   "how-payments": "how payments have been calculated",
   "you-can-use": "You can use any of the following methods to contact us.",
-  "response-time": "We aim to respond to your request within 5 working days but complex queries may take up to 20 days",
+  "response-time": "We aim to respond to your request within 5 working days but complex queries may take up to 20 days.",
   "we-will-contact": "We will contact you by email if we:",
   "need-more-info": "need more information",
   "think-it-is": "think it is going to take us longer to respond to your request",
@@ -192,5 +192,5 @@
   "menu": "Menu",
   "locale-cookie-use": "Used to set your language preference",
   "csrf-token": "Cross Site Request Forgery (CSRF) token storage",
-  "no-payment-docs": "You have no payment documents to view"
+  "no-payment-docs": "You have no payment documents to view."
 }
