@@ -84,9 +84,9 @@ export function translateBankDetails(value, translations) {
 }
 
 export const confirmBankDetailsController = {
-  options: {
-    pre: [requirePermission('confirmBankDetails')]
-  },
+  // options: {
+  //   pre: [requirePermission('confirmBankDetails')]
+  // },
   handler: async (request, h) => {
     const bankApiData = request.yar.get('bankDetails')
 
@@ -129,12 +129,13 @@ export const bankDetailsConfirmedController = {
       request,
       `/bank-details/${encodeURIComponent(localAuthority)}`,
       {
-        id: bankApiData.id,
+        sysId: bankApiData.id,
         accountName: bankApiData.accountName,
         sortCode: bankApiData.sortCode,
         accountNumber: bankApiData.accountNumber,
         confirmed: true,
-        requesterEmail: request.auth.credentials.email
+        requesterEmail: request.auth.credentials.email,
+        jpp: bankApiData.jpp
       }
     )
 
