@@ -84,9 +84,9 @@ export function translateBankDetails(value, translations) {
 }
 
 export const confirmBankDetailsController = {
-  // options: {
-  //   pre: [requirePermission('confirmBankDetails')]
-  // },
+  options: {
+    pre: [requirePermission('confirmBankDetails')]
+  },
   handler: async (request, h) => {
     const bankApiData = request.yar.get('bankDetails')
 
