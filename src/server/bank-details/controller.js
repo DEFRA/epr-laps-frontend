@@ -127,14 +127,16 @@ export const bankDetailsConfirmedController = {
     // Call reusable PUT function
     await authUtils.putWithToken(
       request,
-      `/bank-details/${encodeURIComponent(localAuthority)}`,
+      `/bank-details/confirm-bank-details`,
       {
-        id: bankApiData.id,
         accountName: bankApiData.accountName,
         sortCode: bankApiData.sortCode,
         accountNumber: bankApiData.accountNumber,
         confirmed: true,
-        requesterEmail: request.auth.credentials.email
+        requesterEmail: request.auth.credentials.email,
+        sysId: bankApiData.sysId,
+        jpp: bankApiData.jpp,
+        localAuthority
       }
     )
 
