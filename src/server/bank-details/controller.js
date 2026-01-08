@@ -214,11 +214,7 @@ export const postBankDetailsController = {
       payload.sortCode?.replaceAll('-', '')?.replaceAll(' ', '') || ''
     payload.requesterEmail = request.auth.credentials.email
 
-    await authUtils.postWithToken(
-      request,
-      '/bank-details/update-bank-details',
-      payload
-    )
+    await authUtils.postWithToken(request, '/bank-details', payload)
 
     request.logger.info(
       `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
