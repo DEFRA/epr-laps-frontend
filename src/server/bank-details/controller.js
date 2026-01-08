@@ -181,12 +181,16 @@ export const checkBankDetailsController = {
   },
   handler: (request, h) => {
     const newBankDetails = request.yar.get('payload')
+    const bankApiData = request.yar.get('bankDetails')
 
     if (!newBankDetails) {
       return h.redirect('bank-details/update-bank-details')
     }
 
     newBankDetails.localAuthority = request.auth.credentials.organisationName
+    newBankDetails.sysId = bankApiData.sysId
+    newBankDetails.jpp = bankApiData.jpp
+    newBankDetails.organizationId = request.auth.credentials.organisationId
 
     request.yar.set('ConfirmedBankDetails', newBankDetails)
     return h.view('bank-details/check-bank-details.njk', {
@@ -209,7 +213,12 @@ export const postBankDetailsController = {
     payload.sortCode =
       payload.sortCode?.replaceAll('-', '')?.replaceAll(' ', '') || ''
     payload.requesterEmail = request.auth.credentials.email
-    await authUtils.postWithToken(request, '/bank-details', payload)
+
+    await authUtils.postWithToken(
+      request,
+      '/bank-details/update-bank-details',
+      payload
+    )
 
     request.logger.info(
       `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`

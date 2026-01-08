@@ -827,7 +827,8 @@ describe('#checkBankDetailsController', () => {
       auth: {
         credentials: {
           displayName: 'XYZ',
-          organisationName: 'Defra Test'
+          organisationName: 'Defra Test',
+          organisationId: '123'
         }
       },
       yar: {
@@ -838,6 +839,12 @@ describe('#checkBankDetailsController', () => {
               accountNumber: '094785923',
               accountName: 'Defra Test',
               sortCode: '09-03-023'
+            }
+          }
+          if (key === 'bankDetails') {
+            return {
+              sysId: 'sys999',
+              jpp: 'jppabc'
             }
           }
         }),
@@ -858,7 +865,10 @@ describe('#checkBankDetailsController', () => {
         accountNumber: '094785923',
         accountName: 'Defra Test',
         sortCode: '09-03-023',
-        localAuthority: 'Defra Test'
+        localAuthority: 'Defra Test',
+        sysId: 'sys999',
+        jpp: 'jppabc',
+        organizationId: '123'
       })
     )
 
@@ -957,12 +967,16 @@ describe('#postBankDetailsController', () => {
 
     const result = await postBankDetailsController.handler(request, h)
 
-    expect(postWithToken).toHaveBeenCalledWith(request, '/bank-details', {
-      accountNumber: '094785923',
-      accountName: 'Defra Test',
-      sortCode: '0903023',
-      localAuthority: 'Defra Test'
-    })
+    expect(postWithToken).toHaveBeenCalledWith(
+      request,
+      '/bank-details/update-bank-details',
+      {
+        accountNumber: '094785923',
+        accountName: 'Defra Test',
+        sortCode: '0903023',
+        localAuthority: 'Defra Test'
+      }
+    )
     expect(request.logger.info).toHaveBeenCalledWith(
       expect.stringContaining(
         'Bank details successfully posted for organisation'
