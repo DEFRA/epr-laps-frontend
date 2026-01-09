@@ -377,6 +377,38 @@ describe('#bankDetailsConfirmedController', () => {
     expect(h.redirect).toHaveBeenCalledWith('/bank-details-confirmed?lang=en')
     expect(request.logger.info).toHaveBeenCalled()
   })
+
+  it('should call putWithToken with the correct PUT URL and payload', async () => {
+    request.auth.credentials = {
+      organisationId: 'LA123',
+      email: 'user@test.com'
+    }
+
+    request.yar.get = vi.fn().mockReturnValue({
+      accountName: 'Test',
+      sortCode: '12-34-56',
+      accountNumber: '12345678',
+      sysId: 'sys-1',
+      jpp: 'jpp-1'
+    })
+
+    putWithToken.mockResolvedValue({ success: true })
+
+    await bankDetailsConfirmedController.handler(request, h)
+
+    expect(putWithToken).toHaveBeenCalledTimes(1)
+
+    expect(putWithToken).toHaveBeenCalledWith(request, '/bank-details', {
+      accountName: 'Test',
+      sortCode: '12-34-56',
+      accountNumber: '12345678',
+      confirmed: true,
+      requesterEmail: 'user@test.com',
+      sysId: 'sys-1',
+      jpp: 'jpp-1',
+      localAuthority: 'LA123'
+    })
+  })
 })
 
 describe('#updateBankDetailsInfoController', () => {
