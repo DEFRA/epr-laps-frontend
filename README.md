@@ -4,7 +4,12 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_epr-laps-frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_epr-laps-frontend)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_epr-laps-frontend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_epr-laps-frontend)
 
-Core delivery platform Node.js Frontend Template.
+Local Authority Payments Frontend.
+
+Local Authority Payments (LAPs) is the digital journey within pEPR that enables local authorities in the UK to engage with the scheme and receive fair compensation for their work in managing packaging waste.
+This repository contains a GDS complaint application that serves as the frontend application for Local Authority Payments.
+
+- [Prerequisites](#prerequisites)
 
 - [Requirements](#requirements)
   - [Node.js](#nodejs)
@@ -27,6 +32,19 @@ Core delivery platform Node.js Frontend Template.
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
 
+## Prerequisites
+
+For latest minimum versions of Node.js and NPM, see the [package.json](./package.json) 'engines'
+property.
+
+- [Node.js](http://nodejs.org/)
+- [npm](https://nodejs.org/)
+- [Docker](https://www.docker.com/)
+
+You may find it easier to manage Node.js versions using a version manager such
+as [nvm](https://github.com/creationix/nvm) or [n](https://www.npmjs.com/package/n). From within the
+project folder you can then either run `nvm use` or `n auto` to install the required version.
+
 ## Requirements
 
 ### Node.js
@@ -39,6 +57,45 @@ To use the correct version of Node.js for this application, via nvm:
 ```bash
 cd epr-laps-frontend
 nvm use
+```
+
+## Local Development
+
+### Setup
+
+Install application dependencies:
+
+```bash
+npm install
+```
+
+### Development
+
+To run the application in `development` mode run:
+
+```bash
+npm run dev
+```
+
+and hit <http://localhost:3000> in your browser. This will
+use [Defra ID stub](https://github.com/DEFRA/cdp-defra-id-stub?tab=readme-ov-file#cdp-defra-id-stub)
+for login. And its required to run before the frontend is run.
+
+### Production
+
+To mimic the application running in `production` mode locally run:
+
+```bash
+npm start
+```
+
+### Npm scripts
+
+All available Npm scripts can be seen in [package.json](./package.json)
+To view them in your command line run:
+
+```bash
+npm run
 ```
 
 ## Server-side Caching
@@ -80,41 +137,6 @@ return await fetch(url, {
     keepAliveMaxTimeout: 10
   })
 })
-```
-
-## Local Development
-
-### Setup
-
-Install application dependencies:
-
-```bash
-npm install
-```
-
-### Development
-
-To run the application in `development` mode run:
-
-```bash
-npm run dev
-```
-
-### Production
-
-To mimic the application running in `production` mode locally run:
-
-```bash
-npm start
-```
-
-### Npm scripts
-
-All available Npm scripts can be seen in [package.json](./package.json)
-To view them in your command line run:
-
-```bash
-npm run
 ```
 
 ### Update dependencies
