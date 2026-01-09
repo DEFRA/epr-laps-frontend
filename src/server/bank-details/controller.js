@@ -125,20 +125,16 @@ export const bankDetailsConfirmedController = {
     const bankApiData = request.yar.get('bankDetails')
 
     // Call reusable PUT function
-    await authUtils.putWithToken(
-      request,
-      `/bank-details/confirm-bank-details`,
-      {
-        accountName: bankApiData.accountName,
-        sortCode: bankApiData.sortCode,
-        accountNumber: bankApiData.accountNumber,
-        confirmed: true,
-        requesterEmail: request.auth.credentials.email,
-        sysId: bankApiData.sysId,
-        jpp: bankApiData.jpp,
-        localAuthority
-      }
-    )
+    await authUtils.putWithToken(request, `/bank-details`, {
+      accountName: bankApiData.accountName,
+      sortCode: bankApiData.sortCode,
+      accountNumber: bankApiData.accountNumber,
+      confirmed: true,
+      requesterEmail: request.auth.credentials.email,
+      sysId: bankApiData.sysId,
+      jpp: bankApiData.jpp,
+      localAuthority
+    })
 
     request.logger.info('bank details successfully confirmed')
     // Redirect on success
