@@ -192,5 +192,6 @@
   "menu": "Menu",
   "locale-cookie-use": "Used to set your language preference",
   "csrf-token": "Cross Site Request Forgery (CSRF) token storage",
-  "no-payment-docs": "You have no payment documents to view."
+  "no-payment-docs": "You have no payment documents to view.",
+  "opens-in-new-tab": "(opens in new tab)"
 }

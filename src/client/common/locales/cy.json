@@ -217,5 +217,6 @@
   "menu": "Bwydlen",
   "locale-cookie-use": "Wedi'i ddefnyddio i osod eich dewis iaith",
   "csrf-token": "Storio tocynnau Ffugiad Cais Traws-Safle (CSRF)",
-  "no-payment-docs": "Does gennych chi ddim dogfennau talu i'w gweld."
+  "no-payment-docs": "Does gennych chi ddim dogfennau talu i'w gweld.",
+  "opens-in-new-tab": "(yn agor mewn tab newydd)"
 }
