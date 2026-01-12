@@ -34,6 +34,9 @@ This repository contains a GDS complaint application that serves as the frontend
 
 ## Prerequisites
 
+- [Windows Subsystem For Linux](https://docs.microsoft.com/en-us/windows/wsl/about) If you are on windows.
+  If you are on windows, its recommended you install windows subsystem and have all dependencies installed on them.
+
 For latest minimum versions of Node.js and NPM, see the [package.json](./package.json) 'engines'
 property.
 
