@@ -406,7 +406,7 @@ describe('#bankDetailsConfirmedController', () => {
       requesterEmail: 'user@test.com',
       sysId: 'sys-1',
       jpp: 'jpp-1',
-      localAuthority: 'LA123'
+      organizationId: 'LA123'
     })
   })
 })
