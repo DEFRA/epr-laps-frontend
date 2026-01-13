@@ -120,7 +120,6 @@ export const bankDetailsConfirmedController = {
     pre: [requirePermission('confirmBankDetails')]
   },
   handler: async (request, h) => {
-    const localAuthority = request.auth.credentials.organisationId
     const { currentLang } = request.app
     const bankApiData = request.yar.get('bankDetails')
 
@@ -133,7 +132,7 @@ export const bankDetailsConfirmedController = {
       requesterEmail: request.auth.credentials.email,
       sysId: bankApiData.sysId,
       jpp: bankApiData.jpp,
-      localAuthority
+      organizationId: request.auth.credentials.organisationId
     })
 
     request.logger.info('bank details successfully confirmed')
