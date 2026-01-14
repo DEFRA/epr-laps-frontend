@@ -40,7 +40,8 @@ const createRequest = (overrides = {}) => ({
   auth: {
     credentials: {
       account: { localAuthorityName: 'Defra Test' },
-      organisationName: 'Defra Test'
+      organisationName: 'Defra Test',
+      organisationId: '123'
     }
   },
   logger: { error: vi.fn(), info: vi.fn() },
@@ -159,7 +160,7 @@ describe('#bankDetailsController', () => {
 
     expect(fetchWithToken).toHaveBeenCalledWith(
       request,
-      `/bank-details/${request.auth.credentials.organisationName}`
+      `/bank-details/${request.auth.credentials.organisationId}`
     )
 
     const [, context] = h.view.mock.calls[0]
