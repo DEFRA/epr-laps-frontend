@@ -15,7 +15,7 @@ export const paymentDocumentsController = {
     let documentApiData = {}
     let rows = []
     let financialYearOptions = []
-    const documentPath = `/documents/${request.auth.credentials.organisationName}`
+    const documentPath = `/documents/${request.auth.credentials.organisationId}`
     documentApiData = await fetchWithToken(request, documentPath)
 
     request.logger.info(
