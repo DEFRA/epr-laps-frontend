@@ -27,7 +27,7 @@ export const homeController = {
       )
     }
 
-    const bankPath = `/bank-details/${request.auth.credentials.organisationName}`
+    const bankPath = `/bank-details/${request.auth.credentials.organisationId}`
     const bankApiData = await fetchWithToken(request, bankPath)
     request.yar.set('bankDetails', bankApiData)
     request.logger.info('successfully fetched bank details')
