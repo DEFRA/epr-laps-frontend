@@ -62,7 +62,7 @@
     "hapi-i18n": "3.0.1",
     "hapi-pino": "13.0.0",
     "hapi-pulse": "3.0.1",
-    "ioredis": "5.9.1",
+    "ioredis": "5.9.2",
     "joi": "18.0.2",
     "lodash": "4.17.21",
     "node-fetch": "3.3.2",
