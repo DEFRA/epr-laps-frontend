@@ -121,17 +121,11 @@ export const bankDetailsConfirmedController = {
   },
   handler: async (request, h) => {
     const { currentLang } = request.app
-    const bankApiData = request.yar.get('bankDetails')
 
     // Call reusable PUT function
     await authUtils.putWithToken(request, `/bank-details`, {
-      accountName: bankApiData.accountName,
-      sortCode: bankApiData.sortCode,
-      accountNumber: bankApiData.accountNumber,
       confirmed: true,
       requesterEmail: request.auth.credentials.email,
-      sysId: bankApiData.sysId,
-      jpp: bankApiData.jpp,
       organizationId: request.auth.credentials.organisationId
     })
 

@@ -400,13 +400,8 @@ describe('#bankDetailsConfirmedController', () => {
     expect(putWithToken).toHaveBeenCalledTimes(1)
 
     expect(putWithToken).toHaveBeenCalledWith(request, '/bank-details', {
-      accountName: 'Test',
-      sortCode: '12-34-56',
-      accountNumber: '12345678',
       confirmed: true,
       requesterEmail: 'user@test.com',
-      sysId: 'sys-1',
-      jpp: 'jpp-1',
       organizationId: 'LA123'
     })
   })
