@@ -1,6 +1,5 @@
-@use "pkg:govuk-frontend" as govuk with (
-  $govuk-assets-path: "/assets/",
+@forward "pkg:govuk-frontend" with (
+  $govuk-assets-path: "/public/assets/",
+  $govuk-new-organisation-colours: true,
   $govuk-global-styles: true
 );
-
-@forward "pkg:govuk-frontend";
