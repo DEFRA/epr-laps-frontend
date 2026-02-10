@@ -173,6 +173,10 @@ export default {
               path.join(govukFrontendPath, 'dist/govuk/assets/images')
             ]
           }
+        },
+        {
+          from: path.join(govukFrontendPath, 'dist/govuk/assets/rebrand'),
+          to: 'assets'
         }
       ]
     })

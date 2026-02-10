@@ -1,5 +1,5 @@
 @use "pkg:govuk-frontend" as govuk with (
-  $govuk-assets-path: "/public/assets/",
+  $govuk-assets-path: "/assets/",
   $govuk-global-styles: true
 );
 
