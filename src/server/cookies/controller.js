@@ -16,7 +16,7 @@ const cookiesController = {
       config.get('cookies.cookie_policy.ttl')
     )
     for (const [en, translated] of Object.entries(translationMap)) {
-      const regex = new RegExp(`\\b${en}\\b`, 'g')
+      const regex = new RegExp(String.raw`\b${en}\b`, 'g')
       sessionCookieExpiry = sessionCookieExpiry.replace(regex, translated)
       cookiePolicyExpiry = cookiePolicyExpiry.replace(regex, translated)
     }

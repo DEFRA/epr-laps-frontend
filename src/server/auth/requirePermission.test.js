@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import Boom from '@hapi/boom'
-import requirePermission from './permissionCheck.js'
+import requirePermission from './requirePermission.js'
 
-describe('permissionCheck pre-handler', () => {
+describe('requirePermission pre-handler', () => {
   it('throws Boom.notFound when userPermissions is missing', () => {
     const pre = requirePermission('createBankDetails')
 
