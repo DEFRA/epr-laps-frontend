@@ -50,7 +50,7 @@ export const updateUserSession = async (request, refreshedSession) => {
 
   const authedUser = await getUserSession(request, request.state.userSession)
   const displayName = [payload.firstName, payload.lastName]
-    .filter((part) => part)
+    .filter(Boolean)
     .join(' ')
 
   await request.server.app.cache.set(
