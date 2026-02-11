@@ -1,4 +1,4 @@
-import Path from 'path'
+import Path from 'node:path'
 import Hapi from '@hapi/hapi'
 import Vision from '@hapi/vision'
 import Nunjucks from 'nunjucks'
