@@ -3,7 +3,6 @@ import {
   Button,
   Checkboxes,
   ErrorSummary,
-  Header,
   Radios,
   SkipLink,
   ServiceNavigation
@@ -12,7 +11,6 @@ import {
 createAll(Button)
 createAll(Checkboxes)
 createAll(ErrorSummary)
-createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
 createAll(ServiceNavigation)

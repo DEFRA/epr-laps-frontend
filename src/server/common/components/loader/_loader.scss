@@ -12,7 +12,7 @@
   .app-loader--is-loading {
     width: govuk-spacing(9);
     height: govuk-spacing(9);
-    border: 0.5rem solid govuk-colour("light-grey");
+    border: 0.5rem solid govuk-colour("black", $variant: "tint-95");
     border-top-color: $govuk-brand-colour;
     border-radius: 50%;
     display: inline-block;
