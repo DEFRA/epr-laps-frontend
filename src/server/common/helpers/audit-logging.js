@@ -36,7 +36,7 @@ export const Action = {
   }
 }
 
-export const writeAuditLog = (request, action, outcome) => {
+export const writeAuditLog = (request, action, outcome, statusCode) => {
   if (!action) {
     return
   }
@@ -49,7 +49,8 @@ export const writeAuditLog = (request, action, outcome) => {
     user_role: request.auth.credentials.role,
     local_authority_name: request.auth.credentials.currentOrganisation,
     action_kind: action,
-    outcome
+    outcome,
+    status: statusCode
   }
   request.logger.debug(`Audit log: ${JSON.stringify(auditLogData)}`)
   audit(auditLogData)
