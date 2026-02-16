@@ -38,15 +38,16 @@ export function catchAll(request, h) {
     return h.continue
   }
 
+  const statusCode = response.output.statusCode
   writeAuditLog(
     request,
     Action[request.path]?.[request.method]?.kind,
-    Outcome.Failure
+    Outcome.Failure,
+    statusCode
   )
 
   const translations = request.app?.translations || {}
 
-  const statusCode = response.output.statusCode
   const { heading, message } = statusCodeMessage(statusCode, translations)
 
   if (statusCode >= statusCodes.internalServerError) {
