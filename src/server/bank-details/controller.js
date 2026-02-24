@@ -236,7 +236,7 @@ const buildSchema = (translations) =>
       }),
     accountNumber: joi
       .string()
-      .replace(/\s+/g, '')
+      .replace(/\s+/g, '') // NOSONAR
       .required()
       .pattern(/^\d+$/, 'digits')
       .min(ACCOUNT_NUMBER_MIN)
