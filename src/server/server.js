@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import hapi from '@hapi/hapi'
 import bell from '@hapi/bell'
 import cookie from '@hapi/cookie'
