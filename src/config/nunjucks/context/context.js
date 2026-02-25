@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
-
+import Boom from '@hapi/boom'
 import { config } from '../../config.js'
 import { buildNavigation } from './build-navigation.js'
 import { createLogger } from '../../../server/common/helpers/logging/logger.js'
@@ -32,6 +32,7 @@ async function context(request) {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
     } catch (error) {
       logger.error(`Webpack ${path.basename(manifestPath)} not found`)
+      throw Boom.internal(`Failed to load webpack manifest.`)
     }
   }
 
