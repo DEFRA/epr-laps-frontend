@@ -189,10 +189,6 @@ describe('context and cache', () => {
 
         it('should default authedUser to {} when getUserSession returns null', async () => {
           vi.resetModules()
-          mockReadFileSync.mockReturnValue(`{
-            "application.js": "javascripts/application.js",
-            "stylesheets/application.scss": "stylesheets/application.css"
-          }`)
           const req = {
             ...mockRequest,
             getUserSession: vi.fn().mockResolvedValue({
