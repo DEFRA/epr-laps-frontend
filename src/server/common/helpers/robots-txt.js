@@ -8,13 +8,13 @@
  * @module robotsTxt
  */
 
-import { promises as fs } from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { statusCodes } from '../constants/status-codes'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const ROBOTS_TXT_PATH = path.resolve(__dirname, '../../public/robots.txt')
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const ROBOTS_TXT_PATH = path.resolve(dirname, '../../public/robots.txt')
 
 /**
  * Hapi plugin for serving robots.txt from file
