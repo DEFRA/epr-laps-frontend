@@ -12,6 +12,7 @@ import { auth } from './auth/index.js'
 import { timedOut } from './timed-out/index.js'
 import { noServiceRole } from './no-service-role/index.js'
 import { cookies } from './cookies/index.js'
+import { robotsTxt } from './common/helpers/robots-txt.js'
 import Boom from '@hapi/boom'
 
 export const router = {
@@ -22,6 +23,9 @@ export const router = {
 
       // Health-check route. Used by platform to check if service is running, do not remove!
       await server.register([health])
+
+      // Robots.txt for search engine crawler control
+      await server.register([robotsTxt])
 
       // Application specific routes, add your own routes here
       await server.register([

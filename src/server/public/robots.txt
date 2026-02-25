@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Crawl delay to reduce server load
+Crawl-delay: 1
