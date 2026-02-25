@@ -11,6 +11,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { statusCodes } from '../constants/status-codes'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROBOTS_TXT_PATH = path.resolve(__dirname, '../../public/robots.txt')
@@ -46,7 +47,7 @@ export const robotsTxt = {
       method: 'GET',
       path: '/robots.txt',
       handler: (_request, h) => {
-        return h.response(robotsContent).type('text/plain').code(200)
+        return h.response(robotsContent).type('text/plain').code(statusCodes.ok)
       },
       options: {
         auth: false,
