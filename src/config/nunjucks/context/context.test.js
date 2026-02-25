@@ -188,7 +188,6 @@ describe('context and cache', () => {
         })
 
         it('should default authedUser to {} when getUserSession returns null', async () => {
-          vi.resetModules()
           const req = {
             ...mockRequest,
             getUserSession: vi.fn().mockResolvedValue({
