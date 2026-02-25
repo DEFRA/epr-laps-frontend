@@ -60,6 +60,10 @@ describe('context and cache', () => {
     mockgetUserSession.mockReset()
     vi.resetModules()
 
+    mockReadFileSync.mockReturnValue(`{
+      "application.js": "javascripts/application.js",
+      "stylesheets/application.scss": "stylesheets/application.css"
+    }`)
     config.get = vi.fn().mockImplementation((key) => {
       const configValues = {
         root: '/',
@@ -100,11 +104,6 @@ describe('context and cache', () => {
       })
 
       beforeEach(async () => {
-        mockReadFileSync.mockReturnValue(`{
-          "application.js": "javascripts/application.js",
-          "stylesheets/application.scss": "stylesheets/application.css"
-        }`)
-
         vi.mocked(fetchWithToken).mockResolvedValue(null)
 
         contextResult = await contextImport.context(mockRequest)
@@ -189,6 +188,11 @@ describe('context and cache', () => {
         })
 
         it('should default authedUser to {} when getUserSession returns null', async () => {
+          vi.resetModules()
+          mockReadFileSync.mockReturnValue(`{
+            "application.js": "javascripts/application.js",
+            "stylesheets/application.scss": "stylesheets/application.css"
+          }`)
           const req = {
             ...mockRequest,
             getUserSession: vi.fn().mockResolvedValue({
@@ -289,7 +293,7 @@ describe('context and cache', () => {
       test('Should use cache on second call', async () => {
         mockReadFileSync.mockClear()
         await contextImport.context(req)
-        expect(mockReadFileSync).toHaveBeenCalled()
+        expect(mockReadFileSync).not.toHaveBeenCalled()
       })
     })
   })
