@@ -11,7 +11,7 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { statusCodes } from '../constants/status-codes'
+import { statusCodes } from '../constants/status-codes.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROBOTS_TXT_PATH = path.resolve(dirname, '../../public/robots.txt')
