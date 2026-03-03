@@ -6,6 +6,11 @@ import joi from 'joi'
 import Boom from '@hapi/boom'
 import { fetchWithToken } from '../auth/utils.js'
 import requirePermission from '../auth/requirePermission.js'
+import {
+  writeAuditLog,
+  ActionKind,
+  Outcome
+} from '../../server/common/helpers/audit-logging.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
@@ -272,6 +277,12 @@ export const getUpdateBankDetailsController = {
     } else {
       request.yar.clear('payload')
       request.yar.set('formSubmitted', false)
+      writeAuditLog(
+        request,
+        ActionKind.BankJourneyStarted,
+        Outcome.Success,
+        200
+      )
     }
 
     request.yar.set('languageSwitched', false)
