@@ -478,8 +478,20 @@ describe('#updateBankDetailsController', () => {
       query: {},
       headers: {},
       path: '/update-bank-details',
+      auth: {
+        credentials: {
+          sub: 'test-123',
+          email: 'test@test.com',
+          firstName: 'Test',
+          lastName: 'User',
+          organisationId: '123'
+        }
+      },
       payload: {},
       yar,
+      logger: {
+        debug: vi.fn()
+      },
       app: {
         currentLang: 'en',
         translations: {

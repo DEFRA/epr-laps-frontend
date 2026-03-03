@@ -279,7 +279,7 @@ export const getUpdateBankDetailsController = {
       request.yar.set('formSubmitted', false)
       writeAuditLog(
         request,
-        ActionKind.BankJourneyStarted,
+        ActionKind.BankDetailsCreationStarted,
         Outcome.Success,
         200
       )
