@@ -12,7 +12,8 @@ export const ActionKind = {
   DocumentsListed: 'DocumentsListed',
   FullBankDetailsViewed: 'FullBankDetailsViewed',
   MaskedBankDetailsViewed: 'MaskedBankDetailsViewed',
-  BankDetailsCreated: 'BankDetailsCreated'
+  BankDetailsCreated: 'BankDetailsCreated',
+  BankDetailsCreationStarted: 'BankDetailsCreationStarted'
 }
 
 export const Action = {
