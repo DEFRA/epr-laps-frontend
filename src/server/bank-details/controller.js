@@ -11,6 +11,7 @@ import {
   ActionKind,
   Outcome
 } from '../../server/common/helpers/audit-logging.js'
+import { statusCodes } from '../common/constants/status-codes.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
@@ -281,7 +282,7 @@ export const getUpdateBankDetailsController = {
         request,
         ActionKind.BankDetailsCreationStarted,
         Outcome.Success,
-        200
+        statusCodes.ok
       )
     }
 
