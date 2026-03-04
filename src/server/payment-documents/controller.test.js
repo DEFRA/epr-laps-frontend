@@ -50,7 +50,9 @@ describe('paymentDocumentsController', () => {
       logger: { info: vi.fn() },
       payload: {},
       yar: {
-        flash: vi.fn()
+        flash: vi.fn(),
+        set: vi.fn(),
+        get: vi.fn()
       }
     }
     fetchWithTokenMockData = {
@@ -117,11 +119,35 @@ describe('paymentDocumentsController', () => {
 
   it('renders payment documents with correct rows', async () => {
     request.yar.flash.mockReturnValueOnce(['2024 to 2025']).mockReturnValue()
+    request.yar.set = vi.fn()
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
     expect(viewArg.rows.length).toBe(2)
     expect(viewArg.pageTitle).toBe('Payment documents')
+  })
+
+  it('stores document metadata in session for secure audit logging', async () => {
+    request.yar.flash.mockReturnValueOnce(['2024 to 2025']).mockReturnValue()
+    request.yar.set = vi.fn()
+
+    await paymentDocumentsController.handler(request, h)
+
+    expect(request.yar.set).toHaveBeenCalled()
+  })
+
+  it('caches metadata by document ID in session', async () => {
+    request.yar.flash.mockReturnValueOnce(['2024 to 2025']).mockReturnValue()
+    request.yar.set = vi.fn()
+
+    await paymentDocumentsController.handler(request, h)
+
+    const callArgs = request.yar.set.mock.calls[0]
+    const metadata = callArgs[1]
+
+    expect(metadata['1']).toBeDefined()
+    expect(metadata['2']).toBeDefined()
+    expect(Object.keys(metadata)).toEqual(['1', '2'])
   })
 
   it('applies bold-row class only to documents within the last 30 days', async () => {
@@ -236,7 +262,9 @@ describe('paymentDocumentsController', () => {
         logger: { info: vi.fn() },
         payload: {},
         yar: {
-          flash: vi.fn()
+          flash: vi.fn(),
+          set: vi.fn(),
+          get: vi.fn()
         }
       }
     })
@@ -283,11 +311,14 @@ describe('fileDownloadController', () => {
         error: vi.fn()
       },
       params: { fileId: '123' },
-      query: {},
+      query: { docName: 'test.pdf' },
       auth: {
         credentials: {
           organisationName: 'TestOrg'
         }
+      },
+      yar: {
+        get: vi.fn().mockReturnValue({})
       }
     }
 
@@ -326,7 +357,7 @@ describe('fileDownloadController', () => {
     )
     expect(responseMock.header).toHaveBeenCalledWith(
       'Content-Disposition',
-      'inline; filename="123.pdf"'
+      'inline; filename="test.pdf"'
     )
   })
 
@@ -337,6 +368,66 @@ describe('fileDownloadController', () => {
 
     const responseMock = h.response.mock.results[0].value
     expect(responseMock.code).toHaveBeenCalledWith(statusCodes.notFound)
+  })
+
+  it('retrieves document metadata from session cache', async () => {
+    const buffer = Buffer.from('PDF data')
+    const documentMetadata = {
+      123: {
+        documentType: 'grant',
+        language: 'EN',
+        fileName: 'test.pdf'
+      }
+    }
+    request.yar.get.mockReturnValue(documentMetadata)
+    fetchWithToken.mockResolvedValue(buffer)
+
+    await fileDownloadController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('documentMetadata')
+    expect(fetchWithToken).toHaveBeenCalledWith(
+      request,
+      '/document/123?documentType=grant&language=EN'
+    )
+  })
+
+  it('handles missing metadata from session gracefully', async () => {
+    const buffer = Buffer.from('PDF data')
+    request.yar.get.mockReturnValue(null)
+    fetchWithToken.mockResolvedValue(buffer)
+
+    await fileDownloadController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('documentMetadata')
+    // Should call backend without metadata when session is empty
+    expect(fetchWithToken).toHaveBeenCalledWith(request, '/document/123')
+  })
+
+  it('only passes metadata from session, not from URL', async () => {
+    const buffer = Buffer.from('PDF data')
+    // Attacker tries to add fake metadata via URL
+    request.query = {
+      docName: 'test.pdf',
+      documentType: 'malicious',
+      language: 'FAKE'
+    }
+    const documentMetadata = {
+      123: {
+        documentType: 'grant',
+        language: 'EN',
+        fileName: 'test.pdf'
+      }
+    }
+    request.yar.get.mockReturnValue(documentMetadata)
+    fetchWithToken.mockResolvedValue(buffer)
+
+    await fileDownloadController.handler(request, h)
+
+    // Should use metadata from session, not malicious URL params
+    expect(fetchWithToken).toHaveBeenCalledWith(
+      request,
+      '/document/123?documentType=grant&language=EN'
+    )
   })
 })
 
