@@ -182,7 +182,8 @@ export const fileDownloadController = {
     }
 
     const queryString = backendQueryParams.toString()
-    const documentPath = `/document/${encodeURIComponent(fileId)}${queryString ? `?${queryString}` : ''}`
+    const queryStringPrefix = queryString ? `?${queryString}` : ''
+    const documentPath = `/document/${encodeURIComponent(fileId)}${queryStringPrefix}`
     const apiResponse = await fetchWithToken(request, documentPath)
     request.logger.info(`Fetched file metadata for ID: ${fileId}`)
 
