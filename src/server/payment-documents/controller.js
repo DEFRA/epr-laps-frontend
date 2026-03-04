@@ -51,6 +51,18 @@ export const paymentDocumentsController = {
     const docsToShow =
       docsByYear[isWelshCouncil ? langKey : languageKeys.en.toUpperCase()] || []
 
+    // Store document metadata in session for secure audit logging
+    // This prevents users from tampering with documentType/language in URLs
+    const documentMetadataCache = {}
+    docsToShow.forEach((doc) => {
+      documentMetadataCache[doc.id] = {
+        documentType: doc.documentType,
+        language: doc.language,
+        fileName: doc.fileName
+      }
+    })
+    request.yar.set('documentMetadata', documentMetadataCache)
+
     rows = buildTableRows(docsToShow, translations)
     request.yar.flash('selectedYear', selectedYear)
 
@@ -101,6 +113,8 @@ export function buildFinancialYearOptions(
 
 function buildTableRows(docsToShow, translations) {
   return docsToShow.map((doc) => {
+    // Only include filename in URL for download purposes
+    // Metadata is stored securely in session, not exposed in URL
     const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
     const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
@@ -154,7 +168,22 @@ export const fileDownloadController = {
     const { fileId } = request.params
     const filename = request.query.docName || `${fileId}.pdf`
 
-    const documentPath = `/document/${encodeURIComponent(fileId)}`
+    // Retrieve authentic metadata from session (not from URL to prevent tampering)
+    const documentMetadata = request.yar.get('documentMetadata') || {}
+    const docMetadata = documentMetadata[fileId] || {}
+
+    // Build query params to pass to backend with secure metadata from session
+    const backendQueryParams = new URLSearchParams()
+    if (docMetadata.documentType) {
+      backendQueryParams.append('documentType', docMetadata.documentType)
+    }
+    if (docMetadata.language) {
+      backendQueryParams.append('language', docMetadata.language)
+    }
+
+    const queryString = backendQueryParams.toString()
+    const queryStringPrefix = queryString ? `?${queryString}` : ''
+    const documentPath = `/document/${encodeURIComponent(fileId)}${queryStringPrefix}`
     const apiResponse = await fetchWithToken(request, documentPath)
     request.logger.info(`Fetched file metadata for ID: ${fileId}`)
 
