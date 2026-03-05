@@ -52,12 +52,13 @@ export const paymentDocumentsController = {
       docsByYear[isWelshCouncil ? langKey : languageKeys.en.toUpperCase()] || []
 
     // Store document metadata in session for secure audit logging
-    // This prevents users from tampering with documentType/language in URLs
+    // This prevents users from tampering with documentType/language/quarter in URLs
     const documentMetadataCache = {}
     docsToShow.forEach((doc) => {
       documentMetadataCache[doc.id] = {
         documentType: doc.documentType,
         language: doc.language,
+        quarter: doc.quarter,
         fileName: doc.fileName
       }
     })
@@ -179,6 +180,9 @@ export const fileDownloadController = {
     }
     if (docMetadata.language) {
       backendQueryParams.append('language', docMetadata.language)
+    }
+    if (docMetadata.quarter) {
+      backendQueryParams.append('quarter', docMetadata.quarter)
     }
 
     const queryString = backendQueryParams.toString()
