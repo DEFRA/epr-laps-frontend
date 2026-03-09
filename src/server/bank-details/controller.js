@@ -111,6 +111,13 @@ export const confirmBankDetailsController = {
       translations
     )
 
+    writeAuditLog(
+      request,
+      ActionKind.BankDetailsCreated,
+      Outcome.Success,
+      statusCodes.ok,
+      'journey_started'
+    )
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,

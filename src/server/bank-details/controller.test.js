@@ -23,6 +23,10 @@ vi.mock('../auth/utils.js', () => ({
   postWithToken: vi.fn()
 }))
 
+vi.mock('../../server/common/helpers/audit-logging.js', () => ({
+  writeAuditLog: vi.fn()
+}))
+
 const createH = () => ({
   view: vi.fn().mockReturnValue('view-rendered'),
   redirect: vi.fn().mockReturnValue('redirected'),
@@ -204,6 +208,12 @@ describe('#confirmBankDetailsController', () => {
       payload: { sortCode: '00-00-00', accountNumber: '12345678' },
       yar: {
         get: vi.fn()
+      },
+      logger: {
+        error: vi.fn(),
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn()
       }
     })
     vi.clearAllMocks()
