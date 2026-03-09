@@ -6,9 +6,16 @@ import joi from 'joi'
 import Boom from '@hapi/boom'
 import { fetchWithToken } from '../auth/utils.js'
 import requirePermission from '../auth/requirePermission.js'
+import {
+  writeAuditLog,
+  ActionKind,
+  Outcome
+} from '../../server/common/helpers/audit-logging.js'
+import { statusCodes } from '../common/constants/status-codes.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
+const JOURNEY_STARTED = 'journey_started'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -105,6 +112,13 @@ export const confirmBankDetailsController = {
       translations
     )
 
+    writeAuditLog(
+      request,
+      ActionKind.BankDetailsConfirmed,
+      Outcome.Success,
+      statusCodes.ok,
+      JOURNEY_STARTED
+    )
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
       bankApiData,
@@ -272,6 +286,13 @@ export const getUpdateBankDetailsController = {
     } else {
       request.yar.clear('payload')
       request.yar.set('formSubmitted', false)
+      writeAuditLog(
+        request,
+        ActionKind.BankDetailsCreated,
+        Outcome.Success,
+        statusCodes.ok,
+        JOURNEY_STARTED
+      )
     }
 
     request.yar.set('languageSwitched', false)

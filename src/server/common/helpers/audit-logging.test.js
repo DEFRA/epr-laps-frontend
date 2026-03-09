@@ -24,8 +24,9 @@ describe('#writeAuditLog', () => {
     }
     const action = 'TestAction'
     const outcome = 'Success'
+    const journeyType = 'journey_started'
 
-    writeAuditLog(mockRequest, action, outcome)
+    writeAuditLog(mockRequest, action, outcome, 200, journeyType)
 
     expect(mockRequest.logger.debug).toHaveBeenCalled()
     expect(audit).toHaveBeenCalledWith({
@@ -37,7 +38,9 @@ describe('#writeAuditLog', () => {
       user_role: 'Chief Executive Officer',
       local_authority_name: 'Test Authority',
       action_kind: 'TestAction',
-      outcome: 'Success'
+      outcome: 'Success',
+      status: 200,
+      journey_type: 'journey_started'
     })
   })
   test('Should not call cdp audit library for unknown actions', () => {
