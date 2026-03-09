@@ -480,6 +480,15 @@ describe('#updateBankDetailsController', () => {
       path: '/update-bank-details',
       payload: {},
       yar,
+      auth: {
+        credentials: {
+          sub: 'test-123',
+          email: 'test@test.com',
+          firstName: 'Test',
+          lastName: 'User',
+          organisationId: '123'
+        }
+      },
       app: {
         currentLang: 'en',
         translations: {
@@ -491,6 +500,9 @@ describe('#updateBankDetailsController', () => {
           accountNumberDigits: 'Enter a valid account number like 12345678',
           accountNumberRange: 'Account number must be between 6 and 8 digits'
         }
+      },
+      logger: {
+        debug: vi.fn()
       }
     }
   })
