@@ -113,7 +113,7 @@ export const confirmBankDetailsController = {
 
     writeAuditLog(
       request,
-      ActionKind.BankDetailsCreated,
+      ActionKind.BankDetailsConfirmed,
       Outcome.Success,
       statusCodes.ok,
       'journey_started'
