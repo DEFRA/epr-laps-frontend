@@ -15,6 +15,7 @@ import { statusCodes } from '../common/constants/status-codes.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
+const JOURNEY_STARTED = 'journey_started'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -116,7 +117,7 @@ export const confirmBankDetailsController = {
       ActionKind.BankDetailsConfirmed,
       Outcome.Success,
       statusCodes.ok,
-      'journey_started'
+      JOURNEY_STARTED
     )
     return h.view('bank-details/confirm-bank-details.njk', {
       pageTitle: 'Confirm Bank Details',
@@ -290,7 +291,7 @@ export const getUpdateBankDetailsController = {
         ActionKind.BankDetailsCreated,
         Outcome.Success,
         statusCodes.ok,
-        'journey_started'
+        JOURNEY_STARTED
       )
     }
 
