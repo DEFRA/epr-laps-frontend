@@ -54,6 +54,12 @@ export function catchAll(request, h) {
     request.logger.error(response?.stack)
   }
 
+  const currentLang = request.query?.lang || request.app?.currentLang || 'en'
+
+  if (request.method === 'post') {
+    return h.redirect(`/service-problem?lang=${currentLang}`)
+  }
+
   return h
     .view('error/index', {
       pageTitle: heading,

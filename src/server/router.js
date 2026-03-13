@@ -44,6 +44,20 @@ export const router = {
       // Static assets
       await server.register([serveStaticFiles])
 
+      server.route({
+        method: 'GET',
+        path: '/service-problem',
+        handler: (request, h) => {
+          const translations = request.app?.translations || {}
+
+          return h.view('error/index', {
+            pageTitle: translations['service-problem'],
+            heading: translations['service-problem'],
+            message: translations['try-again']
+          })
+        }
+      })
+
       //Global catch-all route for unknown URLs (404)
       server.route({
         method: '*',
