@@ -14,6 +14,7 @@ import { noServiceRole } from './no-service-role/index.js'
 import { cookies } from './cookies/index.js'
 import { robotsTxt } from './common/helpers/robots-txt.js'
 import Boom from '@hapi/boom'
+import { serviceProblem } from './error/index.js'
 
 export const router = {
   plugin: {
@@ -38,25 +39,12 @@ export const router = {
         auth,
         defraAccount,
         noServiceRole,
-        cookies
+        cookies,
+        serviceProblem
       ])
 
       // Static assets
       await server.register([serveStaticFiles])
-
-      server.route({
-        method: 'GET',
-        path: '/service-problem',
-        handler: (request, h) => {
-          const translations = request.app?.translations || {}
-
-          return h.view('error/index', {
-            pageTitle: translations['service-problem'],
-            heading: translations['service-problem'],
-            message: translations['try-again']
-          })
-        }
-      })
 
       //Global catch-all route for unknown URLs (404)
       server.route({
