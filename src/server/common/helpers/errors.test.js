@@ -197,4 +197,66 @@ describe('#catchAll', () => {
       message: undefined
     })
   })
+  test('Should redirect POST requests to /service-problem with currentLang from query', () => {
+    const req = {
+      method: 'post',
+      query: { lang: 'cy' },
+      response: {
+        isBoom: true,
+        output: { statusCode: statusCodes.internalServerError }
+      },
+      app: { translations: {} },
+      logger: { error: vi.fn() }
+    }
+
+    const mockRedirect = vi.fn().mockReturnValue('redirected')
+    const h = { redirect: mockRedirect }
+
+    const result = catchAll(req, h)
+
+    expect(mockRedirect).toHaveBeenCalledWith('/service-problem?lang=cy')
+    expect(result).toBe('redirected')
+  })
+
+  test('Should redirect POST requests to /service-problem with currentLang from app if query missing', () => {
+    const req = {
+      method: 'post',
+      query: {},
+      response: {
+        isBoom: true,
+        output: { statusCode: statusCodes.internalServerError }
+      },
+      app: { translations: {}, currentLang: 'en' },
+      logger: { error: vi.fn() }
+    }
+
+    const mockRedirect = vi.fn().mockReturnValue('redirected')
+    const h = { redirect: mockRedirect }
+
+    const result = catchAll(req, h)
+
+    expect(mockRedirect).toHaveBeenCalledWith('/service-problem?lang=en')
+    expect(result).toBe('redirected')
+  })
+
+  test('Should redirect POST requests to /service-problem with default "en" if no query or app currentLang', () => {
+    const req = {
+      method: 'post',
+      query: {},
+      response: {
+        isBoom: true,
+        output: { statusCode: statusCodes.internalServerError }
+      },
+      app: {}, // no translations or currentLang
+      logger: { error: vi.fn() }
+    }
+
+    const mockRedirect = vi.fn().mockReturnValue('redirected')
+    const h = { redirect: mockRedirect }
+
+    const result = catchAll(req, h)
+
+    expect(mockRedirect).toHaveBeenCalledWith('/service-problem?lang=en')
+    expect(result).toBe('redirected')
+  })
 })
