@@ -46,12 +46,37 @@ export function catchAll(request, h) {
     statusCode
   )
 
+  // persist error context for language toggles (only store what you need; keep it tiny)
+  // request.yar?.set('lastError', {
+  //   statusCode,
+  //   kind:
+  //     statusCode == statusCodes.internalServerError
+  //       ? 'service-problem'
+  //       : 'http-error'
+  // })
+
+  request.logger.info(
+    { lastError: request.yar?.get('lastError') },
+    'catchAll: lastError set in yar'
+  )
+
+  console.log('Last set by yar:', request.yar?.get('lastError'))
   const translations = request.app?.translations || {}
 
   const { heading, message } = statusCodeMessage(statusCode, translations)
 
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error(response?.stack)
+  }
+
+  // ✅ Persist service-problem via cookie
+  if (statusCode >= statusCodes.internalServerError) {
+    h.state('lastError', {
+      statusCode,
+      kind: 'service-problem'
+    })
+
+    request.logger?.error(response.stack)
   }
 
   return h

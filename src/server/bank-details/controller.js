@@ -145,9 +145,38 @@ export const bankDetailsConfirmedController = {
 
     request.logger.info('bank details successfully confirmed')
     // Redirect on success
-    return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+    return h.redirect(
+      `/bank-details/bank-details-confirmed?lang=${currentLang}`
+    )
   }
 }
+
+// export const bankDetailsConfirmedController = {
+//   options: { pre: [requirePermission('confirmBankDetails')] },
+//   handler: async (request, h) => {
+//     const { currentLang } = request.app
+
+//     try {
+//       await authUtils.putWithToken(request, `/bank-details`, {
+//         confirmed: true,
+//         requesterEmail: request.auth.credentials.email,
+//         organizationId: request.auth.credentials.organisationId
+//       })
+
+//       request.logger.info('bank details successfully confirmed')
+//       return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+
+//     } catch (err) {
+//       request.logger.error('Bank details confirm failed', err)
+
+//       // Store error in session to show on GET route
+//       // request.yar.set('bankDetailsConfirmError', 'There was a problem confirming bank details')
+
+//       // Redirect to GET route instead of staying on POST
+//       return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+//     }
+//   }
+// }
 
 export const updateBankDetailsInfoController = {
   options: {

@@ -68,8 +68,64 @@ export const bankDetails = {
 
       server.route({
         method: 'GET',
-        path: '/bank-details-confirmed',
-        handler: (_request, h) => {
+        path: '/bank-details/bank-details-confirmed',
+        handler: (request, h) => {
+          // const lastError = request.yar?.get('lastError')
+
+          // console.log('Last error from yar:', lastError)
+          // ✅ If this is a service problem, short-circuit and re-render error page
+          // if (lastError?.kind === 'service-problem') {
+          //   const translations = request.app?.translations || {}
+
+          //   const { heading, message } = statusCodeMessage(
+          //     lastError.statusCode,
+          //     translations
+          //   )
+
+          //   return h
+          //     .view('error/index', {
+          //       pageTitle: heading,
+          //       heading,
+          //       message
+          //     })
+          //     .code(lastError.statusCode)
+          // } else {
+          //   console.log('in else')
+          //   request.yar?.clear('lastError')
+          // }
+
+          const lastError = request.state.lastError
+
+          console.log('Last error from cookie:', lastError)
+
+          // ✅ Service problem → short-circuit controller
+          if (lastError?.kind === 'service-problem') {
+            const translations = request.app?.translations || {}
+
+            // const { heading, message } = statusCodeMessage(
+            //   lastError.statusCode,
+            //   translations
+            // )
+            const heading = translations['service-problem']
+            const message = translations['try-again']
+
+            // ✅ clear after use
+            h.unstate('lastError')
+
+            return h
+              .view('error/index', {
+                pageTitle: heading,
+                heading,
+                message
+              })
+              .code(lastError.statusCode)
+          }
+
+          // ✅ clear stale error state
+          if (lastError) {
+            h.unstate('lastError', { path: '/' })
+          }
+
           return h.view('bank-details/bank-details-confirmed.njk', {
             pageTitle: 'Bank Details Confirmed'
           })
