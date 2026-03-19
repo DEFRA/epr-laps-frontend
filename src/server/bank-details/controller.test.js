@@ -843,7 +843,7 @@ describe('#UpdateBankDetails index.js route coverage', () => {
     const h = {
       view: vi.fn().mockReturnValue('view-rendered'),
       redirect: vi.fn().mockImplementation(() => ({
-        unstate: vi.fn(), // <-- add this
+        unstate: vi.fn(),
         code: vi.fn().mockReturnThis()
       }))
     }
