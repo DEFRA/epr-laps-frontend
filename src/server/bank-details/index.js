@@ -1,3 +1,4 @@
+// import { statusCodes } from '../common/constants/status-codes.js'
 import {
   bankDetailsController,
   confirmBankDetailsController,
@@ -70,64 +71,36 @@ export const bankDetails = {
         method: 'GET',
         path: '/bank-details/bank-details-confirmed',
         handler: (request, h) => {
-          // const lastError = request.yar?.get('lastError')
-
-          // console.log('Last error from yar:', lastError)
-          // ✅ If this is a service problem, short-circuit and re-render error page
-          // if (lastError?.kind === 'service-problem') {
-          //   const translations = request.app?.translations || {}
-
-          //   const { heading, message } = statusCodeMessage(
-          //     lastError.statusCode,
-          //     translations
-          //   )
-
-          //   return h
-          //     .view('error/index', {
-          //       pageTitle: heading,
-          //       heading,
-          //       message
-          //     })
-          //     .code(lastError.statusCode)
-          // } else {
-          //   console.log('in else')
-          //   request.yar?.clear('lastError')
-          // }
-
           const lastError = request.state.lastError
 
-          console.log('Last error from cookie:', lastError)
+          // Log for debugging
+          request.logger.info(
+            { lastError, allState: request.state },
+            'GET /bank-details/bank-details-confirmed'
+          )
 
-          // ✅ Service problem → short-circuit controller
+          // If there was a service problem, show the error page
           if (lastError?.kind === 'service-problem') {
             const translations = request.app?.translations || {}
+            const heading = translations['service-problem'] || 'Service Problem'
+            const message =
+              translations['try-again'] || 'Please try again later'
 
-            // const { heading, message } = statusCodeMessage(
-            //   lastError.statusCode,
-            //   translations
-            // )
-            const heading = translations['service-problem']
-            const message = translations['try-again']
-
-            // ✅ clear after use
-            h.unstate('lastError')
-
+            // Return error view without clearing the cookie
             return h
               .view('error/index', {
                 pageTitle: heading,
                 heading,
                 message
               })
-              .code(lastError.statusCode)
+              .code(lastError.statusCode || 500)
           }
 
-          // ✅ clear stale error state
-          if (lastError) {
-            h.unstate('lastError', { path: '/' })
-          }
-
+          // Normal confirmed page — pass defaults to avoid template errors
           return h.view('bank-details/bank-details-confirmed.njk', {
-            pageTitle: 'Bank Details Confirmed'
+            pageTitle: 'Bank Details Confirmed',
+            bankDetails: request.state.bankDetails || {},
+            user: request.auth?.credentials || {}
           })
         }
       })

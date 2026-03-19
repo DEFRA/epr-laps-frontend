@@ -55,10 +55,10 @@ export function catchAll(request, h) {
   //       : 'http-error'
   // })
 
-  request.logger.info(
-    { lastError: request.yar?.get('lastError') },
-    'catchAll: lastError set in yar'
-  )
+  // request.logger.info(
+  //   { lastError: request.yar?.get('lastError') },
+  //   'catchAll: lastError set in yar'
+  // )
 
   console.log('Last set by yar:', request.yar?.get('lastError'))
   const translations = request.app?.translations || {}
