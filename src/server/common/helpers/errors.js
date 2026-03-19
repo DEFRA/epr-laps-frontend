@@ -54,6 +54,16 @@ export function catchAll(request, h) {
     request.logger.error(response?.stack)
   }
 
+  // ✅ Persist service-problem via cookie
+  if (statusCode >= statusCodes.internalServerError) {
+    h.state('lastError', {
+      statusCode,
+      kind: 'service-problem'
+    })
+
+    request.logger?.error(response.stack)
+  }
+
   return h
     .view('error/index', {
       pageTitle: heading,

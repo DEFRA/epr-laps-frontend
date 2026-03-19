@@ -347,6 +347,35 @@ describe('#confirmBankDetailsController', () => {
 
 describe('#bankDetailsConfirmedController', () => {
   let h, request
+
+  const createH = () => {
+    const mockUnstate = vi.fn()
+    const mockCode = vi.fn().mockReturnThis()
+
+    const mockRedirect = vi.fn().mockReturnValue({
+      unstate: mockUnstate,
+      code: mockCode
+    })
+
+    return {
+      view: vi.fn().mockReturnValue('view-rendered'),
+      redirect: mockRedirect
+    }
+  }
+
+  const createRequest = (overrides = {}) => ({
+    auth: {
+      credentials: {
+        organisationId: 'ORG123',
+        email: 'user@test.com'
+      }
+    },
+    logger: { info: vi.fn(), error: vi.fn() },
+    yar: { get: vi.fn(), set: vi.fn(), clear: vi.fn() },
+    app: { currentLang: 'en', translations: {} },
+    ...overrides
+  })
+
   beforeEach(() => {
     h = createH()
     request = createRequest()
@@ -354,18 +383,6 @@ describe('#bankDetailsConfirmedController', () => {
   })
 
   it('should handle putWithToken failure and return 500', async () => {
-    request.app.translations = {
-      'laps-home': 'Home',
-      'bank-details': 'Bank Details'
-    }
-    request.app.currentLang = 'en'
-    request.yar.get = vi.fn().mockReturnValue({
-      id: '123',
-      accountName: 'Foo',
-      sortCode: '00-00-00',
-      accountNumber: '12345678'
-    })
-
     putWithToken.mockRejectedValue(
       Boom.internal('Failed to update bank details')
     )
@@ -386,12 +403,22 @@ describe('#bankDetailsConfirmedController', () => {
       accountNumber: '12345678'
     })
 
-    putWithToken.mockResolvedValue({
-      success: true
-    })
+    putWithToken.mockResolvedValue({ success: true })
 
     await bankDetailsConfirmedController.handler(request, h)
-    expect(h.redirect).toHaveBeenCalledWith('/bank-details-confirmed?lang=en')
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      '/bank-details/bank-details-confirmed?lang=en'
+    )
+    const redirectResponse = h.redirect.mock.results[0].value
+    expect(redirectResponse.unstate).toHaveBeenCalledWith('lastError', {
+      path: '/',
+      encoding: 'base64json',
+      isHttpOnly: true,
+      isSameSite: 'Lax',
+      isSecure: false
+    })
+    // expect(redirectResponse.unstate).toHaveBeenCalledWith('lastError', { path: '/' })
     expect(request.logger.info).toHaveBeenCalled()
   })
 
@@ -414,7 +441,6 @@ describe('#bankDetailsConfirmedController', () => {
     await bankDetailsConfirmedController.handler(request, h)
 
     expect(putWithToken).toHaveBeenCalledTimes(1)
-
     expect(putWithToken).toHaveBeenCalledWith(request, '/bank-details', {
       confirmed: true,
       requesterEmail: 'user@test.com',
@@ -816,7 +842,10 @@ describe('#UpdateBankDetails index.js route coverage', () => {
 
     const h = {
       view: vi.fn().mockReturnValue('view-rendered'),
-      redirect: vi.fn((url) => url)
+      redirect: vi.fn().mockImplementation(() => ({
+        unstate: vi.fn(), // <-- add this
+        code: vi.fn().mockReturnThis()
+      }))
     }
 
     const baseReq = {
@@ -847,7 +876,8 @@ describe('#UpdateBankDetails index.js route coverage', () => {
         }
       },
       auth: { credentials: { email: 'test@test.com' } },
-      logger: { info: vi.fn(), error: vi.fn() }
+      logger: { info: vi.fn(), error: vi.fn() },
+      state: { lastError: undefined }
     }
 
     // Execute each registered route handler

@@ -12,6 +12,7 @@ import {
   Outcome
 } from '../../server/common/helpers/audit-logging.js'
 import { statusCodes } from '../common/constants/status-codes.js'
+import { config } from '../../config/config.js'
 
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
@@ -144,8 +145,24 @@ export const bankDetailsConfirmedController = {
     })
 
     request.logger.info('bank details successfully confirmed')
+
     // Redirect on success
-    return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+    const response = h.redirect(
+      `/bank-details/bank-details-confirmed?lang=${currentLang}`
+    )
+
+    response.unstate('lastError', {
+      path: '/',
+      isHttpOnly: true,
+      isSecure: config.get('session.cookie.secure'),
+      isSameSite: 'Lax',
+      encoding: 'base64json'
+    })
+
+    request.logger.info(
+      'Clearing lastError cookie after successful confirmation'
+    )
+    return response
   }
 }
 

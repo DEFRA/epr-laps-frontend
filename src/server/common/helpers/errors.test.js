@@ -80,7 +80,10 @@ describe('#catchAll', () => {
   const mockToolkitCode = vi.fn()
   const mockToolkit = {
     view: mockToolkitView.mockReturnThis(),
-    code: mockToolkitCode.mockReturnThis()
+    code: mockToolkitCode.mockReturnThis(),
+
+    state: vi.fn().mockReturnThis(), // added to prevent TypeError
+    unstate: vi.fn().mockReturnThis() // added to prevent TypeError
   }
 
   test('Should provide expected "Not Found" page', () => {
@@ -166,6 +169,11 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(
       statusCodes.internalServerError
     )
+    // Verify that state() was called to set the cookie
+    expect(mockToolkit.state).toHaveBeenCalledWith('lastError', {
+      statusCode: statusCodes.internalServerError,
+      kind: 'service-problem'
+    })
   })
 
   test('Should continue when response is not Boom', () => {
