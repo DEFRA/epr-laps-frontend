@@ -419,13 +419,14 @@ describe('#bankDetailsConfirmedController', () => {
 })
 
 describe('#bankDetailsConfirmedErrorController', () => {
-  it('renders error page with correct translations for 500+ lastError', async () => {
+  it('renders confirmed page when lastError is 500', async () => {
     const request = {
-      yar: { get: vi.fn(() => 500) },
+      yar: { get: vi.fn(() => 500) }, // number, not object
       app: { translations: {} }
     }
     const h = { view: vi.fn(() => 'view-rendered') }
-    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/bank-details-confirmed.njk',
@@ -433,15 +434,17 @@ describe('#bankDetailsConfirmedErrorController', () => {
         pageTitle: 'Bank Details Confirmed'
       }
     )
+    expect(result).toBe('view-rendered')
   })
 
-  it('renders error page with correct translations for 503 lastError', async () => {
+  it('renders confirmed page for other lastError values (e.g., 503 without statusCode object)', async () => {
     const request = {
       yar: { get: vi.fn(() => 503) },
       app: { translations: {} }
     }
     const h = { view: vi.fn(() => 'view-rendered') }
-    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/bank-details-confirmed.njk',
@@ -449,6 +452,7 @@ describe('#bankDetailsConfirmedErrorController', () => {
         pageTitle: 'Bank Details Confirmed'
       }
     )
+    expect(result).toBe('view-rendered')
   })
 
   it('renders normal confirmation view when no lastError', async () => {
@@ -457,17 +461,24 @@ describe('#bankDetailsConfirmedErrorController', () => {
       app: {}
     }
     const h = { view: vi.fn(() => 'view-rendered') }
-    const result = await bankDetailsConfirmedErrorController.handler(request, h)
 
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed'
+      }
+    )
     expect(result).toBe('view-rendered')
   })
 
   it('handles missing request.app gracefully when lastError exists', async () => {
     const request = {
-      yar: { get: vi.fn(() => 500) }
+      yar: { get: vi.fn(() => 500) } // number
     }
     const h = { view: vi.fn(() => 'view-rendered') }
-    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
       'bank-details/bank-details-confirmed.njk',
@@ -475,6 +486,7 @@ describe('#bankDetailsConfirmedErrorController', () => {
         pageTitle: 'Bank Details Confirmed'
       }
     )
+    expect(result).toBe('view-rendered')
   })
 
   it('handles missing lastError gracefully and renders normal view', async () => {
@@ -483,8 +495,14 @@ describe('#bankDetailsConfirmedErrorController', () => {
       app: {}
     }
     const h = { view: vi.fn(() => 'view-rendered') }
-    const result = await bankDetailsConfirmedErrorController.handler(request, h)
 
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed'
+      }
+    )
     expect(result).toBe('view-rendered')
   })
 })
