@@ -7,9 +7,9 @@ import {
   postBankDetailsController,
   postUpdateBankDetailsController,
   getUpdateBankDetailsController,
-  bankDetailsSubmittedController
+  bankDetailsSubmittedController,
+  bankDetailsConfirmedErrorController
 } from './controller.js'
-import { statusCodes } from '../common/constants/status-codes.js'
 export const bankDetails = {
   plugin: {
     name: 'bankDetails',
@@ -79,28 +79,7 @@ export const bankDetails = {
       server.route({
         method: 'GET',
         path: '/bank-details/bank-details-confirmed',
-        handler: (request, h) => {
-          const lastError = request.yar.get('lastError')
-          const translations = request.app?.translations || {}
-
-          if (lastError?.statusCode >= statusCodes.internalServerError) {
-            const heading = translations['service-problem'] || 'Service Problem'
-            const message =
-              translations['try-again'] || 'Please try again later'
-
-            return h
-              .view('error/index', {
-                pageTitle: heading,
-                heading,
-                message
-              })
-              .code(lastError.statusCode)
-          }
-
-          return h.view('bank-details/bank-details-confirmed.njk', {
-            pageTitle: 'Bank Details Confirmed'
-          })
-        }
+        ...bankDetailsConfirmedErrorController
       })
       server.route({
         method: 'GET',

@@ -3,6 +3,7 @@ import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController,
+  bankDetailsConfirmedErrorController,
   postBankDetailsController,
   checkBankDetailsController,
   updateBankDetailsInfoController,
@@ -12,7 +13,6 @@ import {
   bankDetailsSubmittedController,
   translateBankDetails
 } from './controller.js'
-import Boom from '@hapi/boom'
 import { fetchWithToken, postWithToken, putWithToken } from '../auth/utils.js'
 import { bankDetails } from './index.js'
 
@@ -345,7 +345,7 @@ describe('#confirmBankDetailsController', () => {
   })
 })
 
-describe.skip('#bankDetailsConfirmedController', () => {
+describe('#bankDetailsConfirmedController', () => {
   let h, request
   beforeEach(() => {
     h = createH()
@@ -353,7 +353,7 @@ describe.skip('#bankDetailsConfirmedController', () => {
     vi.clearAllMocks()
   })
 
-  it('should handle putWithToken failure and return 500', async () => {
+  it('should handle putWithToken failure and redirect to error', async () => {
     request.app.translations = {
       'laps-home': 'Home',
       'bank-details': 'Bank Details'
@@ -366,16 +366,11 @@ describe.skip('#bankDetailsConfirmedController', () => {
       accountNumber: '12345678'
     })
 
-    putWithToken.mockRejectedValue(
-      Boom.internal('Failed to update bank details')
-    )
+    putWithToken.mockRejectedValue(new Error('Failed to update bank details'))
 
-    await expect(
-      bankDetailsConfirmedController.handler(request, h)
-    ).rejects.toMatchObject({
-      isBoom: true,
-      output: { statusCode: 500 }
-    })
+    const result = await bankDetailsConfirmedController.handler(request, h)
+
+    expect(result).toBe('redirected')
   })
 
   it('should redirect users to confirmation page successfully after confirmation', async () => {
@@ -420,6 +415,77 @@ describe.skip('#bankDetailsConfirmedController', () => {
       requesterEmail: 'user@test.com',
       organizationId: 'LA123'
     })
+  })
+})
+
+describe('#bankDetailsConfirmedErrorController', () => {
+  it('renders error page with correct translations for 500+ lastError', async () => {
+    const request = {
+      yar: { get: vi.fn(() => 500) },
+      app: { translations: {} }
+    }
+    const h = { view: vi.fn(() => 'view-rendered') }
+    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed'
+      }
+    )
+  })
+
+  it('renders error page with correct translations for 503 lastError', async () => {
+    const request = {
+      yar: { get: vi.fn(() => 503) },
+      app: { translations: {} }
+    }
+    const h = { view: vi.fn(() => 'view-rendered') }
+    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed'
+      }
+    )
+  })
+
+  it('renders normal confirmation view when no lastError', async () => {
+    const request = {
+      yar: { get: vi.fn(() => undefined) },
+      app: {}
+    }
+    const h = { view: vi.fn(() => 'view-rendered') }
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
+
+    expect(result).toBe('view-rendered')
+  })
+
+  it('handles missing request.app gracefully when lastError exists', async () => {
+    const request = {
+      yar: { get: vi.fn(() => 500) }
+    }
+    const h = { view: vi.fn(() => 'view-rendered') }
+    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed'
+      }
+    )
+  })
+
+  it('handles missing lastError gracefully and renders normal view', async () => {
+    const request = {
+      yar: { get: vi.fn(() => undefined) },
+      app: {}
+    }
+    const h = { view: vi.fn(() => 'view-rendered') }
+    const result = await bankDetailsConfirmedErrorController.handler(request, h)
+
+    expect(result).toBe('view-rendered')
   })
 })
 
