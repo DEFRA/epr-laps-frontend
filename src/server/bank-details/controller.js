@@ -135,17 +135,56 @@ export const bankDetailsConfirmedController = {
   },
   handler: async (request, h) => {
     const { currentLang } = request.app
+    try {
+      // Call reusable PUT function
+      await authUtils.putWithToken(request, `/bank-details`, {
+        confirmed: true,
+        requesterEmail: request.auth.credentials.email,
+        organizationId: request.auth.credentials.organisationId
+      })
 
-    // Call reusable PUT function
-    await authUtils.putWithToken(request, `/bank-details`, {
-      confirmed: true,
-      requesterEmail: request.auth.credentials.email,
-      organizationId: request.auth.credentials.organisationId
+      request.logger.info('bank details successfully confirmed')
+      // Redirect on success
+      return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+    } catch (err) {
+      const statusCode =
+        err?.output?.statusCode ||
+        err?.statusCode ||
+        statusCodes.internalServerError
+
+      request.yar.set('lastError', {
+        statusCode
+      })
+      return h.redirect(
+        `/bank-details/bank-details-confirmed?lang=${currentLang}`
+      )
+    }
+  }
+}
+
+export const bankDetailsConfirmedErrorController = {
+  handler: (request, h) => {
+    const lastError = request.yar.get('lastError')
+    const translations = request.app?.translations || {}
+
+    // Handle internal server errors
+    if (lastError?.statusCode >= statusCodes.internalServerError) {
+      const heading = translations['service-problem']
+      const message = translations['try-again']
+
+      return h
+        .view('error/index', {
+          pageTitle: heading,
+          heading,
+          message
+        })
+        .code(lastError.statusCode)
+    }
+
+    // Normal successful response
+    return h.view('bank-details/bank-details-confirmed.njk', {
+      pageTitle: 'Bank Details Confirmed'
     })
-
-    request.logger.info('bank details successfully confirmed')
-    // Redirect on success
-    return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
   }
 }
 

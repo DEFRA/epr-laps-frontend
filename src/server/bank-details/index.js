@@ -7,9 +7,9 @@ import {
   postBankDetailsController,
   postUpdateBankDetailsController,
   getUpdateBankDetailsController,
-  bankDetailsSubmittedController
+  bankDetailsSubmittedController,
+  bankDetailsConfirmedErrorController
 } from './controller.js'
-
 export const bankDetails = {
   plugin: {
     name: 'bankDetails',
@@ -74,6 +74,12 @@ export const bankDetails = {
             pageTitle: 'Bank Details Confirmed'
           })
         }
+      })
+
+      server.route({
+        method: 'GET',
+        path: '/bank-details/bank-details-confirmed',
+        ...bankDetailsConfirmedErrorController
       })
       server.route({
         method: 'GET',
