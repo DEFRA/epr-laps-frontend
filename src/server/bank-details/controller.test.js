@@ -505,6 +505,37 @@ describe('#bankDetailsConfirmedErrorController', () => {
     )
     expect(result).toBe('view-rendered')
   })
+
+  it('renders service problem page when lastError has statusCode >= 500', async () => {
+    const request = {
+      yar: {
+        get: vi.fn(() => ({ statusCode: 500 }))
+      },
+      app: {
+        translations: {
+          'service-problem': 'Service problem',
+          'try-again': 'Please try again later'
+        }
+      }
+    }
+
+    const codeMock = vi.fn()
+    const h = {
+      view: vi.fn(() => ({
+        code: codeMock
+      }))
+    }
+
+    await bankDetailsConfirmedErrorController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith('error/index', {
+      pageTitle: 'Service problem',
+      heading: 'Service problem',
+      message: 'Please try again later'
+    })
+
+    expect(codeMock).toHaveBeenCalledWith(500)
+  })
 })
 
 describe('#updateBankDetailsInfoController', () => {

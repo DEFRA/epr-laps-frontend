@@ -147,7 +147,10 @@ export const bankDetailsConfirmedController = {
       // Redirect on success
       return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
     } catch (err) {
-      const statusCode = err?.output?.statusCode || err?.statusCode || 500
+      const statusCode =
+        err?.output?.statusCode ||
+        err?.statusCode ||
+        statusCodes.internalServerError
 
       request.yar.set('lastError', {
         statusCode
@@ -165,7 +168,7 @@ export const bankDetailsConfirmedErrorController = {
     const translations = request.app?.translations || {}
 
     // Handle internal server errors
-    if (lastError?.statusCode >= statusCodes.INTERNAL_SERVER_ERROR) {
+    if (lastError?.statusCode >= statusCodes.internalServerError) {
       const heading = translations['service-problem']
       const message = translations['try-again']
 
