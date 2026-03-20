@@ -135,17 +135,27 @@ export const bankDetailsConfirmedController = {
   },
   handler: async (request, h) => {
     const { currentLang } = request.app
+    try {
+      // Call reusable PUT function
+      await authUtils.putWithToken(request, `/bank-details`, {
+        confirmed: true,
+        requesterEmail: request.auth.credentials.email,
+        organizationId: request.auth.credentials.organisationId
+      })
 
-    // Call reusable PUT function
-    await authUtils.putWithToken(request, `/bank-details`, {
-      confirmed: true,
-      requesterEmail: request.auth.credentials.email,
-      organizationId: request.auth.credentials.organisationId
-    })
+      request.logger.info('bank details successfully confirmed')
+      // Redirect on success
+      return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+    } catch (err) {
+      const statusCode = err?.output?.statusCode || err?.statusCode || 500
 
-    request.logger.info('bank details successfully confirmed')
-    // Redirect on success
-    return h.redirect(`/bank-details-confirmed?lang=${currentLang}`)
+      request.yar.set('lastError', {
+        statusCode
+      })
+      return h.redirect(
+        `/bank-details/bank-details-confirmed?lang=${currentLang}`
+      )
+    }
   }
 }
 
