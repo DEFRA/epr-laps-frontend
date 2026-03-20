@@ -24,7 +24,8 @@ export const defraId = {
         clientSecret,
         isSecure: cookie.secure,
         providerParams: {
-          serviceId
+          serviceId,
+          forceReselection: true
         }
       })
 

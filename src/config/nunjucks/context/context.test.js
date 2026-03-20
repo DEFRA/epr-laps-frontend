@@ -39,9 +39,11 @@ const baseRequest = {
     info: vi.fn(),
     error: vi.fn()
   },
-  getUserSession: vi
-    .fn()
-    .mockResolvedValue({ organisationName: EN_NAME, relationships: [] }),
+  getUserSession: vi.fn().mockResolvedValue({
+    organisationName: EN_NAME,
+    relationships: [],
+    roles: []
+  }),
   state: { userSession: null },
   i18n: {
     getLocale: vi.fn().mockReturnValue('en'),
@@ -91,7 +93,8 @@ describe('context and cache', () => {
       getUserSession: vi.fn().mockResolvedValue({
         organisationName: EN_NAME,
         organisationId: '123-abc',
-        relationships: []
+        relationships: [],
+        roles: []
       })
     }
 
@@ -114,7 +117,8 @@ describe('context and cache', () => {
           authedUser: {
             organisationName: EN_NAME,
             organisationId: '123-abc',
-            relationships: []
+            relationships: [],
+            roles: []
           },
           assetPath: '/public/assets',
           breadcrumbs: [],
@@ -192,14 +196,16 @@ describe('context and cache', () => {
             ...mockRequest,
             getUserSession: vi.fn().mockResolvedValue({
               organisationName: undefined,
-              relationships: []
+              relationships: [],
+              roles: []
             })
           }
           const contextImport = await import('./context.js')
           const ctx = await contextImport.context(req)
           expect(ctx.authedUser).toEqual({
             organisationName: undefined,
-            relationships: []
+            relationships: [],
+            roles: []
           })
         })
       })
@@ -254,7 +260,8 @@ describe('context and cache', () => {
           ...mockRequest,
           getUserSession: vi.fn().mockResolvedValue({
             organisationName: undefined,
-            relationships: []
+            relationships: [],
+            roles: []
           })
         }
 
@@ -262,7 +269,8 @@ describe('context and cache', () => {
         const ctx = await contextImport.context(req)
         expect(ctx.authedUser).toEqual({
           organisationName: undefined,
-          relationships: []
+          relationships: [],
+          roles: []
         })
       })
     })

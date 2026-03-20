@@ -1,4 +1,7 @@
-import { buildNavigation } from './build-navigation.js'
+import {
+  buildNavigation,
+  userInMultipleOrganisations
+} from './build-navigation.js'
 import { config } from '../../config.js'
 
 const manageDefraAccountUrl =
@@ -36,7 +39,8 @@ describe('#buildNavigation', () => {
         mockRequest({
           path: '/non-existent-path',
           getUserSession: vi.fn().mockResolvedValue({
-            relationships: []
+            relationships: [],
+            roles: []
           })
         })
       )
@@ -59,7 +63,8 @@ describe('#buildNavigation', () => {
       mockRequest({
         path: '/',
         getUserSession: vi.fn().mockResolvedValue({
-          relationships: []
+          relationships: [],
+          roles: []
         })
       })
     )
@@ -83,7 +88,8 @@ describe('#buildNavigation', () => {
         relationships: [
           '777:222:Test:0:employee:0,333:456:test-organization:0:employee:0',
           '888:333:Another Test:0:employee:0,444:567:another-organization:0:employee:0'
-        ]
+        ],
+        roles: []
       })
     })
     const navigation = await buildNavigation(mockedRequest)
@@ -95,7 +101,7 @@ describe('#buildNavigation', () => {
       },
       {
         current: false,
-        href: '/defra-account/change-organisation',
+        href: '/change-organisation',
         text: 'Change organisation'
       },
       {
@@ -112,7 +118,8 @@ describe('#buildNavigation', () => {
         path: '/dashboard',
         query: { lang: 'cy' }, // simulate Welsh language
         getUserSession: vi.fn().mockResolvedValue({
-          relationships: []
+          relationships: [],
+          roles: []
         })
       })
     )
@@ -142,5 +149,41 @@ describe('#buildNavigation', () => {
     )
 
     expect(navigation).toEqual([])
+  })
+})
+
+describe('#userInMultipleOrganisations', () => {
+  test('Should return true if user has more than one relationship', () => {
+    const result = userInMultipleOrganisations({
+      relationships: ['relationship1', 'relationship2']
+    })
+    expect(result).toBe(true)
+  })
+
+  test('Should return true if enrolmentCount is greater than roles length', () => {
+    const result = userInMultipleOrganisations({
+      relationships: ['relationship1'],
+      enrolmentCount: 3,
+      roles: ['role1']
+    })
+    expect(result).toBe(true)
+  })
+
+  test('Should return true if enrolmentRequestCount is greater than unselected relationships', () => {
+    const result = userInMultipleOrganisations({
+      relationships: ['relationship1'],
+      enrolmentRequestCount: 2,
+      roles: ['role1']
+    })
+    expect(result).toBe(true)
+  })
+
+  test('Should return false if user has only one relationship and enrolmentCount is not greater than roles length', () => {
+    const result = userInMultipleOrganisations({
+      relationships: ['relationship1'],
+      enrolmentCount: 1,
+      roles: ['role1']
+    })
+    expect(result).toBe(false)
   })
 })
