@@ -166,6 +166,37 @@ export const bankDetailsConfirmedController = {
   }
 }
 
+export const getBankDetailsConfirmedController = {
+  handler: (request, h) => {
+    const lastError = request.state.lastError
+
+    request.logger.info(
+      { lastError, allState: request.state },
+      'GET /bank-details/bank-details-confirmed'
+    )
+
+    if (lastError?.kind === 'service-problem') {
+      const translations = request.app?.translations || {}
+      const heading = translations['service-problem'] || 'Service Problem'
+      const message = translations['try-again'] || 'Please try again later'
+
+      return h
+        .view('error/index', {
+          pageTitle: heading,
+          heading,
+          message
+        })
+        .code(lastError.statusCode)
+    }
+
+    return h.view('bank-details/bank-details-confirmed.njk', {
+      pageTitle: 'Bank Details Confirmed',
+      bankDetails: request.state.bankDetails || {},
+      user: request.auth?.credentials || {}
+    })
+  }
+}
+
 export const updateBankDetailsInfoController = {
   options: {
     pre: [requirePermission('createBankDetails')]

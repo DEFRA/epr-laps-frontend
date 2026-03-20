@@ -3,6 +3,7 @@ import {
   bankDetailsController,
   confirmBankDetailsController,
   bankDetailsConfirmedController,
+  getBankDetailsConfirmedController,
   postBankDetailsController,
   checkBankDetailsController,
   updateBankDetailsInfoController,
@@ -446,6 +447,110 @@ describe('#bankDetailsConfirmedController', () => {
       requesterEmail: 'user@test.com',
       organizationId: 'LA123'
     })
+  })
+})
+
+describe('#getBankDetailsConfirmedController', () => {
+  let h
+  let request
+
+  beforeEach(() => {
+    h = {
+      view: vi.fn((view, context) => ({
+        view,
+        context,
+        code: vi.fn(function (statusCode) {
+          this.statusCode = statusCode
+          return this
+        })
+      }))
+    }
+
+    request = {
+      state: {},
+      app: {
+        translations: {}
+      },
+      auth: {
+        credentials: {
+          organisationId: '123',
+          email: 'user@test.com'
+        }
+      },
+      logger: {
+        info: vi.fn()
+      }
+    }
+  })
+
+  it('should render service problem error page when lastError.kind is service-problem', () => {
+    request.state.lastError = {
+      kind: 'service-problem',
+      statusCode: 503
+    }
+    request.app.translations = {
+      'service-problem': 'Service Problem',
+      'try-again': 'Please try again later'
+    }
+
+    const result = getBankDetailsConfirmedController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith('error/index', {
+      pageTitle: 'Service Problem',
+      heading: 'Service Problem',
+      message: 'Please try again later'
+    })
+    expect(result.statusCode).toBe(503)
+  })
+
+  it('should use fallback strings when translations are missing', () => {
+    request.state.lastError = {
+      kind: 'service-problem',
+      statusCode: 500
+    }
+    request.app = {}
+
+    const result = getBankDetailsConfirmedController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith('error/index', {
+      pageTitle: 'Service Problem',
+      heading: 'Service Problem',
+      message: 'Please try again later'
+    })
+    expect(result.statusCode).toBe(500)
+  })
+
+  it('should render confirmed page when there is no service-problem error', () => {
+    request.state.bankDetails = { accountName: 'Test Account' }
+
+    const result = getBankDetailsConfirmedController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed',
+        bankDetails: { accountName: 'Test Account' },
+        user: request.auth.credentials
+      }
+    )
+    expect(result.view).toBe('bank-details/bank-details-confirmed.njk')
+  })
+
+  it('should use defaults when bankDetails or auth credentials are missing', () => {
+    request.state = {}
+    request.auth = undefined
+
+    const result = getBankDetailsConfirmedController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'bank-details/bank-details-confirmed.njk',
+      {
+        pageTitle: 'Bank Details Confirmed',
+        bankDetails: {},
+        user: {}
+      }
+    )
+    expect(result.view).toBe('bank-details/bank-details-confirmed.njk')
   })
 })
 

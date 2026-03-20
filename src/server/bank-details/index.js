@@ -7,7 +7,8 @@ import {
   postBankDetailsController,
   postUpdateBankDetailsController,
   getUpdateBankDetailsController,
-  bankDetailsSubmittedController
+  bankDetailsSubmittedController,
+  getBankDetailsConfirmedController
 } from './controller.js'
 
 export const bankDetails = {
@@ -69,39 +70,7 @@ export const bankDetails = {
       server.route({
         method: 'GET',
         path: '/bank-details/bank-details-confirmed',
-        handler: (request, h) => {
-          const lastError = request.state.lastError
-
-          // Log for debugging
-          request.logger.info(
-            { lastError, allState: request.state },
-            'GET /bank-details/bank-details-confirmed'
-          )
-
-          // If there was a service problem, show the error page
-          if (lastError?.kind === 'service-problem') {
-            const translations = request.app?.translations || {}
-            const heading = translations['service-problem'] || 'Service Problem'
-            const message =
-              translations['try-again'] || 'Please try again later'
-
-            // Return error view without clearing the cookie
-            return h
-              .view('error/index', {
-                pageTitle: heading,
-                heading,
-                message
-              })
-              .code(lastError.statusCode || 500)
-          }
-
-          // Normal confirmed page — pass defaults to avoid template errors
-          return h.view('bank-details/bank-details-confirmed.njk', {
-            pageTitle: 'Bank Details Confirmed',
-            bankDetails: request.state.bankDetails || {},
-            user: request.auth?.credentials || {}
-          })
-        }
+        ...getBankDetailsConfirmedController
       })
       server.route({
         method: 'GET',
