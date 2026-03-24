@@ -8,7 +8,8 @@ import {
   postUpdateBankDetailsController,
   getUpdateBankDetailsController,
   bankDetailsSubmittedController,
-  bankDetailsConfirmedErrorController
+  bankDetailsConfirmedErrorController,
+  bankDetailsSubmittedErrorController
 } from './controller.js'
 export const bankDetails = {
   plugin: {
@@ -95,6 +96,11 @@ export const bankDetails = {
         method: 'GET',
         path: '/bank-details-submitted',
         ...bankDetailsSubmittedController
+      })
+      server.route({
+        method: 'GET',
+        path: '/bank-details/bank-details-submitted',
+        ...bankDetailsSubmittedErrorController
       })
     }
   }

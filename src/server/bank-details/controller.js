@@ -217,6 +217,31 @@ export const bankDetailsSubmittedController = {
   }
 }
 
+export const bankDetailsSubmittedErrorController = {
+  handler: (request, h) => {
+    const lastError = request.yar.get('lastError')
+    const translations = request.app?.translations || {}
+    const { currentLang } = request.app
+
+    // Handle internal server errors
+    if (lastError?.statusCode >= statusCodes.internalServerError) {
+      const heading = translations['service-problem']
+      const message = translations['try-again']
+
+      return h
+        .view('error/index', {
+          pageTitle: heading,
+          heading,
+          message
+        })
+        .code(lastError.statusCode)
+    }
+
+    // If no error, redirect to success page
+    return h.redirect(`/bank-details-submitted?lang=${currentLang}`)
+  }
+}
+
 export const checkBankDetailsController = {
   options: {
     pre: [requirePermission('createBankDetails')]
@@ -256,20 +281,34 @@ export const postBankDetailsController = {
       payload.sortCode?.replaceAll('-', '')?.replaceAll(' ', '') || ''
     payload.requesterEmail = request.auth.credentials.email
 
-    await authUtils.postWithToken(request, '/bank-details', payload)
+    try {
+      await authUtils.postWithToken(request, '/bank-details', payload)
 
-    request.logger.info(
-      `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
-    )
+      request.logger.info(
+        `Bank details successfully posted for organisation: ${request.auth.credentials.organisationName}`
+      )
 
-    // Set session flag to allow access to submitted page
-    request.yar.set('bankDetailsSubmitted', true)
+      // Set session flag to allow access to submitted page
+      request.yar.set('bankDetailsSubmitted', true)
 
-    request.yar.clear('ConfirmedBankDetails')
-    request.yar.clear('payload')
+      request.yar.clear('ConfirmedBankDetails')
+      request.yar.clear('payload')
 
-    // Redirect on success
-    return h.redirect(`/bank-details-submitted?lang=${currentLang}`)
+      // Redirect on success
+      return h.redirect(`/bank-details-submitted?lang=${currentLang}`)
+    } catch (err) {
+      const statusCode =
+        err?.output?.statusCode ||
+        err?.statusCode ||
+        statusCodes.internalServerError
+
+      request.yar.set('lastError', {
+        statusCode
+      })
+      return h.redirect(
+        `/bank-details/bank-details-submitted?lang=${currentLang}`
+      )
+    }
   }
 }
 

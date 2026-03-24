@@ -11,6 +11,7 @@ import {
   postUpdateBankDetailsController,
   switchLanguageController,
   bankDetailsSubmittedController,
+  bankDetailsSubmittedErrorController,
   translateBankDetails
 } from './controller.js'
 import { fetchWithToken, postWithToken, putWithToken } from '../auth/utils.js'
@@ -1200,5 +1201,70 @@ describe('#bankDetailsSubmittedController', () => {
     expect(request.yar.get).toHaveBeenCalledWith('bankDetailsSubmitted')
     expect(h.redirect).toHaveBeenCalledWith('/update-bank-details-info?lang=en')
     expect(result).toBe('redirected')
+  })
+})
+
+describe('bankDetailsSubmittedErrorController', () => {
+  const createH = () => {
+    const h = {
+      view: vi.fn().mockReturnThis(),
+      code: vi.fn().mockReturnThis(),
+      redirect: vi.fn()
+    }
+    return h
+  }
+
+  it('renders error page when lastError is an internal server error', () => {
+    const request = {
+      yar: {
+        get: vi.fn().mockReturnValue({
+          statusCode: 500
+        })
+      },
+      app: {
+        currentLang: 'en',
+        translations: {
+          'service-problem': 'Service problem',
+          'try-again': 'Try again later'
+        }
+      }
+    }
+
+    const h = createH()
+
+    const response = bankDetailsSubmittedErrorController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('lastError')
+
+    expect(h.view).toHaveBeenCalledWith('error/index', {
+      pageTitle: 'Service problem',
+      heading: 'Service problem',
+      message: 'Try again later'
+    })
+
+    expect(h.code).toHaveBeenCalledWith(500)
+    expect(h.redirect).not.toHaveBeenCalled()
+    expect(response).toBe(h)
+  })
+
+  it('redirects to bank-details-submitted when there is no error', () => {
+    const request = {
+      yar: {
+        get: vi.fn().mockReturnValue(undefined)
+      },
+      app: {
+        currentLang: 'cy',
+        translations: {}
+      }
+    }
+
+    const h = createH()
+
+    bankDetailsSubmittedErrorController.handler(request, h)
+
+    expect(request.yar.get).toHaveBeenCalledWith('lastError')
+    expect(h.redirect).toHaveBeenCalledWith('/bank-details-submitted?lang=cy')
+    expect(h.view).not.toHaveBeenCalled()
+    expect(h.code).not.toHaveBeenCalled()
   })
 })
