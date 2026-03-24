@@ -235,6 +235,8 @@ const checkLastError = (request, h) => {
       })
       .code(lastError.statusCode)
   }
+
+  return undefined
 }
 
 export const checkBankDetailsController = {
