@@ -164,21 +164,9 @@ export const bankDetailsConfirmedController = {
 
 export const bankDetailsConfirmedErrorController = {
   handler: (request, h) => {
-    const lastError = request.yar.get('lastError')
-    const translations = request.app?.translations || {}
-
-    // Handle internal server errors
-    if (lastError?.statusCode >= statusCodes.internalServerError) {
-      const heading = translations['service-problem']
-      const message = translations['try-again']
-
-      return h
-        .view('error/index', {
-          pageTitle: heading,
-          heading,
-          message
-        })
-        .code(lastError.statusCode)
+    const errorResponse = checkLastError(request, h)
+    if (errorResponse) {
+      return errorResponse
     }
 
     // Normal successful response
@@ -219,26 +207,33 @@ export const bankDetailsSubmittedController = {
 
 export const bankDetailsSubmittedErrorController = {
   handler: (request, h) => {
-    const lastError = request.yar.get('lastError')
-    const translations = request.app?.translations || {}
-    const { currentLang } = request.app
-
-    // Handle internal server errors
-    if (lastError?.statusCode >= statusCodes.internalServerError) {
-      const heading = translations['service-problem']
-      const message = translations['try-again']
-
-      return h
-        .view('error/index', {
-          pageTitle: heading,
-          heading,
-          message
-        })
-        .code(lastError.statusCode)
+    const errorResponse = checkLastError(request, h)
+    if (errorResponse) {
+      return errorResponse
     }
 
+    const { currentLang } = request.app
     // If no error, redirect to success page
     return h.redirect(`/bank-details-submitted?lang=${currentLang}`)
+  }
+}
+
+const checkLastError = (request, h) => {
+  const lastError = request.yar.get('lastError')
+  const translations = request.app?.translations || {}
+
+  // Handle internal server errors
+  if (lastError?.statusCode >= statusCodes.internalServerError) {
+    const heading = translations['service-problem']
+    const message = translations['try-again']
+
+    return h
+      .view('error/index', {
+        pageTitle: heading,
+        heading,
+        message
+      })
+      .code(lastError.statusCode)
   }
 }
 

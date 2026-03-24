@@ -1167,6 +1167,20 @@ describe('#postBankDetailsController', () => {
     expect(h.view).not.toHaveBeenCalled?.()
     expect(result).toBe('redirected')
   })
+
+  it('sets lastError and redirects when postWithToken throws', async () => {
+    postWithToken.mockRejectedValue(new Error('Failed to create bank details'))
+
+    await postBankDetailsController.handler(request, h)
+
+    expect(postWithToken).toHaveBeenCalled()
+    expect(request.yar.set).toHaveBeenCalledWith('lastError', {
+      statusCode: 500
+    })
+    expect(h.redirect).toHaveBeenCalledWith(
+      '/bank-details/bank-details-submitted?lang=en'
+    )
+  })
 })
 
 describe('#bankDetailsSubmittedController', () => {
