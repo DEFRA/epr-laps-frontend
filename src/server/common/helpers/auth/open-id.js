@@ -61,14 +61,29 @@ export const extractRoleName = (payload) => {
   return { currentRole }
 }
 
+/**
+ * Extracts unique role names from a list of role strings.
+ *
+ * Each role string is expected to follow the format:
+ *   "<organisationId>:<roleName>:<level>"
+ *
+ * For example:
+ *   "23950a2d-c37d-43da-9fcb-0a4ce9aa11ee:CEO:3"
+ *
+ * This function:
+ * - Parses the role name (the second colon‑separated segment)
+ * - Removes duplicates while preserving the original order
+ * - Ignores malformed role strings where the role name is missing
+ *
+ * @param {string[]} [roles=[]] - Array of colon-delimited role strings.
+ * @returns {string[]} An array of unique role names (e.g. ["CEO", "ADMIN"]).
+ */
 export function extractRawRoles(roles = []) {
-  const seen = new Set()
   const result = []
 
   for (const role of roles) {
     const name = role.split(':')[1]
-    if (name && !seen.has(name)) {
-      seen.add(name)
+    if (name && !result.includes(name)) {
       result.push(name)
     }
   }
