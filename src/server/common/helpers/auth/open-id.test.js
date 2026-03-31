@@ -206,36 +206,36 @@ describe('#extractRoleName', () => {
 
 describe('#extractRawRoles', () => {
   it('returns an empty array when no roles are provided', () => {
-    expect(extractRawRoles()).toEqual([])
+    expect(extractRawRoles()).toEqual('')
   })
 
   it('extracts the role name from a single role string', () => {
     const roles = ['org-1:CEO:3']
 
-    expect(extractRawRoles(roles)).toEqual(['CEO'])
+    expect(extractRawRoles(roles)).toEqual('CEO')
   })
 
   it('extracts unique role names and removes duplicates', () => {
     const roles = ['org-1:CEO:3', 'org-2:CEO:2', 'org-3:ADMIN:1']
 
-    expect(extractRawRoles(roles)).toEqual(['CEO', 'ADMIN'])
+    expect(extractRawRoles(roles)).toEqual('CEO, ADMIN')
   })
 
   it('preserves the order of first occurrence', () => {
     const roles = ['org-1:ADMIN:1', 'org-2:CEO:3', 'org-3:ADMIN:2']
 
-    expect(extractRawRoles(roles)).toEqual(['ADMIN', 'CEO'])
+    expect(extractRawRoles(roles)).toEqual('ADMIN, CEO')
   })
 
   it('ignores malformed role strings with missing role name', () => {
     const roles = ['org-1::3', 'org-2:CEO:1', 'invalid']
 
-    expect(extractRawRoles(roles)).toEqual(['CEO'])
+    expect(extractRawRoles(roles)).toEqual('CEO')
   })
 
   it('returns an empty array when all role strings are malformed', () => {
     const roles = ['invalid', 'org-1::3', ':::']
 
-    expect(extractRawRoles(roles)).toEqual([])
+    expect(extractRawRoles(roles)).toEqual('')
   })
 })

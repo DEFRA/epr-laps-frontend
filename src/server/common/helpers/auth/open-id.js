@@ -62,21 +62,14 @@ export const extractRoleName = (payload) => {
 }
 
 /**
- * Extracts unique role names from a list of role strings.
+ * Extracts unique role names from a list of role strings and returns them
+ * as a comma-separated string.
  *
  * Each role string is expected to follow the format:
  *   "<organisationId>:<roleName>:<level>"
  *
- * For example:
- *   "23950a2d-c37d-43da-9fcb-0a4ce9aa11ee:CEO:3"
- *
- * This function:
- * - Parses the role name (the second colon‑separated segment)
- * - Removes duplicates while preserving the original order
- * - Ignores malformed role strings where the role name is missing
- *
  * @param {string[]} [roles=[]] - Array of colon-delimited role strings.
- * @returns {string[]} An array of unique role names (e.g. ["CEO", "ADMIN"]).
+ * @returns {string} A comma-separated list of unique role names.
  */
 export function extractRawRoles(roles = []) {
   const result = []
@@ -88,7 +81,7 @@ export function extractRawRoles(roles = []) {
     }
   }
 
-  return result
+  return result.join(', ')
 }
 
 export const openIdProvider = (name, oidcConf) => {
