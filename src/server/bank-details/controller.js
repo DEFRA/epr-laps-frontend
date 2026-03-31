@@ -16,6 +16,7 @@ import { statusCodes } from '../common/constants/status-codes.js'
 const ACCOUNT_NUMBER_MIN = 6
 const ACCOUNT_NUMBER_MAX = 8
 const JOURNEY_STARTED = 'journey_started'
+const JOURNEY_ENDED = 'journey_ended'
 
 export const bankDetailsController = {
   handler: async (request, h) => {
@@ -44,6 +45,27 @@ export const bankDetailsController = {
     const userPermissions = request.yar.get('userPermissions')
 
     request.logger.info('successfully fetched bank details from cookie')
+
+    if (
+      request.auth.credentials.currentRole !== 'Chief Executive Officer' ||
+      request.auth.credentials.currentRole !== 'Head of Finance'
+    ) {
+      writeAuditLog(
+        request,
+        ActionKind.MaskedBankDetailsViewed,
+        Outcome.Success,
+        statusCodes.ok,
+        JOURNEY_ENDED
+      )
+    } else {
+      writeAuditLog(
+        request,
+        ActionKind.FullBankDetailsViewed,
+        Outcome.Success,
+        statusCodes.ok,
+        JOURNEY_ENDED
+      )
+    }
 
     return h.view('bank-details/index.njk', {
       pageTitle: 'Bank Details',
