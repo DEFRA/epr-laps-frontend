@@ -61,6 +61,29 @@ export const extractRoleName = (payload) => {
   return { currentRole }
 }
 
+/**
+ * Extracts unique role names from a list of role strings and returns them
+ * as a comma-separated string.
+ *
+ * Each role string is expected to follow the format:
+ *   "<organisationId>:<roleName>:<level>"
+ *
+ * @param {string[]} [roles=[]] - Array of colon-delimited role strings.
+ * @returns {string} A comma-separated list of unique role names.
+ */
+export function extractRawRoles(roles = []) {
+  const result = []
+
+  for (const role of roles) {
+    const name = role.split(':')[1]
+    if (name && !result.includes(name)) {
+      result.push(name)
+    }
+  }
+
+  return result.join(', ')
+}
+
 export const openIdProvider = (name, oidcConf) => {
   const authConfig = config.get('defraId')
   return {
@@ -105,6 +128,7 @@ export const openIdProvider = (name, oidcConf) => {
         organisationName,
         currentRole,
         roles: payload.roles,
+        rawRoles: extractRawRoles(payload.roles),
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,
         logoutUrl: oidcConf.end_session_endpoint
