@@ -17,7 +17,7 @@ describe('#writeAuditLog', () => {
           firstName: 'John',
           lastName: 'Doe',
           role: 'Chief Executive Officer',
-          rawRoles: ['Chief Executive Officer', 'Head of Finance'],
+          rawRoles: 'Chief Executive Officer, Head of Finance',
           currentOrganisation: 'Test Authority'
         }
       },
@@ -36,7 +36,7 @@ describe('#writeAuditLog', () => {
       user_email: 'test@testy.com',
       user_first_name: 'John',
       user_last_name: 'Doe',
-      user_role: ['Chief Executive Officer', 'Head of Finance'],
+      user_role: 'Chief Executive Officer, Head of Finance',
       local_authority_name: 'Test Authority',
       action_kind: 'TestAction',
       outcome: 'Success',
@@ -53,7 +53,7 @@ describe('#writeAuditLog', () => {
           firstName: 'John',
           lastName: 'Doe',
           role: 'Chief Executive Officer',
-          rawRoles: ['Chief Executive Officer', 'Head of Finance'],
+          rawRoles: 'Chief Executive Officer, Head of Finance',
           currentOrganisation: 'Test Authority'
         }
       },
