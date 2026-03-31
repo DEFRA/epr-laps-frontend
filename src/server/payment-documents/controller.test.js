@@ -47,7 +47,7 @@ describe('paymentDocumentsController', () => {
           organisationName: 'MyOrg'
         }
       },
-      logger: { info: vi.fn(), debug: vi.fn() },
+      logger: { info: vi.fn() },
       payload: {},
       yar: {
         flash: vi.fn(),
@@ -259,7 +259,7 @@ describe('paymentDocumentsController', () => {
             organisationName: 'MyOrg'
           }
         },
-        logger: { info: vi.fn(), debug: vi.fn() },
+        logger: { info: vi.fn() },
         payload: {},
         yar: {
           flash: vi.fn(),
@@ -308,8 +308,7 @@ describe('fileDownloadController', () => {
     request = {
       logger: {
         info: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn()
+        error: vi.fn()
       },
       params: { fileId: '123' },
       query: { docName: 'test.pdf' },

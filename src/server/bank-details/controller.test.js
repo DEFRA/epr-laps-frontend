@@ -61,7 +61,7 @@ const createRequest = (overrides = {}) => ({
       organisationId: '123'
     }
   },
-  logger: { error: vi.fn(), info: vi.fn(), debug: vi.fn() },
+  logger: { error: vi.fn(), info: vi.fn() },
   app: {
     currentLang: 'en',
     translations: {

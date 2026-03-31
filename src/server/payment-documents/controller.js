@@ -4,12 +4,7 @@
 import { fetchWithToken } from '../../server/auth/utils.js'
 import { languageKeys } from '../common/constants/laguages.js'
 import { statusCodes } from '../common/constants/status-codes.js'
-import {
-  writeAuditLog,
-  ActionKind,
-  Outcome
-} from '../../server/common/helpers/audit-logging.js'
-const JOURNEY_ENDED = 'journey_ended'
+
 export const paymentDocumentsController = {
   async handler(request, h) {
     const { currentLang, translations } = request.app
@@ -27,13 +22,6 @@ export const paymentDocumentsController = {
       `Successfully fetched document metadata for ${organisationName}`
     )
 
-    writeAuditLog(
-      request,
-      ActionKind.DocumentsListed,
-      Outcome.Success,
-      statusCodes.ok,
-      JOURNEY_ENDED
-    )
     // Build financial year dropdown
     const selectedYear = findSelectedOption(isPost, request, documentApiData)
 
@@ -203,13 +191,6 @@ export const fileDownloadController = {
     const apiResponse = await fetchWithToken(request, documentPath)
     request.logger.info(`Fetched file metadata for ID: ${fileId}`)
 
-    writeAuditLog(
-      request,
-      ActionKind.DocumentAccessed,
-      Outcome.Success,
-      statusCodes.ok,
-      JOURNEY_ENDED
-    )
     if (Buffer.isBuffer(apiResponse)) {
       return h
         .response(apiResponse)
