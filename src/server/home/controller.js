@@ -6,26 +6,20 @@ import { mapPermissions } from '../common/helpers/utils.js'
 
 export const homeController = {
   handler: async (request, h) => {
-    let userPermissions = {}
     const { currentLang, translations } = request.app
 
-    userPermissions = request.yar.get('userPermissions')
-    if (!userPermissions) {
-      request.logger.error('failed to load permission from cookie')
-      const authorizationConfig = await fetchWithToken(
-        request,
-        '/permissions/config'
-      )
+    request.logger.error('failed to load permission from cookie')
+    const authorizationConfig = await fetchWithToken(
+      request,
+      '/permissions/config'
+    )
 
-      userPermissions = mapPermissions(
-        authorizationConfig,
-        request.auth.credentials?.currentRole
-      )
-      request.yar.set('userPermissions', userPermissions)
-      request.logger.info(
-        'permissions successfully fetched and saved in cookie'
-      )
-    }
+    const userPermissions = mapPermissions(
+      authorizationConfig,
+      request.auth.credentials?.currentRole
+    )
+    request.yar.set('userPermissions', userPermissions)
+    request.logger.info('permissions successfully fetched and saved in cookie')
 
     const bankPath = `/bank-details/${request.auth.credentials.organisationId}`
     const bankApiData = await fetchWithToken(request, bankPath)
