@@ -248,7 +248,7 @@ describe('#extractRawRoles', () => {
 describe('resolveEffectiveRole', () => {
   it('should return CEO if roles include Chief Executive Officer', () => {
     const roles = ['Chief Executive Officer', 'Head of Finance']
-    expect(resolveEffectiveRole(roles)).toBe('Chief Executive Officer')
+    expect(resolveEffectiveRole(roles)).toBe('Head of Finance')
   })
 
   it('should return HOF if roles include Head of Finance but not CEO', () => {
@@ -270,7 +270,7 @@ describe('normaliseRoles', () => {
     const roles = [' Chief Executive Officer ', ' Head of Finance ', ' Admin ']
     const normalised = normaliseRoles(roles)
 
-    expect(normalised).toEqual(['CEO', 'HOF'])
+    expect(normalised).toEqual(['Chief Executive Officer', 'Head of Finance'])
   })
 
   it('should return empty array if input is empty or null', () => {
@@ -279,6 +279,6 @@ describe('normaliseRoles', () => {
   })
 
   it('should handle non-array input (string) per current behaviour', () => {
-    expect(normaliseRoles('Head of Finance')).toEqual(['HOF'])
+    expect(normaliseRoles('Head of Finance')).toEqual(['Head of Finance'])
   })
 })

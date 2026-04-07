@@ -146,34 +146,29 @@ export const openIdProvider = (name, oidcConf) => {
   }
 }
 
-const rolesMap = {
-  'Chief Executive Officer': 'CEO',
-  'Head of Finance': 'HOF',
-  'Head of Waste': 'HOW',
-  'Waste Officer': 'WO',
-  'Finance Officer': 'FO'
-}
-
 const rolePriority = {
-  HOF: 1,
-  CEO: 2,
-  HOW: 3,
-  FO: 4,
-  WO: 5
+  'Head of Finance': 1,
+  'Chief Executive Officer': 2,
+  'Head of Waste': 3,
+  'Finance Officer': 4,
+  'Waste Officer': 5
 }
 
 export function normaliseRoles(rawRoles) {
+  if (!rawRoles) return []
+
   const roles = Array.isArray(rawRoles) ? rawRoles : [rawRoles]
 
   return roles
     .map((roleEntry) => {
-      if (!roleEntry || typeof roleEntry !== 'string') {
+      if (typeof roleEntry !== 'string') {
         return null
       }
 
       const parts = roleEntry.split(':')
       const roleName = parts.length >= 2 ? parts[1].trim() : roleEntry.trim()
-      return rolesMap[roleName]
+
+      return rolePriority[roleName] ? roleName : null
     })
     .filter(Boolean)
 }
