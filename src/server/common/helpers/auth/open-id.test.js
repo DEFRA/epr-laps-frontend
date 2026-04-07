@@ -256,6 +256,11 @@ describe('resolveEffectiveRole', () => {
     expect(resolveEffectiveRole(roles)).toBe('Head of Finance')
   })
 
+  it('should return the role when only one role is provided', () => {
+    const roles = ['Head of Finance']
+    expect(resolveEffectiveRole(roles)).toBe('Head of Finance')
+  })
+
   it('should return null for empty roles array', () => {
     expect(resolveEffectiveRole([])).toBeNull()
   })
