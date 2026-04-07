@@ -56,8 +56,8 @@ export const extractRoleName = (payload) => {
 
   // Single role case
   const matchedRole = roles.find((role) => {
-    const [roleParts] = role.split(':')
-    return roleParts === payload.currentRelationshipId
+    const roleParts = role.split(':')
+    return roleParts[0] === payload.currentRelationshipId
   })
 
   if (!matchedRole) {
