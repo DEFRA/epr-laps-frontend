@@ -14,6 +14,10 @@ export const homeController = {
       '/permissions/config'
     )
 
+    console.log(
+      'Fetched role in home controller:',
+      request.auth.credentials?.currentRole
+    )
     const userPermissions = mapPermissions(
       authorizationConfig,
       request.auth.credentials?.currentRole
