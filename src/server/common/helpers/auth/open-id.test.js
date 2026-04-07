@@ -3,7 +3,9 @@ import {
   openIdProvider,
   extractUserOrgDetails,
   extractRoleName,
-  extractRawRoles
+  extractRawRoles,
+  resolveEffectiveRole,
+  normaliseRoles
 } from './open-id.js'
 
 describe('#openIdProvider', () => {
@@ -200,7 +202,10 @@ describe('#extractRoleName', () => {
       currentRelationshipId: '123',
       roles: ['999:User', '123:Manager', '456:Admin']
     }
-    expect(extractRoleName(payload).currentRole).toBe('Manager')
+
+    const expected = resolveEffectiveRole(normaliseRoles(payload.roles))
+
+    expect(extractRoleName(payload).currentRole).toBe(expected)
   })
 })
 
@@ -237,5 +242,48 @@ describe('#extractRawRoles', () => {
     const roles = ['invalid', 'org-1::3', ':::']
 
     expect(extractRawRoles(roles)).toEqual('')
+  })
+})
+
+describe('resolveEffectiveRole', () => {
+  it('should return CEO if roles include Chief Executive Officer', () => {
+    const roles = ['Chief Executive Officer', 'Head of Finance']
+    expect(resolveEffectiveRole(roles)).toBe('Head of Finance')
+  })
+
+  it('should return HOF if roles include Head of Finance but not CEO', () => {
+    const roles = ['Head of Finance', 'Admin']
+    expect(resolveEffectiveRole(roles)).toBe('Head of Finance')
+  })
+
+  it('should return the role when only one role is provided', () => {
+    const roles = ['Head of Finance']
+    expect(resolveEffectiveRole(roles)).toBe('Head of Finance')
+  })
+
+  it('should return null for empty roles array', () => {
+    expect(resolveEffectiveRole([])).toBeNull()
+  })
+
+  it('should throw if roles is null', () => {
+    expect(() => resolveEffectiveRole(null)).toThrow()
+  })
+})
+
+describe('normaliseRoles', () => {
+  it('should normalise roles (trim whitespace) and map to abbreviations', () => {
+    const roles = [' Chief Executive Officer ', ' Head of Finance ', ' Admin ']
+    const normalised = normaliseRoles(roles)
+
+    expect(normalised).toEqual(['Chief Executive Officer', 'Head of Finance'])
+  })
+
+  it('should return empty array if input is empty or null', () => {
+    expect(normaliseRoles()).toEqual([])
+    expect(normaliseRoles(null)).toEqual([])
+  })
+
+  it('should handle non-array input (string) per current behaviour', () => {
+    expect(normaliseRoles('Head of Finance')).toEqual(['Head of Finance'])
   })
 })

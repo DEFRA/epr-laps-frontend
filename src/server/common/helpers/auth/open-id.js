@@ -41,11 +41,20 @@ export function extractUserOrgDetails(payload) {
 
 export const extractRoleName = (payload) => {
   const roles = payload.roles
+
   if (!Array.isArray(roles) || roles.length === 0) {
     return { currentRole: null }
   }
 
-  // Find the matching role string
+  // Multiple roles case - normalise and resolve effective role
+  if (roles.length > 1) {
+    const mappedRoles = normaliseRoles(roles)
+    return {
+      currentRole: resolveEffectiveRole(mappedRoles)
+    }
+  }
+
+  // Single role case
   const matchedRole = roles.find((role) => {
     const roleParts = role.split(':')
     return roleParts[0] === payload.currentRelationshipId
@@ -135,4 +144,44 @@ export const openIdProvider = (name, oidcConf) => {
       }
     }
   }
+}
+
+const rolePriority = {
+  'Head of Finance': 1,
+  'Chief Executive Officer': 2,
+  'Head of Waste': 3,
+  'Finance Officer': 4,
+  'Waste Officer': 5
+}
+
+export function normaliseRoles(rawRoles) {
+  if (!rawRoles) {
+    return []
+  }
+
+  const roles = Array.isArray(rawRoles) ? rawRoles : [rawRoles]
+
+  return roles
+    .map((roleEntry) => {
+      if (typeof roleEntry !== 'string') {
+        return null
+      }
+
+      const parts = roleEntry.split(':')
+      const roleName = parts.length >= 2 ? parts[1].trim() : roleEntry.trim()
+
+      return rolePriority[roleName] ? roleName : null
+    })
+    .filter(Boolean)
+}
+
+export function resolveEffectiveRole(mappedRoles) {
+  if (mappedRoles.length === 0) {
+    return null
+  }
+  if (mappedRoles.length === 1) {
+    return mappedRoles[0]
+  }
+
+  return [...mappedRoles].sort((a, b) => rolePriority[a] - rolePriority[b])[0]
 }
