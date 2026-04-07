@@ -155,7 +155,9 @@ const rolePriority = {
 }
 
 export function normaliseRoles(rawRoles) {
-  if (!rawRoles) return []
+  if (!rawRoles) {
+    return []
+  }
 
   const roles = Array.isArray(rawRoles) ? rawRoles : [rawRoles]
 
