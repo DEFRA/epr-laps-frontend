@@ -13,6 +13,7 @@ export const homeController = {
       request,
       '/permissions/config'
     )
+
     const userPermissions = mapPermissions(
       authorizationConfig,
       request.auth.credentials?.currentRole
