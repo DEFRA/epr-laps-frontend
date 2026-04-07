@@ -43,7 +43,6 @@ export const extractRoleName = (payload) => {
   const roles = payload.roles
 
   if (!Array.isArray(roles) || roles.length === 0) {
-    console.log('No roles found in payload or roles is not an array')
     return { currentRole: null }
   }
 
@@ -57,8 +56,8 @@ export const extractRoleName = (payload) => {
 
   // Single role case
   const matchedRole = roles.find((role) => {
-    const [relationshipId] = role.split(':')
-    return relationshipId === payload.currentRelationshipId
+    const [roleParts] = role.split(':')
+    return roleParts === payload.currentRelationshipId
   })
 
   if (!matchedRole) {
