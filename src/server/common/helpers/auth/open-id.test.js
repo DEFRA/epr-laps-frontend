@@ -203,9 +203,7 @@ describe('#extractRoleName', () => {
       roles: ['999:User', '123:Manager', '456:Admin']
     }
 
-    const expected = resolveEffectiveRole(normaliseRoles(payload.roles))
-
-    expect(extractRoleName(payload).currentRole).toBe(expected)
+    expect(extractRoleName(payload).currentRole).toBe('Manager')
   })
 })
 

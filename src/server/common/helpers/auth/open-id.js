@@ -46,25 +46,28 @@ export const extractRoleName = (payload) => {
     return { currentRole: null }
   }
 
-  // Multiple roles case - normalise and resolve effective role
-  if (roles.length > 1) {
-    const mappedRoles = normaliseRoles(roles)
+  // Get ALL roles that match the currentRelationshipId
+  const matchedRoles = roles.filter((role) => {
+    const [relationshipId] = role.split(':')
+    return relationshipId === payload.currentRelationshipId
+  })
+
+  if (matchedRoles.length === 0) {
+    return { currentRole: null }
+  }
+
+  // Multiple matched roles → resolve effective role
+  if (matchedRoles.length > 1) {
+    const mappedRoles = normaliseRoles(matchedRoles)
     return {
       currentRole: resolveEffectiveRole(mappedRoles)
     }
   }
 
-  // Single role case
-  const matchedRole = roles.find((role) => {
-    const roleParts = role.split(':')
-    return roleParts[0] === payload.currentRelationshipId
-  })
-
-  if (!matchedRole) {
-    return { currentRole: null }
-  }
-
+  // Single matched role → extract role name
+  const matchedRole = matchedRoles[0]
   const parts = matchedRole.split(':')
+
   const currentRole = parts.length >= 2 ? parts[1] : matchedRole
 
   return { currentRole }
