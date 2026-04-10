@@ -1,7 +1,4 @@
-import {
-  getUserSession,
-  removeUserSession
-} from '../common/helpers/auth/utils.js'
+import { getUserSession } from '../common/helpers/auth/utils.js'
 import { config } from '../../config/config.js'
 
 export const signOutController = {
@@ -15,7 +12,6 @@ export const signOutController = {
       return h.redirect('/')
     }
 
-    removeUserSession(request, request.auth.credentials)
     const { idToken } = userSession
     request.logger.info('User session removed. Signing user out of Defra ID')
     // Always use fallback URL from config

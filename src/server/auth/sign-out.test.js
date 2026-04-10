@@ -1,5 +1,5 @@
 import { createServer } from '../server'
-import { getUserSession, removeUserSession } from '../common/helpers/auth/utils'
+import { getUserSession } from '../common/helpers/auth/utils'
 import { signOutController } from './sign-out'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 
@@ -58,10 +58,6 @@ describe('#signOutController', () => {
     getUserSession.mockReturnValueOnce(mockedUserSession)
 
     await signOutController.handler(mockedRequest, mockedResponse)
-    expect(removeUserSession).toHaveBeenCalledWith(
-      mockedRequest,
-      mockedRequest.auth.credentials
-    )
     expect(mockedResponse.redirect).toHaveBeenCalledWith(
       `testLogout?id_token_hint=testId&post_logout_redirect_uri=http://localhost:3000/logout`
     )
