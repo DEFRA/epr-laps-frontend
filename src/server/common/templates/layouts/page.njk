@@ -84,54 +84,56 @@
 {% block content %}{% endblock %}
 
 {% block footer %}
-  {{ govukFooter({
-    meta: {
-    items: [
-      {
-        href: "https://www.gov.uk/help",
-        text: translations['help']
+  <footer role="contentinfo">
+    {{ govukFooter({
+      meta: {
+        items: [
+          {
+            href: "https://www.gov.uk/help",
+            text: translations['help']
+          },
+          {
+            href: "https://www.gov.uk/help/privacy-notice",
+            text: translations['privacy']
+          },
+          {
+            href: "/cookies?lang=" + currentLang,
+            text: translations['cookies']
+          },
+          {
+            href: "https://www.gov.uk/help/accessibility-statement",
+            text: translations['accessibility-s']
+          },
+          {
+            href: "https://www.gov.uk/contact",
+            text: translations['contact']
+          },
+          {
+            href: "https://www.gov.uk/help/terms-conditions",
+            text: translations['terms-and-condi']
+          },
+          {
+            href: "https://www.gov.uk/cymraeg",
+            text: "Rhestr o Wasanaethau Cymraeg",
+            attributes: {
+              lang: "cy",
+              hreflang: "cy"
+            }
+          },
+          {
+            href: "https://www.gov.uk/government/organisations/government-digital-service",
+            text:  translations['government-digi']
+          }
+        ]
       },
-      {
-        href: "https://www.gov.uk/help/privacy-notice",
-        text: translations['privacy']
+      contentLicence: {
+         html: translations['all-content-is-'] | safe
       },
-      {
-        href: "/cookies?lang=" + currentLang,
-        text: translations['cookies']
-      },
-      {
-        href: "https://www.gov.uk/help/accessibility-statement",
-        text: translations['accessibility-s']
-      },
-      {
-        href: "https://www.gov.uk/contact",
-        text: translations['contact']
-      },
-      {
-        href: "https://www.gov.uk/help/terms-conditions",
-        text: translations['terms-and-condi']
-      },
-      {
-        href: "https://www.gov.uk/cymraeg",
-        text: "Rhestr o Wasanaethau Cymraeg",
-        attributes: {
-          lang: "cy",
-          hreflang: "cy"
-        }
-      },
-      {
-        href: "https://www.gov.uk/government/organisations/government-digital-service",
-        text:  translations['government-digi']
+      copyright: {
+        text: translations['crown-copyright']
       }
-    ]
-    },
-    contentLicence: {
-       html: translations['all-content-is-'] | safe
-    },
-    copyright: {
-      text: translations['crown-copyright']
-    }
-  }) }}
+    }) }}
+  </footer>
 {% endblock %}
 
 {% block bodyEnd %}
