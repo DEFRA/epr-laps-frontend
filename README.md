@@ -27,6 +27,7 @@ This repository contains a GDS complaint application that serves as the frontend
   - [Development image](#development-image)
   - [Production image](#production-image)
   - [Docker Compose](#docker-compose)
+  - [Podman](#podman)
   - [Dependabot](#dependabot)
   - [SonarCloud](#sonarcloud)
 - [Licence](#licence)
@@ -118,7 +119,7 @@ to how services might have a database (or MongoDB). All frontend services are gi
 matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
 
 If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
-disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `src/config/index.js`.
+change the default value in `src/config/config.js`.
 
 ## Proxy
 
@@ -209,6 +210,17 @@ A local environment with:
 
 ```bash
 docker compose up --build -d
+```
+
+## Podman
+
+Podman can be used as an alternative to Docker for local development.
+All docker commands shown above can be run with podman instead.
+Example:
+
+```bash
+podman build --target development --no-cache --tag epr-laps-frontend:development .
+podman run -p 3000:3000 epr-laps-frontend:development
 ```
 
 ### Dependabot
