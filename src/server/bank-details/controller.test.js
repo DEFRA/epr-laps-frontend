@@ -36,7 +36,8 @@ vi.mock('../../server/common/helpers/audit-logging.js', () => ({
   },
   statusCodes: {
     ok: 200,
-    internalError: 500
+    internalError: 500,
+    badRequest: 400
   }
 }))
 
