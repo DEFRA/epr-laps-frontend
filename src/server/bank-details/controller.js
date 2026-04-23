@@ -223,7 +223,10 @@ const checkLastError = (request, h) => {
   const translations = request.app?.translations || {}
 
   // Handle internal server errors
-  if (lastError?.statusCode >= statusCodes.internalServerError) {
+  if (
+    lastError?.statusCode >= statusCodes.internalServerError ||
+    lastError?.statusCode === statusCodes.badRequest
+  ) {
     const heading = translations['service-problem']
     const message = translations['try-again']
 
