@@ -108,6 +108,18 @@ describe('paymentDocumentsController', () => {
             }),
             language: 'CY',
             isLatest: true
+          },
+          {
+            id: '3',
+            documentName: 'Recalculated Notice of Assessment',
+            fileName: 'file.pdf',
+            creationDate: new Date().toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }),
+            language: 'CY',
+            isLatest: true
           }
         ]
       }
@@ -190,6 +202,27 @@ describe('paymentDocumentsController', () => {
       '2023-to-2024'
     )
     expect(result).toEqual([])
+  })
+
+  it('translates Recalculated Notice of Assessment to Welsh', async () => {
+    request.app.currentLang = 'cy'
+    request.auth.credentials.organisationName = 'Powys County Council'
+
+    request.app.translations.laNames = {
+      'Powys County Council': 'Cyngor Sir Powys'
+    }
+
+    request.app.translations['recalculated-notice-of-assessment'] =
+      'Hysbysiad Ailgyfrifo Asesiad'
+
+    request.yar.flash.mockReturnValue([])
+
+    await paymentDocumentsController.handler(request, h)
+
+    const viewArg = h.view.mock.calls[0][1]
+    const docNames = viewArg.rows.map((r) => r[1].text)
+
+    expect(docNames).toContain('Hysbysiad Ailgyfrifo Asesiad')
   })
 
   describe.each`
