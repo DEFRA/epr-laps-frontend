@@ -110,7 +110,7 @@ describe('paymentDocumentsController', () => {
             isLatest: true
           },
           {
-            id: '1',
+            id: '3',
             documentName: 'Recalculated Notice of Assessment',
             fileName: 'file.pdf',
             creationDate: '18 May 2026',
