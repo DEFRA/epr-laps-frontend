@@ -113,7 +113,11 @@ describe('paymentDocumentsController', () => {
             id: '3',
             documentName: 'Recalculated Notice of Assessment',
             fileName: 'file.pdf',
-            creationDate: '18 May 2026',
+            creationDate: new Date().toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }),
             language: 'CY',
             isLatest: true
           }
