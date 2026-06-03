@@ -304,8 +304,7 @@ export const config = convict({
   userFeedbackUrl: {
     doc: 'Feedback link used in the service',
     format: String,
-    default:
-      'https://forms-runner.test.cdp-int.defra.cloud/form/local-authority-payments-service-user-satisfaction',
+    default: '',
     env: 'USER_FEEDBACK_URL'
   },
   customerServiceEmail: {
