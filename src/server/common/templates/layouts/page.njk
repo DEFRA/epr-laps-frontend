@@ -49,7 +49,11 @@
     tag: {
       text: translations['beta']
     },
-    html: translations['this-is-a-new-s'] | safe
+    html: ( translations['this-is-a-new-s']
+      + ' <a class="govuk-link" href="' + feedbackUrl + '" target="_blank" rel="noopener noreferrer">'
+      + translations['feedback-link-text']
+      + '</a>.'
+    ) | safe
   }) }}
 {% endif %}
 

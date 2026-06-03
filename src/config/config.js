@@ -301,6 +301,12 @@ export const config = convict({
     default: 'https://google.com',
     env: 'GET_HELP_URL'
   },
+  userFeedbackUrl: {
+    doc: 'Feedback link used in the service',
+    format: String,
+    default: '',
+    env: 'USER_FEEDBACK_URL'
+  },
   customerServiceEmail: {
     doc: 'Customer service email',
     format: String,

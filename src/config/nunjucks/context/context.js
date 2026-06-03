@@ -54,6 +54,7 @@ async function context(request) {
     navigation,
     sessionTimer,
     showBetaBanner: config.get('showBetaBanner'),
+    feedbackUrl: config.get('userFeedbackUrl'),
     cookies,
     currentPath: request.path,
     getAssetPath(asset) {
