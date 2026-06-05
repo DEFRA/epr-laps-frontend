@@ -1,0 +1,72 @@
+{% extends 'layouts/page.njk' %}
+
+{% set language = currentLang %}
+{% block content %}
+<div class="govuk-grid-row">
+<div class="govuk-grid-column-two-thirds">
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{{ appHeading({
+  text: authedUser.organisationName,
+  caption: translations['get-help']
+
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <h2 class="govuk-heading-m">{{ translations['guidance'] }}</h2>
+        <p class="govuk-body">
+          {{ translations['read-guidance'] }}
+          <a href='https://www.gov.uk/government/collections/extended-producer-responsibility-for-packaging-local-authorities'
+             class="govuk-link" rel="noreferrer noopener" target="_blank">
+            {{ translations['extended-producer'] }}
+          </a>
+          {{ translations['includes-info'] }}
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ translations['when-and-how'] }}</li>
+          <li>{{ translations['how-payments'] }}</li>
+        </ul>
+
+      <h2 class="govuk-heading-m">{{ translations['contact-us'] }}</h2>
+        <p class="govuk-body">{{ translations['you-can-use'] }} <br> {{ translations['response-time'] }}</p>
+        <p class="govuk-body">{{ translations['we-will-contact'] }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ translations['need-more-info'] }}</li>
+          <li>{{ translations['think-it-is'] }}</li>
+        </ul>
+
+        <h3 class="govuk-heading-m">{{ translations['raise-a-customer'] }}</h3>
+        <p class="govuk-body">{{ translations['you-can']}}
+        <a href= {{ getHelpUrl }}
+             class="govuk-link" rel="noreferrer noopener" target="_blank">
+            {{ translations['raise-a-'] }} {{ translations['opens-in-new-tab']}}
+          </a>
+          {{ translations['ticket-to:'] }}</p>
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ translations['ask-question'] }}</li>
+          <li>{{ translations['make-complaint'] }}</li>
+          <li>{{ translations['get-help-account'] }}</li>
+        </ul>
+
+      <h3 class="govuk-heading-m">{{ translations['email'] }}</h3>
+      <p class="govuk-body">
+        <a href="mailto:{{ customerServiceEmail }}" class="govuk-link">
+          {{ customerServiceEmail }}
+        </a>
+      </p>
+
+      <h3 class="govuk-heading-m">{{ translations['telephone'] }}</h3>
+      <p class="govuk-body">
+        0300 060 0002<br>
+        {{ translations['monday-to-frida'] }}
+      </p>
+
+    </div>
+  </div>
+   
+  
+{% endblock %}

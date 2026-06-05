@@ -6,6 +6,7 @@ import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 import { paymentDocuments } from './payment-documents/index.js'
 import { bankDetails } from './bank-details/index.js'
 import { getHelp } from './get-help/index.js'
+import { accessibilityStatement } from './accessibility-statement/index.js'
 import { signOut } from './sign-out/index.js'
 import { defraAccount } from './defra-account/index.js'
 import { auth } from './auth/index.js'
@@ -33,6 +34,7 @@ export const router = {
         paymentDocuments,
         bankDetails,
         getHelp,
+        accessibilityStatement,
         signOut,
         timedOut,
         auth,
