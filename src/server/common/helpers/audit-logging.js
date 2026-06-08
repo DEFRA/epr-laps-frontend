@@ -53,12 +53,13 @@ export const writeAuditLog = (
     user_first_name: request.auth.credentials.firstName,
     user_last_name: request.auth.credentials.lastName,
     user_role: request.auth.credentials.rawRoles,
-    local_authority_name: request.auth.credentials.currentOrganisation,
+    local_authority_name: request.auth.credentials.organisationName,
     action_kind: action,
     outcome,
     status: statusCode,
     journey_type: journeyType
   }
+
   request.logger.debug(`Audit log: ${JSON.stringify(auditLogData)}`)
   audit(auditLogData)
 }

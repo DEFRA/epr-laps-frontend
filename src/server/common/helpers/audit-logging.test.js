@@ -18,7 +18,7 @@ describe('#writeAuditLog', () => {
           lastName: 'Doe',
           role: 'Chief Executive Officer',
           rawRoles: 'Chief Executive Officer, Head of Finance',
-          currentOrganisation: 'Test Authority'
+          organisationName: 'Test Authority'
         }
       },
       logger: { debug: vi.fn() }
