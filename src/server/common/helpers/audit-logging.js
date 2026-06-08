@@ -59,10 +59,7 @@ export const writeAuditLog = (
     status: statusCode,
     journey_type: journeyType
   }
-  console.log(
-    'Before logging audit data',
-    request.auth.credentials.organisationName
-  )
+
   request.logger.debug(`Audit log: ${JSON.stringify(auditLogData)}`)
   audit(auditLogData)
 }
