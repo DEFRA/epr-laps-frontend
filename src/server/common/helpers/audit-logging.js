@@ -60,7 +60,6 @@ export const writeAuditLog = (
     journey_type: journeyType
   }
 
-  console.log('Before logging audit data', request.auth.credentials)
   request.logger.debug(`Audit log: ${JSON.stringify(auditLogData)}`)
   audit(auditLogData)
 }
