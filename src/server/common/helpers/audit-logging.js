@@ -48,7 +48,7 @@ export const writeAuditLog = (
   }
   const auditLogData = {
     log_id: uuidv4(),
-    user_id: request.auth.credentials.sub,
+    user_id: request.auth.credentials.id,
     user_email: request.auth.credentials.email,
     user_first_name: request.auth.credentials.firstName,
     user_last_name: request.auth.credentials.lastName,
