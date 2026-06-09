@@ -12,7 +12,7 @@ describe('#writeAuditLog', () => {
     const mockRequest = {
       auth: {
         credentials: {
-          sub: 'user-id',
+          id: 'user-id',
           email: 'test@testy.com',
           firstName: 'John',
           lastName: 'Doe',
@@ -48,7 +48,7 @@ describe('#writeAuditLog', () => {
     const mockRequest = {
       auth: {
         credentials: {
-          sub: 'user-id',
+          id: 'user-id',
           email: 'test@testy.com',
           firstName: 'John',
           lastName: 'Doe',
