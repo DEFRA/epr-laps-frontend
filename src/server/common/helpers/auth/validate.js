@@ -13,9 +13,7 @@ export const validateUserSession = async (request, session) => {
   }
   // Check if user came from your-defra account page
   const referrer = request.headers.referer || ''
-  const isFromYourDefraAccount =
-    referrer.includes('your-account') ||
-    request.yar.flash('forceRefresh')?.at(0)
+  const isFromYourDefraAccount = referrer.includes('your-account')
 
   const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
