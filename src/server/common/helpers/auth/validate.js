@@ -15,7 +15,7 @@ export const validateUserSession = async (request, session) => {
   const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
   // Force refresh if from your-defra account OR if token has expired
-  if (tokenHasExpired ) {
+  if (tokenHasExpired) {
     request.yar.reset()
     const response = await refreshAccessToken(request, session)
 

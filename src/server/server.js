@@ -20,7 +20,7 @@ import { defraId } from './common/helpers/auth/defra-id.js'
 import { handlePostAuth } from './common/helpers/handle-post-auth.js'
 import { getBackLink } from './common/helpers/back-link.js' // adjust the path
 import { csrf } from './common/helpers/csrfToken.js'
-import {refreshAccessToken} from './common/helpers/auth/utils.js'
+import { refreshAccessToken } from './common/helpers/auth/utils.js'
 
 export async function createServer() {
   setupProxy()
@@ -92,7 +92,7 @@ export async function createServer() {
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 
-  server.ext('onPreAuth', ()=>{
+  server.ext('onPreAuth', (request, h) => {
     const session = request.yar.get('getUserSession')
     const referrer = request.headers.referer || ''
 
@@ -101,7 +101,7 @@ export async function createServer() {
     const refreshAlreadyAttempted = request.yar.get('sso_refresh_attempted')
 
     if (session && returningFromAccountService && !refreshAlreadyAttempted) {
-      request.yar.set('sso_refresh_attempted', true)  
+      request.yar.set('sso_refresh_attempted', true)
       return refreshAccessToken(request, h)
     }
 
