@@ -8,14 +8,19 @@ import { isPast, parseISO, subMinutes } from 'date-fns'
 
 export const validateUserSession = async (request, session) => {
   const authedUser = await getUserSession(request, session)
-
   if (!authedUser) {
     return { isValid: false }
   }
+  // Check if user came from your-defra account page
+  const referrer = request.headers.referer || ''
+  const isFromYourDefraAccount =
+    referrer.includes('your-account') ||
+    request.yar.flash('forceRefresh')?.at(0)
 
   const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
-  if (tokenHasExpired) {
+  // Force refresh if from your-defra account OR if token has expired
+  if (tokenHasExpired || isFromYourDefraAccount) {
     request.yar.reset()
     const response = await refreshAccessToken(request, session)
 
