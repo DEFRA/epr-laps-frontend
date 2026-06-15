@@ -44,7 +44,6 @@ export const defraId = {
         },
         validate: async (request, session) => {
           request.yar.clear('sso_refresh_attempted')
-          request.logger.debug('Checking user session validity')
           const validity = await validateUserSession(request, session)
           return validity
         }
