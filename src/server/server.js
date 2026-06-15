@@ -15,12 +15,14 @@ import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { registerLanguageExtension } from './common/helpers/request-language.js'
-import { getUserSession } from './common/helpers/auth/utils.js'
+import {
+  getUserSession,
+  handleSSORefresh
+} from './common/helpers/auth/utils.js'
 import { defraId } from './common/helpers/auth/defra-id.js'
 import { handlePostAuth } from './common/helpers/handle-post-auth.js'
 import { getBackLink } from './common/helpers/back-link.js' // adjust the path
 import { csrf } from './common/helpers/csrfToken.js'
-import { handleSSORefresh } from './common/helpers/auth/utils.js'
 
 export async function createServer() {
   setupProxy()
