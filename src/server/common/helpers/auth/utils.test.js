@@ -49,7 +49,8 @@ describe('#utils', () => {
         clear: vi.fn()
       },
       logger: {
-        setBindings: vi.fn()
+        setBindings: vi.fn(),
+        debug: vi.fn()
       },
       state: {
         userSession: {
