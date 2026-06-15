@@ -13,21 +13,13 @@ export const getUserSession = async (request, session) => {
 }
 
 export const removeUserSession = (request, session) => {
-  if (session?.sessionId) {
-    request.server.app.cache.drop(session.sessionId)
-  }
-
-  request.yar?.reset?.()
-  request.cookieAuth?.clear?.()
+  request.server.app.cache.drop(session.sessionId)
+  request.yar.reset()
+  request.cookieAuth.clear()
 }
 
 export const refreshAccessToken = async (request) => {
   const authedUser = await getUserSession(request, request.state.userSession)
-
-  if (!authedUser) {
-    return null
-  }
-
   request.logger.setBindings({ refreshingAccessToken: authedUser.strategy })
 
   const authConfig = config.get('defraId')
@@ -92,17 +84,4 @@ export const updateUserSession = async (request, refreshedSession) => {
   )
 
   return getUserSession(request, request.state.userSession)
-}
-
-export const handleSSORefresh = async (request, h, session) => {
-  const referrer = request.headers?.referer || ''
-  const returningFromAccountService = referrer.includes('your-account')
-  const refreshAlreadyAttempted = request.yar?.get?.('sso_refresh_attempted')
-
-  if (session && returningFromAccountService && !refreshAlreadyAttempted) {
-    request.yar?.set?.('sso_refresh_attempted', true)
-    await refreshAccessToken(request)
-  }
-
-  return h.continue
 }

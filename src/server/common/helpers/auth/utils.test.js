@@ -2,8 +2,7 @@ import {
   getUserSession,
   removeUserSession,
   refreshAccessToken,
-  updateUserSession,
-  handleSSORefresh
+  updateUserSession
 } from './utils.js'
 import { getOpenIdRefreshToken } from './get-oidc-config.js'
 import jwt from '@hapi/jwt'
@@ -146,22 +145,6 @@ describe('#utils', () => {
       removeUserSession(mockRequest, mockSession)
 
       expect(mockRequest.server.app.cache.drop).toHaveBeenCalledWith('test-id')
-      expect(mockRequest.cookieAuth.clear).toHaveBeenCalled()
-      expect(mockRequest.yar.reset).toHaveBeenCalled()
-    })
-
-    test('should not throw when session is null', () => {
-      expect(() => removeUserSession(mockRequest, null)).not.toThrow()
-
-      expect(mockRequest.server.app.cache.drop).not.toHaveBeenCalled()
-      expect(mockRequest.cookieAuth.clear).toHaveBeenCalled()
-      expect(mockRequest.yar.reset).toHaveBeenCalled()
-    })
-
-    test('should not throw when session has no sessionId', () => {
-      expect(() => removeUserSession(mockRequest, {})).not.toThrow()
-
-      expect(mockRequest.server.app.cache.drop).not.toHaveBeenCalled()
       expect(mockRequest.cookieAuth.clear).toHaveBeenCalled()
       expect(mockRequest.yar.reset).toHaveBeenCalled()
     })
@@ -313,91 +296,6 @@ describe('#utils', () => {
         3600000
       )
       expect(result).toBeNull()
-    })
-  })
-
-  describe('#handleSSORefresh', () => {
-    let mockH
-
-    beforeEach(() => {
-      mockH = {
-        continue: Symbol('continue')
-      }
-
-      mockRequest.headers = {
-        referer: 'http://example.com/your-account'
-      }
-
-      mockRequest.yar = {
-        ...mockRequest.yar,
-        get: vi.fn(),
-        set: vi.fn()
-      }
-    })
-
-    test('should refresh access token when session exists, request comes from your-account, and refresh not attempted', async () => {
-      mockRequest.yar.get.mockReturnValue(false)
-      mockRequest.server.app.cache.get.mockResolvedValue(mockAuthedUser)
-
-      const result = await handleSSORefresh(mockRequest, mockH, mockSession)
-
-      expect(mockRequest.yar.get).toHaveBeenCalledWith('sso_refresh_attempted')
-      expect(mockRequest.yar.set).toHaveBeenCalledWith(
-        'sso_refresh_attempted',
-        true
-      )
-
-      expect(mockedGetOpenIdRefreshToken).toHaveBeenCalledWith(
-        'http://test-token-url',
-        {
-          client_id: 'test-client-id',
-          client_secret: 'test-client-secret',
-          grant_type: 'refresh_token',
-          refresh_token: 'test-refresh-token',
-          scope: 'test-scopes',
-          redirect_uri: 'http://test-redirect-url/auth-response'
-        }
-      )
-
-      expect(result).toBe(mockH.continue)
-    })
-
-    test('should return h.continue when session is not provided', async () => {
-      mockRequest.yar.get.mockReturnValue(false)
-
-      const result = await handleSSORefresh(mockRequest, mockH, null)
-
-      expect(mockRequest.yar.set).not.toHaveBeenCalled()
-      expect(result).toBe(mockH.continue)
-    })
-
-    test('should return h.continue when referer does not include your-account', async () => {
-      mockRequest.headers.referer = 'http://example.com/home'
-      mockRequest.yar.get.mockReturnValue(false)
-
-      const result = await handleSSORefresh(mockRequest, mockH, mockSession)
-
-      expect(mockRequest.yar.set).not.toHaveBeenCalled()
-      expect(result).toBe(mockH.continue)
-    })
-
-    test('should return h.continue when refresh has already been attempted', async () => {
-      mockRequest.yar.get.mockReturnValue(true)
-
-      const result = await handleSSORefresh(mockRequest, mockH, mockSession)
-
-      expect(mockRequest.yar.set).not.toHaveBeenCalled()
-      expect(result).toBe(mockH.continue)
-    })
-
-    test('should return h.continue when referer is missing', async () => {
-      mockRequest.headers = {}
-      mockRequest.yar.get.mockReturnValue(false)
-
-      const result = await handleSSORefresh(mockRequest, mockH, mockSession)
-
-      expect(mockRequest.yar.set).not.toHaveBeenCalled()
-      expect(result).toBe(mockH.continue)
     })
   })
 })
