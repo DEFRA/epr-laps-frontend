@@ -155,4 +155,65 @@ describe('#validateUserSession', () => {
     expect(authUtils.updateUserSession).not.toHaveBeenCalled()
     expect(mockRequest.yar.reset).toHaveBeenCalled()
   })
+
+  test('should use cached session when not from your-defra account and token not expired', async () => {
+    mockRequest.headers.referer = 'https://example.com/some-other-page'
+    mockRequest.yar.flash.mockReturnValue([])
+    authUtils.getUserSession.mockResolvedValue(mockUserSession)
+    isPast.mockReturnValue(false)
+
+    await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+    const result = await validateUserSession(mockRequest, mockSession)
+
+    expect(result).toEqual({
+      isValid: true,
+      credentials: mockUserSession
+    })
+    expect(authUtils.refreshAccessToken).not.toHaveBeenCalled()
+  })
+
+  test('should refresh session when from your-defra account and token not expired', async () => {
+    const mockRefreshResponse = {
+      ok: true,
+      json: {
+        access_token: 'new-access-token',
+        refresh_token: 'new-refresh-token',
+        expires_in: 3600
+      }
+    }
+
+    const mockUpdatedSession = {
+      sessionId: 'test-session-id',
+      token: 'new-access-token',
+      refreshToken: 'new-refresh-token',
+      expiresIn: 3600000
+    }
+
+    mockRequest.headers.referer =
+      'https://your-defra-account.example.com/your-account'
+    mockRequest.yar.flash.mockReturnValue([])
+    authUtils.getUserSession.mockResolvedValue(mockUserSession)
+    authUtils.refreshAccessToken.mockResolvedValue(mockRefreshResponse)
+    authUtils.updateUserSession.mockResolvedValue(mockUpdatedSession)
+    isPast.mockReturnValue(false)
+
+    await server.app.cache.set(mockUserSession.sessionId, mockUserSession)
+
+    const result = await validateUserSession(mockRequest, mockSession)
+
+    expect(result).toEqual({
+      isValid: true,
+      credentials: mockUpdatedSession
+    })
+    expect(authUtils.refreshAccessToken).toHaveBeenCalledWith(
+      mockRequest,
+      mockSession
+    )
+    expect(authUtils.updateUserSession).toHaveBeenCalledWith(
+      mockRequest,
+      mockRefreshResponse.json
+    )
+    expect(mockRequest.yar.reset).toHaveBeenCalled()
+  })
 })

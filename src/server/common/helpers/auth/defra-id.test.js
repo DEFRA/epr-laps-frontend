@@ -26,8 +26,7 @@ describe('#defraId plugin', () => {
   beforeEach(() => {
     mockRequest = {
       yar: {
-        flash: vi.fn(),
-        clear: vi.fn()
+        flash: vi.fn()
       }
     }
 

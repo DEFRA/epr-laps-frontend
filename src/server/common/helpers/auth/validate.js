@@ -11,11 +11,14 @@ export const validateUserSession = async (request, session) => {
   if (!authedUser) {
     return { isValid: false }
   }
+  // Check if user came from your-defra account page
+  const referrer = request.headers.referer || ''
+  const isFromYourDefraAccount = referrer.includes('your-account')
 
   const tokenHasExpired = isPast(subMinutes(parseISO(authedUser.expiresAt), 1))
 
   // Force refresh if from your-defra account OR if token has expired
-  if (tokenHasExpired) {
+  if (tokenHasExpired || isFromYourDefraAccount) {
     request.yar.reset()
     const response = await refreshAccessToken(request, session)
 
