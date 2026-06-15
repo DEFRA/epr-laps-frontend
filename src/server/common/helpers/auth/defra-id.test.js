@@ -28,6 +28,9 @@ describe('#defraId plugin', () => {
       yar: {
         flash: vi.fn(),
         clear: vi.fn()
+      },
+      logger: {
+        debug: vi.fn()
       }
     }
 

@@ -95,6 +95,9 @@ export async function createServer() {
   ])
 
   server.ext('onPreAuth', async (request, h) => {
+    request.logger.debug(
+      `onPreAuth - checking for user session: ${request.yar.get('getUserSession')}`
+    )
     const session = request.yar.get('getUserSession')
     await handleSSORefresh(request, h, session)
     return h.continue

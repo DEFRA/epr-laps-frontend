@@ -95,6 +95,7 @@ export const updateUserSession = async (request, refreshedSession) => {
 }
 
 export const handleSSORefresh = async (request, h, session) => {
+  request.logger.debug('Checking if SSO refresh is needed')
   const referrer = request.headers?.referer || ''
   const returningFromAccountService = referrer.includes('your-account')
   const refreshAlreadyAttempted = request.yar?.get?.('sso_refresh_attempted')

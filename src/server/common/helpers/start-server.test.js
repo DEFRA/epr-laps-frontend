@@ -6,26 +6,39 @@ import { getOidcConfig } from './auth/get-oidc-config.js'
 
 const mockLoggerInfo = vi.fn()
 const mockLoggerError = vi.fn()
+const mockLoggerDebug = vi.fn()
 
 const mockHapiLoggerInfo = vi.fn()
 const mockHapiLoggerError = vi.fn()
+const mockHapiLoggerDebug = vi.fn()
 
-vi.mock('hapi-pino', () => ({
-  default: {
-    register: (server) => {
-      server.decorate('server', 'logger', {
-        info: mockHapiLoggerInfo,
-        error: mockHapiLoggerError
-      })
-    },
-    name: 'mock-hapi-pino'
+vi.mock('hapi-pino', () => {
+  const logger = {
+    info: mockHapiLoggerInfo,
+    error: mockHapiLoggerError,
+    debug: mockHapiLoggerDebug,
+    warn: vi.fn(),
+    trace: vi.fn(),
+    fatal: vi.fn(),
+    child: vi.fn(() => logger)
   }
-}))
+
+  return {
+    default: {
+      name: 'mock-hapi-pino',
+      register: async (server) => {
+        server.decorate('server', 'logger', logger)
+        server.decorate('request', 'logger', logger)
+      }
+    }
+  }
+})
 
 vi.mock('./logging/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
-    error: (...args) => mockLoggerError(...args)
+    error: (...args) => mockLoggerError(...args),
+    debug: (...args) => mockLoggerDebug(...args)
   })
 }))
 
