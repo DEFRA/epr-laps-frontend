@@ -1,5 +1,4 @@
 import { createServer } from '../server.js'
-import { statusCodes } from '../common/constants/status-codes.js'
 import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
 import * as authUtils from '../common/helpers/auth/utils.js'
 import { timedOutController } from './controller.js'
@@ -39,7 +38,6 @@ describe('#timedOutController', () => {
       userName: 'test user'
     })
   })
-
   test('should redirect user when user is unauthenticated', async () => {
     const mockRequest = {
       app: {
@@ -47,15 +45,14 @@ describe('#timedOutController', () => {
         currentLang: 'en'
       }
     }
+
     const mockedResponse = { redirect: vi.fn(), view: vi.fn() }
 
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/'
-    })
-
     await timedOutController.handler(mockRequest, mockedResponse)
-    expect(statusCode).toBe(statusCodes.redirect)
+
+    expect(mockedResponse.view).toHaveBeenCalledWith('timed-out/index.njk', {
+      pageTitle: 'Session timed out'
+    })
   })
 
   test('should provide expected response', async () => {
