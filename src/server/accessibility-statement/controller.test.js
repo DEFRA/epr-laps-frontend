@@ -1,101 +1,84 @@
-import { getOidcConfig } from '../common/helpers/auth/get-oidc-config.js'
-// import { accessibilityController } from './controller.js'
-import { config } from '../../config/config.js'
-import { createServer } from '../server.js'
+import { describe, test, expect, vi } from 'vitest'
+import { accessibilityController } from './controller.js'
 
-vi.mock('../common/helpers/auth/get-oidc-config.js')
-
-describe.skip('#accessibilityController', () => {
-  let server
-
-  beforeEach(async () => {
-    // Mock OIDC configuration
-    vi.mocked(getOidcConfig).mockResolvedValue({
-      authorization_endpoint: 'https://test-idm-endpoint/authorize',
-      token_endpoint: 'https://test-idm-endpoint/token',
-      end_session_endpoint: 'https://test-idm-endpoint/logout'
-    })
-
-    // Create a fresh server instance for each test
-    server = await createServer(config)
-
-    // Mock authentication only once
-    if (!server.auth.settings.default) {
-      server.auth.scheme('mock', () => ({
-        authenticate: (request, h) =>
-          h.authenticated({ credentials: { user: 'test-user' } })
-      }))
-      server.auth.strategy('default', 'mock')
-      server.auth.default('default')
-    }
-  })
-
-  afterEach(async () => {
-    // Stop the server and clear mocks after each test
-    await server.stop()
-    vi.clearAllMocks()
-  })
-
-  test('should render accessibility statement page', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/accessibility-statement'
-    })
-
-    expect(response.statusCode).toBe(200)
-    expect(response.result).toContain('Accessibility Statement')
-  })
-
-  test('should handle missing OIDC configuration gracefully', async () => {
-    vi.mocked(getOidcConfig).mockResolvedValue(null) // Simulate missing OIDC config
-
-    const response = await server.inject({
-      method: 'GET',
-      url: '/accessibility-statement'
-    })
-
-    expect(response.statusCode).toBe(500) // Expect server error
-    expect(response.result).toContain('Internal Server Error') // Check for error message
-  })
-
-  test('should handle errors in getOidcConfig', async () => {
-    vi.mocked(getOidcConfig).mockRejectedValue(new Error('OIDC config error')) // Simulate error
-
-    const response = await server.inject({
-      method: 'GET',
-      url: '/accessibility-statement'
-    })
-
-    expect(response.statusCode).toBe(500) // Expect server error
-    expect(response.result).toContain('Internal Server Error') // Check for error message
-  })
-
-  test('should return 404 for invalid routes', async () => {
-    const response = await server.inject({
-      method: 'GET',
-      url: '/invalid-route'
-    })
-
-    expect(response.statusCode).toBe(404) // Expect not found
-    expect(response.result).toContain('Not Found') // Check for error message
-  })
-
-  test('should handle unexpected server errors', async () => {
-    // Simulate an unexpected error in the controller
-    server.route({
-      method: 'GET',
-      path: '/accessibility-statement',
-      handler: () => {
-        throw new Error('Unexpected error')
+describe('#accessibilityController', () => {
+  test('should render the accessibility statement page with correct view data', () => {
+    const request = {
+      app: {
+        currentLang: 'en',
+        translations: {
+          'laps-home': 'LAPS Home',
+          'accessibility-statement': 'Accessibility Statement'
+        }
       }
-    })
+    }
 
-    const response = await server.inject({
-      method: 'GET',
-      url: '/accessibility-statement'
-    })
+    const h = {
+      view: vi.fn()
+    }
 
-    expect(response.statusCode).toBe(500) // Expect server error
-    expect(response.result).toContain('Internal Server Error') // Check for error message
+    accessibilityController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledTimes(1)
+
+    expect(h.view).toHaveBeenCalledWith('accessibility-statement/index.njk', {
+      pageTitle: 'Accessibility Statement',
+      currentLang: 'en',
+      translations: {
+        'laps-home': 'LAPS Home',
+        'accessibility-statement': 'Accessibility Statement'
+      },
+      breadcrumbs: [
+        {
+          text: 'LAPS Home',
+          href: '/?lang=en'
+        },
+        {
+          text: 'Accessibility Statement',
+          href: '/accessibility-statement?lang=en'
+        }
+      ]
+    })
+  })
+
+  test('should return the result from h.view', () => {
+    const request = {
+      app: {
+        currentLang: 'cy',
+        translations: {
+          'laps-home': 'Cartref LAPS',
+          'accessibility-statement': 'Datganiad Hygyrchedd'
+        }
+      }
+    }
+
+    const viewResponse = Symbol('view response')
+
+    const h = {
+      view: vi.fn().mockReturnValue(viewResponse)
+    }
+
+    const result = accessibilityController.handler(request, h)
+
+    expect(result).toBe(viewResponse)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'accessibility-statement/index.njk',
+      expect.objectContaining({
+        pageTitle: 'Accessibility Statement',
+        currentLang: 'cy',
+        translations: request.app.translations,
+        breadcrumbs: [
+          {
+            text: 'Cartref LAPS',
+            href: '/?lang=cy'
+          },
+          {
+            text: 'Datganiad Hygyrchedd',
+            href: '/accessibility-statement?lang=cy'
+          }
+        ]
+      })
+    )
   })
 })
