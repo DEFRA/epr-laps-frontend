@@ -3,70 +3,56 @@
 {% set language = currentLang %}
 {% block content %}
 <div class="govuk-grid-row">
-<div class="govuk-grid-column-two-thirds">
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+  <div class="govuk-grid-column-two-thirds">
 
 {{ appHeading({
-  text: authedUser.organisationName,
-  caption: translations['get-help']
-
+  caption: translations['accessibility-statement-for-laps']
   }) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-
-      <h2 class="govuk-heading-m">{{ translations['guidance'] }}</h2>
         <p class="govuk-body">
-          {{ translations['read-guidance'] }}
-          <a href='https://www.gov.uk/government/collections/extended-producer-responsibility-for-packaging-local-authorities'
-             class="govuk-link" rel="noreferrer noopener" target="_blank">
-            {{ translations['extended-producer'] }}
-          </a>
-          {{ translations['includes-info'] }}
+            This accessibility statement applies to the https://epr-local-authority-payments.defra.gov.uk/ website. It is limited to this specific subdomain and sitemap and does not cover other GOV.UK subdomains such as primary GOV.UK subdomains (for example www.gov.uk) or the blog subdomain (www.blog.gov.uk), which have their own accessibility statements.
         </p>
-
-        <ul class="govuk-list govuk-list--bullet">
-          <li>{{ translations['when-and-how'] }}</li>
-          <li>{{ translations['how-payments'] }}</li>
-        </ul>
-
-      <h2 class="govuk-heading-m">{{ translations['contact-us'] }}</h2>
-        <p class="govuk-body">{{ translations['you-can-use'] }} <br> {{ translations['response-time'] }}</p>
-        <p class="govuk-body">{{ translations['we-will-contact'] }}</p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>{{ translations['need-more-info'] }}</li>
-          <li>{{ translations['think-it-is'] }}</li>
-        </ul>
-
-        <h3 class="govuk-heading-m">{{ translations['raise-a-customer'] }}</h3>
-        <p class="govuk-body">{{ translations['you-can']}}
-        <a href= {{ getHelpUrl }}
-             class="govuk-link" rel="noreferrer noopener" target="_blank">
-            {{ translations['raise-a-'] }} {{ translations['opens-in-new-tab']}}
-          </a>
-          {{ translations['ticket-to:'] }}</p>
+        <p class="govuk-body">
+          This website is run by the Department for Environment, Food and Rural Affairs (Defra) and the Extended Producer Responsibility (EPR) scheme administrator PackUK.
         </p>
+        <h2 class="govuk-heading-m">How you should be able to use this website</h2>
+        <p class="govuk-body"> We want as many people as possible to be able to use this website. You should be able to: </p>
         <ul class="govuk-list govuk-list--bullet">
-          <li>{{ translations['ask-question'] }}</li>
-          <li>{{ translations['make-complaint'] }}</li>
-          <li>{{ translations['get-help-account'] }}</li>
+          <li>change colours, contrast levels and fonts using browser or device settings</li>
+          <li>zoom in up to 400% without the text spilling off the screen</li>
+          <li>navigate most of the website using a keyboard or speech recognition software</li>
+          <li>listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
         </ul>
 
-      <h3 class="govuk-heading-m">{{ translations['email'] }}</h3>
-      <p class="govuk-body">
-        <a href="mailto:{{ customerServiceEmail }}" class="govuk-link">
-          {{ customerServiceEmail }}
-        </a>
-      </p>
+        <p>We also make the website text as simple as possible to understand.</p>
+        <p>AbilityNet has advice on making your device easier to use if you have a disability.<p>
+    
 
-      <h3 class="govuk-heading-m">{{ translations['telephone'] }}</h3>
-      <p class="govuk-body">
-        0300 060 0002<br>
-        {{ translations['monday-to-frida'] }}
-      </p>
+        <h3 class="govuk-heading-m">How accessible this website is</h3>
+        <p class="govuk-body">Parts of this website are not fully accessible. For example:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>some pages and documents are not written in plain English</li>
+          <li>some page titles are not written in plain English</li>
+          <li>some decorative images have generic image descriptions</li>
+          <li>some links and text have a reduced level of colour contrast</li>
+          <li>some text styling in tables is not consistent</li>
+          <li>some links do not have clearly described destination</li>
+          <li>many documents are in PDF format and are not fully accessible</li>
+          <li>some connected services (e.g. to enable login, helpdesk ticketing and support) do not currently meet accessibility standards. Please refer to their accessibility statements when using these services
+          some connected services are not translated into Welsh </li>
+        </ul>
 
+        <h3 class="govuk-heading-m">Feedback and contact information</h3>
+        <p class="govuk-body">Tell us if you need information in a different format.</p>
+        <p class="govuk-body">In your message, include:</p>
+        <p class="govuk-body"> You can also view Defra’s accessible document policy to report any problems or request documents in an alternative format.</p>
+
+        <h3 class="govuk-heading-m">Reporting accessibility problems with this website</h3>
     </div>
   </div>
    
-  
+  </div>
+  </div>
 {% endblock %}
