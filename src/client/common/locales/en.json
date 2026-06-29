@@ -196,6 +196,7 @@
   "csrf-token": "Cross Site Request Forgery (CSRF) token storage",
   "no-payment-docs": "You have no payment documents to view.",
   "opens-in-new-tab": "(opens in new tab)",
+  "accessibility-statement": "Accessibility statement",
   "accessibility-statement-for-laps": "Accessibility statement for the Local Authority Payments service (LAPs)",
   "accessibility-statement-applies-to": "This accessibility statement applies to the <a class=\"govuk-link\" href=\"https://epr-local-authority-payments.defra.gov.uk/\">Local Authority Payments service</a> website. It is limited to this specific subdomain and sitemap and does not cover other GOV.UK subdomains such as primary GOV.UK subdomains (for example www.gov.uk) or the blog subdomain (www.blog.gov.uk), which have their own accessibility statements.",
   "website-run-by": "This website is run by the Department for Environment, Food and Rural Affairs (Defra) and the Extended Producer Responsibility (EPR) scheme administrator PackUK.",
