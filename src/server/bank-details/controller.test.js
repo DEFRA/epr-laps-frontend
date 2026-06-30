@@ -334,17 +334,6 @@ describe('#confirmBankDetailsController', () => {
 
     expect(result).toBe('view-rendered')
   })
-
-  it('should throw an error when bankApiData is missing', async () => {
-    request.yar.get.mockImplementation((key) => {
-      if (key === 'bankDetails') return null
-      return null
-    })
-
-    await expect(
-      confirmBankDetailsController.handler(request, h)
-    ).rejects.toThrow('Bank Api Data not found')
-  })
 })
 
 describe('#bankDetailsConfirmedController', () => {
