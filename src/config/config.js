@@ -48,7 +48,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'EPR-LAPs'
+    default: 'Extended Producer Responsibility - Local Authority Payments'
   },
   root: {
     doc: 'Project root',
