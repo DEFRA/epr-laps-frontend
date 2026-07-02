@@ -162,17 +162,15 @@ describe('paymentDocumentsController', () => {
     expect(Object.keys(metadata)).toEqual(['1', '2'])
   })
 
-  it('applies bold-row class only to documents within the last 30 days', async () => {
+  it('applies govuk-tag class only to documents within the last 30 days', async () => {
     request.yar.flash.mockReturnValue([])
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
     const [recentRow1, recentRow2] = viewArg.rows
 
-    expect(recentRow1[0].classes).toContain('bold-row')
-    expect(recentRow1[1].classes).toContain('bold-row')
-    expect(recentRow2[0].classes).toContain('bold-row')
-    expect(recentRow2[1].classes).toContain('bold-row')
+    expect(recentRow1[2].html).toContain('govuk-tag')
+    expect(recentRow2[2].html).toContain('govuk-tag')
   })
 
   it('handles missing docs for year/lang gracefully', async () => {
@@ -264,8 +262,8 @@ describe('paymentDocumentsController', () => {
         await paymentDocumentsController.handler(updatedRequest, h)
 
         const viewArg = h.view.mock.calls[0][1]
-        const doc1Html = viewArg.rows[0][2].html
-        const doc2Html = viewArg.rows[1][2].html
+        const doc1Html = viewArg.rows[0][3].html
+        const doc2Html = viewArg.rows[1][3].html
 
         expect(doc1Html).toContain(expectedFile1Name)
         expect(doc2Html).toContain(expectedFile2Name)
@@ -309,8 +307,8 @@ describe('paymentDocumentsController', () => {
       await paymentDocumentsController.handler(updatedRequest, h)
 
       const viewArg = h.view.mock.calls[0][1]
-      const doc1Html = viewArg.rows[0][2].html
-      const doc2Html = viewArg.rows[1][2].html
+      const doc1Html = viewArg.rows[0][3].html
+      const doc2Html = viewArg.rows[1][3].html
 
       expect(doc1Html).toContain('doc1_en.pdf')
       expect(doc2Html).toContain('doc2_en.pdf')
