@@ -52,7 +52,13 @@
           <li>{{ translations['accessible-format-item-contact'] }}</li>
           <li>{{ translations['accessible-format-item-format'] }}</li>
         </ul>
-        <p class="govuk-body">{{translations['request-accessible-pdf'] | safe}}</p>
+        <p class="govuk-body">{{translations['request-accessible-pdf'] | safe}}
+          <a href="{{ getHelpUrl }}"
+            class="govuk-link"
+            rel="noreferrer noopener"
+            target="_blank">
+            {{ translations['raising-a-ticket-through-the-site'] }}</a>.
+        </p>
         <p class="govuk-body">{{translations['accessible-document-policy'] | safe}}</p>
 
         <h2 class="govuk-heading-l">{{translations['reporting-accessibility-issues']}}</h2>
