@@ -122,24 +122,16 @@ function buildTableRows(docsToShow, translations) {
     // Parse date in "DD Mon YYYY" format
     const [day, month, year] = doc.creationDate.split(' ')
 
-    const documentStatus = doc.isLatest
-      ? `<strong class='govuk-tag'>${translations['recently-added']}</strong>`
-      : ''
+    const boldClass = doc.isLatest ? 'bold-row' : ''
+
     const translationKey = getTranslationKey(doc.documentName)
     const docNameTranslated = translations[translationKey] || doc.documentName
     const monthTranslated = translations[month] || month
     const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
 
     return [
-      {
-        text: formattedDateTranslated
-      },
-      {
-        text: docNameTranslated
-      },
-      {
-        html: documentStatus
-      },
+      { text: formattedDateTranslated, classes: boldClass },
+      { text: docNameTranslated, classes: boldClass },
       {
         html: `<a href='${downloadLink}' download class='govuk-link'>
                 ${translations.download}
