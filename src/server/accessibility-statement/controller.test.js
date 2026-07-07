@@ -6,6 +6,7 @@ describe('#accessibilityController', () => {
     const request = {
       app: {
         currentLang: 'en',
+        'get-help': 'Get Help',
         translations: {
           'laps-home': 'LAPS Home',
           'accessibility-statement': 'Accessibility Statement'
@@ -24,6 +25,7 @@ describe('#accessibilityController', () => {
     expect(h.view).toHaveBeenCalledWith('accessibility-statement/index.njk', {
       pageTitle: 'Accessibility Statement',
       currentLang: 'en',
+      getHelpUrl: 'https://google.com',
       translations: {
         'laps-home': 'LAPS Home',
         'accessibility-statement': 'Accessibility Statement'
