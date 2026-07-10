@@ -135,7 +135,7 @@ describe('paymentDocumentsController', () => {
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
-    expect(viewArg.rows.length).toBe(2)
+    expect(viewArg.rows).toHaveLength(2)
     expect(viewArg.pageTitle).toBe('Payment documents')
   })
 
@@ -327,7 +327,7 @@ describe('paymentDocumentsController', () => {
 
         const viewArg = h.view.mock.calls[0][1]
 
-        expect(viewArg.rows.length).toBe(0)
+        expect(viewArg.rows).toHaveLength(0)
       })
     })
   })
