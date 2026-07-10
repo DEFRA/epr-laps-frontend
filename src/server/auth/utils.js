@@ -41,10 +41,12 @@ export const getToken = (request) => {
 }
 
 // To set headers for API call
-export const setHeaders = (token) => {
-  return {
-    Authorization: `Bearer ${token}`
+export const setHeaders = (token, sourcePage) => {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    ...(sourcePage && { 'x-source-page': sourcePage })
   }
+  return headers
 }
 
 // Make GET request
@@ -98,13 +100,13 @@ export const postRequest = async (url, payload, headers = {}) => {
   }
 }
 
-export const fetchWithToken = async (request, path) => {
+export const fetchWithToken = async (request, path, sourcePage) => {
   const { token } = getToken(request)
 
   const apiBaseUrl = config.get('backendApiUrl')
   const url = `${apiBaseUrl}${path}`
 
-  const headers = setHeaders(token)
+  const headers = setHeaders(token, sourcePage)
   return getRequest(url, headers)
 }
 
