@@ -46,7 +46,6 @@ export const setHeaders = (token, sourcePage) => {
     Authorization: `Bearer ${token}`,
     ...(sourcePage && { 'x-source-page': sourcePage })
   }
-  console.log('Headers set for API call:', headers)
   return headers
 }
 
