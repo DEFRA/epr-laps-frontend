@@ -476,7 +476,8 @@ describe('findSelectedOption', () => {
 
   it('should return flash value when not post and flash exists', () => {
     const result = findSelectedOption(false, request, {
-      currentFiscalYear: '2023 to 2024'
+      currentFiscalYear: '2023 to 2024',
+      latestFinancialYear: '2024 to 2025'
     })
     expect(result).toBe('2022 to 2023')
   })
@@ -491,8 +492,9 @@ describe('findSelectedOption', () => {
   it('should return current fiscal year when not post and no flash', () => {
     request.yar.flash.mockReturnValueOnce([])
     const result = findSelectedOption(false, request, {
-      currentFiscalYear: '2023 to 2024'
+      currentFiscalYear: '2023 to 2024',
+      latestFinancialYear: '2024 to 2025'
     })
-    expect(result).toBe('2023 to 2024')
+    expect(result).toBe('2024 to 2025')
   })
 })
