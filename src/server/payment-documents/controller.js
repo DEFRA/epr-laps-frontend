@@ -104,7 +104,10 @@ export function buildFinancialYearOptions(
     return []
   }
 
-  const entries = Object.entries(documentApiData).slice(0, -1)
+  const entries = Object.entries(documentApiData).filter(
+    ([key]) => key !== 'currentFiscalYear' && key !== 'latestFinancialYear'
+  )
+
   return entries.map(([financialYear, _docs]) => ({
     value: financialYear,
     text: financialYear.replace(/\bto\b/, translations['to'] || 'to'),
@@ -157,7 +160,7 @@ export function findSelectedOption(isPost, request, documentApiData) {
   if (messages.length > 0 && !isPost) {
     return messages[0]
   }
-  return isPost ? request.payload.sort : documentApiData.currentFiscalYear
+  return isPost ? request.payload.sort : documentApiData.latestFinancialYear
 }
 
 /**
