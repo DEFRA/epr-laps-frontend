@@ -60,7 +60,7 @@ describe('getBackLink', () => {
     await getBackLink(req, h)
     expect(req.server.app.cache.set).toHaveBeenCalledTimes(1)
     const savedHistory = req.server.app.cache.set.mock.calls[0][1]
-    expect(savedHistory.length).toBe(1)
+    expect(savedHistory).toHaveLength(1)
     expect(savedHistory[0].full).toBe('/page1?foo=bar')
   })
 
@@ -94,7 +94,7 @@ describe('getBackLink', () => {
     const h = mockH()
     await getBackLink(req, h)
     const saved = req.server.app.cache.set.mock.calls[0][1]
-    expect(saved.length).toBe(MAX_HISTORY)
+    expect(saved).toHaveLength(MAX_HISTORY)
   })
 
   it('returns root when history has 0 or 1 entries', async () => {
@@ -141,7 +141,7 @@ describe('getBackLink', () => {
       const h = mockH()
       await getBackLink(req, h)
       const saved = req.server.app.cache.set.mock.calls[0][1]
-      expect(saved.length).toBe(MAX_HISTORY)
+      expect(saved).toHaveLength(MAX_HISTORY)
     })
 
     it('uses sessionId from request.state.session.id', async () => {
@@ -219,7 +219,7 @@ describe('getBackLink', () => {
 
       // updateHistory([]) → becomes length 1
       const saved = req.server.app.cache.set.mock.calls[0][1]
-      expect(saved.length).toBe(1)
+      expect(saved).toHaveLength(1)
     })
 
     it('loads history from cache when available', async () => {
@@ -273,7 +273,7 @@ describe('Helper functions', () => {
 
   it('updateHistory appends on new page', () => {
     const result = updateHistory([], '/a', '/a')
-    expect(result.length).toBe(1)
+    expect(result).toHaveLength(1)
   })
 
   it('updateHistory trims on revisit', () => {
@@ -283,7 +283,7 @@ describe('Helper functions', () => {
       { key: '/c', full: '/c' }
     ]
     const result = updateHistory(hist, '/b', '/b')
-    expect(result.length).toBe(2)
+    expect(result).toHaveLength(2)
     expect(result[1].key).toBe('/b')
   })
 

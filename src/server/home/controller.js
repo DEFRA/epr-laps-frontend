@@ -22,7 +22,7 @@ export const homeController = {
     request.logger.info('permissions successfully fetched and saved in cookie')
 
     const bankPath = `/bank-details/${request.auth.credentials.organisationId}`
-    const bankApiData = await fetchWithToken(request, bankPath)
+    const bankApiData = await fetchWithToken(request, bankPath, 'home')
     request.yar.set('bankDetails', bankApiData)
     request.logger.info('successfully fetched bank details')
 

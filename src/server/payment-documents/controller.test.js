@@ -135,7 +135,7 @@ describe('paymentDocumentsController', () => {
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
-    expect(viewArg.rows.length).toBe(2)
+    expect(viewArg.rows).toHaveLength(2)
     expect(viewArg.pageTitle).toBe('Payment documents')
   })
 
@@ -162,15 +162,17 @@ describe('paymentDocumentsController', () => {
     expect(Object.keys(metadata)).toEqual(['1', '2'])
   })
 
-  it('applies govuk-tag class only to documents within the last 30 days', async () => {
+  it('applies bold-row class only to documents within the last 30 days', async () => {
     request.yar.flash.mockReturnValue([])
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
     const [recentRow1, recentRow2] = viewArg.rows
 
-    expect(recentRow1[2].html).toContain('govuk-tag')
-    expect(recentRow2[2].html).toContain('govuk-tag')
+    expect(recentRow1[0].classes).toContain('bold-row')
+    expect(recentRow1[1].classes).toContain('bold-row')
+    expect(recentRow2[0].classes).toContain('bold-row')
+    expect(recentRow2[1].classes).toContain('bold-row')
   })
 
   it('handles missing docs for year/lang gracefully', async () => {
@@ -262,8 +264,8 @@ describe('paymentDocumentsController', () => {
         await paymentDocumentsController.handler(updatedRequest, h)
 
         const viewArg = h.view.mock.calls[0][1]
-        const doc1Html = viewArg.rows[0][3].html
-        const doc2Html = viewArg.rows[1][3].html
+        const doc1Html = viewArg.rows[0][2].html
+        const doc2Html = viewArg.rows[1][2].html
 
         expect(doc1Html).toContain(expectedFile1Name)
         expect(doc2Html).toContain(expectedFile2Name)
@@ -307,8 +309,8 @@ describe('paymentDocumentsController', () => {
       await paymentDocumentsController.handler(updatedRequest, h)
 
       const viewArg = h.view.mock.calls[0][1]
-      const doc1Html = viewArg.rows[0][3].html
-      const doc2Html = viewArg.rows[1][3].html
+      const doc1Html = viewArg.rows[0][2].html
+      const doc2Html = viewArg.rows[1][2].html
 
       expect(doc1Html).toContain('doc1_en.pdf')
       expect(doc2Html).toContain('doc2_en.pdf')
@@ -325,7 +327,7 @@ describe('paymentDocumentsController', () => {
 
         const viewArg = h.view.mock.calls[0][1]
 
-        expect(viewArg.rows.length).toBe(0)
+        expect(viewArg.rows).toHaveLength(0)
       })
     })
   })
@@ -474,7 +476,8 @@ describe('findSelectedOption', () => {
 
   it('should return flash value when not post and flash exists', () => {
     const result = findSelectedOption(false, request, {
-      currentFiscalYear: '2023 to 2024'
+      currentFiscalYear: '2023 to 2024',
+      latestFinancialYear: '2024 to 2025'
     })
     expect(result).toBe('2022 to 2023')
   })
@@ -489,8 +492,9 @@ describe('findSelectedOption', () => {
   it('should return current fiscal year when not post and no flash', () => {
     request.yar.flash.mockReturnValueOnce([])
     const result = findSelectedOption(false, request, {
-      currentFiscalYear: '2023 to 2024'
+      currentFiscalYear: '2023 to 2024',
+      latestFinancialYear: '2024 to 2025'
     })
-    expect(result).toBe('2023 to 2024')
+    expect(result).toBe('2024 to 2025')
   })
 })

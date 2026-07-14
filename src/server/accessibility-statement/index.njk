@@ -34,7 +34,6 @@
         <p class="govuk-body">{{translations['parts-of-site']}}</p>
         <ul class="govuk-list govuk-list--bullet">
           <li>{{ translations['docs-not-in-eng'] }}</li>
-          <li>{{ translations['titles-not-in-eng'] }}</li>
           <li>{{ translations['decorative-images-no-in-eng'] }}</li>
           <li>{{ translations['reduced-colour-contrast']}}</li>
           <li>{{ translations['inconsistent-text-style']}}</li>
@@ -52,7 +51,13 @@
           <li>{{ translations['accessible-format-item-contact'] }}</li>
           <li>{{ translations['accessible-format-item-format'] }}</li>
         </ul>
-        <p class="govuk-body">{{translations['request-accessible-pdf'] | safe}}</p>
+        <p class="govuk-body">{{translations['request-accessible-pdf'] | safe}}
+          <a href="{{ getHelpUrl }}"
+            class="govuk-link"
+            rel="noreferrer noopener"
+            target="_blank">
+            {{ translations['raising-a-ticket'] }} {{ translations['opens-in-new-tab']}}</a>.
+        </p>
         <p class="govuk-body">{{translations['accessible-document-policy'] | safe}}</p>
 
         <h2 class="govuk-heading-l">{{translations['reporting-accessibility-issues']}}</h2>
