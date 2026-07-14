@@ -169,10 +169,8 @@ describe('paymentDocumentsController', () => {
     const viewArg = h.view.mock.calls[0][1]
     const [recentRow1, recentRow2] = viewArg.rows
 
-    expect(recentRow1[0].classes).toContain('bold-row')
-    expect(recentRow1[1].classes).toContain('bold-row')
-    expect(recentRow2[0].classes).toContain('bold-row')
-    expect(recentRow2[1].classes).toContain('bold-row')
+    expect(recentRow1[1].html).toContain('govuk-tag')
+    expect(recentRow2[1].html).toContain('govuk-tag')
   })
 
   it('handles missing docs for year/lang gracefully', async () => {
@@ -220,9 +218,9 @@ describe('paymentDocumentsController', () => {
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
-    const docNames = viewArg.rows.map((r) => r[1].text)
+    const docNames = viewArg.rows.map((r) => r[1].html)
 
-    expect(docNames).toContain('Hysbysiad Ailgyfrifo Asesiad')
+    expect(docNames[2]).toContain('Hysbysiad Ailgyfrifo Asesiad')
   })
 
   describe.each`
