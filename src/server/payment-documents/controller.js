@@ -123,7 +123,7 @@ function buildTableRows(docsToShow, translations) {
     const [day, month, year] = doc.creationDate.split(' ')
 
     const documentStatus = doc.isLatest
-      ? `<strong class='govuk-tag'>${translations['recently-added']}</strong>`
+      ? `<strong class='govuk-tag' style='float:right;'>${translations['recently-added']}</strong>`
       : ''
     const translationKey = getTranslationKey(doc.documentName)
     const docNameTranslated = translations[translationKey] || doc.documentName
@@ -135,10 +135,7 @@ function buildTableRows(docsToShow, translations) {
         text: formattedDateTranslated
       },
       {
-        text: docNameTranslated
-      },
-      {
-        html: documentStatus
+        html: docNameTranslated + documentStatus
       },
       {
         html: `<a href='${downloadLink}' download class='govuk-link'>
