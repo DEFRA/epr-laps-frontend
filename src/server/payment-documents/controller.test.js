@@ -129,6 +129,33 @@ describe('paymentDocumentsController', () => {
     fetchWithToken.mockResolvedValue(fetchWithTokenMockData)
   })
 
+  it('does not render recently added tag for non latest document', async () => {
+    fetchWithToken.mockResolvedValueOnce({
+      latestFinancialYear: '2023-to-2024',
+      currentFiscalYear: '2023-to-2024',
+      '2023-to-2024': {
+        EN: [
+          {
+            id: '1',
+            documentName: 'Old Document',
+            fileName: 'old.pdf',
+            creationDate: '01 Jan 2025',
+            language: 'EN',
+            isLatest: false
+          }
+        ]
+      }
+    })
+
+    request.yar.flash.mockReturnValue([])
+
+    await paymentDocumentsController.handler(request, h)
+
+    const viewArg = h.view.mock.calls[0][1]
+
+    expect(viewArg.rows[0][1].html).not.toContain('recently-added-tag')
+  })
+
   it('renders payment documents with correct rows', async () => {
     request.yar.flash.mockReturnValueOnce(['2024 to 2025']).mockReturnValue()
     request.yar.set = vi.fn()
@@ -169,10 +196,8 @@ describe('paymentDocumentsController', () => {
     const viewArg = h.view.mock.calls[0][1]
     const [recentRow1, recentRow2] = viewArg.rows
 
-    expect(recentRow1[0].classes).toContain('bold-row')
-    expect(recentRow1[1].classes).toContain('bold-row')
-    expect(recentRow2[0].classes).toContain('bold-row')
-    expect(recentRow2[1].classes).toContain('bold-row')
+    expect(recentRow1[1].html).toContain('govuk-tag')
+    expect(recentRow2[1].html).toContain('govuk-tag')
   })
 
   it('handles missing docs for year/lang gracefully', async () => {
@@ -220,9 +245,9 @@ describe('paymentDocumentsController', () => {
     await paymentDocumentsController.handler(request, h)
 
     const viewArg = h.view.mock.calls[0][1]
-    const docNames = viewArg.rows.map((r) => r[1].text)
+    const docNames = viewArg.rows.map((r) => r[1].html)
 
-    expect(docNames).toContain('Hysbysiad Ailgyfrifo Asesiad')
+    expect(docNames[2]).toContain('Hysbysiad Ailgyfrifo Asesiad')
   })
 
   describe.each`
@@ -364,6 +389,25 @@ describe('fileDownloadController', () => {
       redirect: vi.fn(() => responseMock),
       response: vi.fn(() => responseMock)
     }
+  })
+
+  it('passes quarter when available', async () => {
+    const buffer = Buffer.from('PDF data')
+
+    request.yar.get.mockReturnValue({
+      123: {
+        quarter: 'Q1'
+      }
+    })
+
+    fetchWithToken.mockResolvedValue(buffer)
+
+    await fileDownloadController.handler(request, h)
+
+    expect(fetchWithToken).toHaveBeenCalledWith(
+      request,
+      '/document/123?quarter=Q1'
+    )
   })
 
   it('returns 404 if API returns non-buffer response', async () => {
