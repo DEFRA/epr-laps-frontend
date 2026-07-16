@@ -16,3 +16,13 @@
   padding-left: 1em;
   padding-right: 1em;
 }
+
+.recently-added-tag {
+  float: right;
+}
+
+@include govuk-media-query($until: "tablet") {
+  .govuk-tag {
+    margin-top: 5px;
+  }
+}

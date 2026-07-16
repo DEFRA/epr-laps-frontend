@@ -214,7 +214,6 @@
   "docs-not-in-eng": "some pages and documents are not written in plain English",
   "decorative-images-no-in-eng": "some decorative images have generic image descriptions",
   "reduced-colour-contrast": "some links and text have a reduced level of colour contrast",
-  "inconsistent-text-style": "some text styling in tables is not consistent",
   "link-purpose-unclear": "some links do not have clearly described purpose",
   "pdfs-not-fully-accessible": "many documents are in PDF format and are not fully accessible",
   "connected-services": "some connected services (e.g. to enable login, helpdesk ticketing and support) do not currently meet accessibility standards. Please refer to their accessibility statements when using these services",

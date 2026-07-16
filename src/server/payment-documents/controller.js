@@ -126,7 +126,7 @@ function buildTableRows(docsToShow, translations) {
     const [day, month, year] = doc.creationDate.split(' ')
 
     const documentStatus = doc.isLatest
-      ? `<strong class='govuk-tag' style='float:right;'>${translations['recently-added']}</strong>`
+      ? `<span><strong class='govuk-tag recently-added-tag'>${translations['recently-added']}</strong></span>`
       : ''
     const translationKey = getTranslationKey(doc.documentName)
     const docNameTranslated = translations[translationKey] || doc.documentName
@@ -138,23 +138,21 @@ function buildTableRows(docsToShow, translations) {
         text: formattedDateTranslated
       },
       {
-        html: docNameTranslated + documentStatus
+        html: `<div>${docNameTranslated} ${documentStatus}</div>`
       },
       {
         html: `<a href='${downloadLink}' download class='govuk-link'>
                 ${translations.download}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
-                </span></a>`,
-        classes: 'govuk-table__cell--numeric'
+                </span></a>`
       },
       {
         html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
                 ${translations['view-(opens-in-']}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
-                </span></a>`,
-        classes: 'govuk-table__cell--numeric'
+                </span></a>`
       }
     ]
   })
