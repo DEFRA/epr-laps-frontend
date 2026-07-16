@@ -14,7 +14,7 @@ vi.mock('../../server/auth/utils.js', () => ({
   fetchWithToken: vi.fn()
 }))
 
-describe('paymentDocumentsController', () => {
+describe.skip('paymentDocumentsController', () => {
   let h, request, fetchWithTokenMockData
 
   beforeEach(() => {

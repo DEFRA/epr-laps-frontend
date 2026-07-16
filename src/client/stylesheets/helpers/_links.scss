@@ -1,7 +1,12 @@
 // Example SASS helpers
 
+
 @mixin app-link-style {
   text-decoration: none;
+}
+
+.my-link {
+  @include app-link-style;
 
   &:hover {
     text-decoration: underline;
@@ -11,3 +16,4 @@
     text-decoration: none;
   }
 }
+
