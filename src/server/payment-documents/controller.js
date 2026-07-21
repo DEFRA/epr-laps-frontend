@@ -138,7 +138,7 @@ function buildTableRows(docsToShow, translations) {
         text: formattedDateTranslated
       },
       {
-        html: `<div>${docNameTranslated} ${documentStatus}</div>`
+        html: `<div><span class='document-name'>${docNameTranslated}</span> ${documentStatus}</div>`
       },
       {
         html: `<a href='${downloadLink}' download class='govuk-link'>
