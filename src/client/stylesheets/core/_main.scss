@@ -27,7 +27,7 @@
 
 @include govuk-media-query($until: 811px) {
   .govuk-tag {
-    margin-top: 5px;
+    margin-top: govuk-spacing(1);
   }
   
   .recently-added-tag {
