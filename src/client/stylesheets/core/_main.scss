@@ -21,8 +21,16 @@
   float: right;
 }
 
-@include govuk-media-query($until: "tablet") {
+.document-name {
+  float: left;
+}
+
+@include govuk-media-query($until: 811px) {
   .govuk-tag {
     margin-top: 5px;
+  }
+  
+  .recently-added-tag {
+    float: left;
   }
 }
