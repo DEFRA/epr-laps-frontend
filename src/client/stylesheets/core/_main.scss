@@ -31,6 +31,8 @@
   }
   
   .recently-added-tag {
-    float: left;
+    float: none;
+    display: block;
+    clear: both;
   }
 }
