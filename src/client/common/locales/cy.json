@@ -263,7 +263,6 @@
   "compliance-status-description": "Mae’r wefan hon yn cydymffurfio’n rhannol â safon AA <a href=\"https://www.w3.org/TR/WCAG22/\">Canllawiau Hygyrchedd Cynnwys y We</a> Fersiwn 2.2, o ganlyniad i’r eithriadau a’r materion isod sydd ddim yn cydymffurfio.",
   "non-accessible-content-heading": "Cynnwys anhygyrch",
   "non-compliance-heading": "Diffyg cydymffurfio â'r rheoliadau hygyrchedd",
-  "non-compliance-abbreviations": "Mae rhai teitlau tudalen yn defnyddio byrfoddau (e.e. EPR, LAPs) nad ydynt wedi’u diffinio na'u hegluro. Mae’n bosibl na fydd defnyddwyr yn gyfarwydd â’r byrfoddau. Nid yw hyn yn bodloni'r maen prawf llwyddiant 2.4.2 Teitlau Tudalennau WCAG 2.2 (Lefel A)",
   "non-compliance-documents": "Mae dogfennau mewn fformatau nad ydynt yn HTML, er enghraifft PDF. Dylent fodloni’r safon ar gyfer PDFs hygyrch, gan gynnwys nodweddion tagio a strwythur dogfennau priodol",
   "non-compliance-policy-link": "Gallwch ddarllen <a href=\"https://www.gov.uk/government/organisations/department-for-environment-food-rural-affairs/about/accessible-documents-policy\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">polisi dogfennau hygyrch Defra</a> ar sut i roi gwybod am unrhyw broblemau neu i ofyn am ddogfennau mewn fformat gwahanol.",
   "out-of-scope": "Cynnwys nad yw o fewn cwmpas y rheoliadau hygyrchedd",
