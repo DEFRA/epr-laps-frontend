@@ -238,7 +238,6 @@
   "compliance-status-description": "This website is partially compliant with the <a href=\"https://www.w3.org/TR/WCAG22/\">Web Content Accessibility Guidelines</a> version 2.2 AA standard, due to the non-compliances and exemptions listed below.",
   "non-accessible-content-heading": "Non-accessible content",
   "non-compliance-heading": "Non-compliance with the accessibility regulations",
-  "non-compliance-abbreviations": "Some page titles utilise abbreviations (e.g. EPR, LAPs) which are not defined or expanded upon. Users may be unfamiliar with the abbreviated terms. This fails WCAG 2.2 success criterion 2.4.2 Page Titled (Level A)",
   "non-compliance-documents": "Documents are in non-HTML formats, for example PDF. They should meet the standard for accessible PDFs including tagging and appropriate document structure",
   "non-compliance-policy-link": "View the <a href=\"https://www.gov.uk/government/organisations/department-for-environment-food-rural-affairs/about/accessible-documents-policy\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">Defra accessible document policy</a> to report any problems or request documents in an alternative format.",
   "out-of-scope": "Content that’s not within the scope of the accessibility regulations",
