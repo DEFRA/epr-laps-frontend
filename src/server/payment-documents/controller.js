@@ -31,10 +31,10 @@ export const paymentDocumentsController = {
       selectedYear
     )
     // Determine which year to show
-    const yearToShow =
-      selectedYear && documentApiData[selectedYear]
-        ? selectedYear
-        : Object.keys(documentApiData).find((key) => key.includes('to'))
+    const hasSelectedYear = selectedYear && documentApiData[selectedYear]
+    const yearsToShow = hasSelectedYear
+      ? [selectedYear]
+      : Object.keys(documentApiData).filter((key) => key.includes('to'))
 
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
@@ -47,9 +47,13 @@ export const paymentDocumentsController = {
       langKey === languageKeys.cy.toUpperCase() &&
       Object.keys(welshCouncils).includes(organisationName)
 
-    const docsByYear = documentApiData[yearToShow] || {}
-    const docsToShow =
-      docsByYear[isWelshCouncil ? langKey : languageKeys.en.toUpperCase()] || []
+    const docsToShow = yearsToShow.flatMap((year) => {
+      const docsByYear = documentApiData[year] || {}
+      return (
+        docsByYear[isWelshCouncil ? langKey : languageKeys.en.toUpperCase()] ||
+        []
+      )
+    })
 
     // Store document metadata in session for secure audit logging
     // This prevents users from tampering with documentType/language/quarter in URLs
@@ -163,7 +167,12 @@ export function findSelectedOption(isPost, request, documentApiData) {
   if (messages.length > 0 && !isPost) {
     return messages[0]
   }
-  return isPost ? request.payload.sort : documentApiData.latestFinancialYear
+
+  if (isPost) {
+    return request.payload.sort
+  }
+
+  return undefined
 }
 
 /**
