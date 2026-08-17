@@ -31,10 +31,26 @@ export const paymentDocumentsController = {
       selectedYear
     )
     // Determine which year to show
-    const hasSelectedYear = selectedYear && documentApiData[selectedYear]
-    const yearsToShow = hasSelectedYear
-      ? [selectedYear]
-      : Object.keys(documentApiData).filter((key) => key.includes('to'))
+    const jsEnabled = request.yar.get('js_enabled');
+
+    const defaultYear = Object.keys(documentApiData)
+      .find(key => key.includes('to'));
+
+    
+    const hasSelectedYear = !!(
+      selectedYear &&
+      documentApiData[selectedYear]
+    )
+
+    const allYears = Object.keys(documentApiData).filter(key => key.includes('to'))
+
+    const yearsToShow =
+      jsEnabled !== true
+        ? allYears
+        : hasSelectedYear
+          ? [selectedYear]
+          : [defaultYear];
+
 
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
@@ -168,11 +184,7 @@ export function findSelectedOption(isPost, request, documentApiData) {
     return messages[0]
   }
 
-  if (isPost) {
-    return request.payload.sort
-  }
-
-  return undefined
+  return isPost ? request.payload.sort : documentApiData.latestFinancialYear
 }
 
 /**

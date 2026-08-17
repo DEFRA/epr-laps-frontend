@@ -20,6 +20,14 @@ export const paymentDocuments = {
         },
         {
           method: 'GET',
+          path: '/session/js-enabled',
+          handler: (request, h) => {
+            request.yar.set('js_enabled', true)
+            return h.response().code(204)
+          }
+        },
+        {
+          method: 'GET',
           path: '/document/view/{fileId}',
           options: {
             pre: [

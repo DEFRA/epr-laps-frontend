@@ -26,7 +26,22 @@
   {% endif %}
 
   <form method="post" id="yearFilterForm">
-  <input type="hidden" name="csrfToken" value="{{csrfToken}}">
+    <input type="hidden" name="js_enabled" id="js_enabled" value="">
+    <script>
+      if (!sessionStorage.getItem('js-detection-complete')) {
+        fetch('/session/js-enabled', {
+          method: 'GET',
+          credentials: 'same-origin'
+        })
+        .then(() => {
+          sessionStorage.setItem('js-detection-complete', 'true');
+          window.location.reload();
+        })
+        .catch(() => {});
+      }
+    </script>
+    <noscript><input type="hidden" name="js_enabled" value="0"></noscript>
+    <input type="hidden" name="csrfToken" value="{{csrfToken}}">
     {{ govukSelect({
       id: "sort",
       name: "sort",
