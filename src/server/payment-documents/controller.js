@@ -31,26 +31,24 @@ export const paymentDocumentsController = {
       selectedYear
     )
     // Determine which year to show
-    const jsEnabled = request.yar.get('js_enabled');
+    const jsEnabled = request.yar.get('js_enabled')
 
-    const defaultYear = Object.keys(documentApiData)
-      .find(key => key.includes('to'));
-
-    
-    const hasSelectedYear = !!(
-      selectedYear &&
-      documentApiData[selectedYear]
+    const defaultYear = Object.keys(documentApiData).find((key) =>
+      key.includes('to')
     )
 
-    const allYears = Object.keys(documentApiData).filter(key => key.includes('to'))
+    const hasSelectedYear = !!(selectedYear && documentApiData[selectedYear])
+
+    const allYears = Object.keys(documentApiData).filter((key) =>
+      key.includes('to')
+    )
 
     const yearsToShow =
       jsEnabled !== true
         ? allYears
         : hasSelectedYear
           ? [selectedYear]
-          : [defaultYear];
-
+          : [defaultYear]
 
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
