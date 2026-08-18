@@ -33,7 +33,6 @@ export const paymentDocumentsController = {
     // Determine which year to show
     const jsEnabled = request.yar.get('js_enabled')
 
-
     const defaultYear = Object.keys(documentApiData).find((key) =>
       key.includes('to')
     )
@@ -42,10 +41,6 @@ export const paymentDocumentsController = {
 
     const allYears = Object.keys(documentApiData).filter((key) =>
       key.includes('to')
-    )
-    console.log(
-      'Controller value:',
-      request.yar.get('js_enabled')
     )
 
     const yearsToShow =
