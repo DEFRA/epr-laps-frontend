@@ -38,17 +38,13 @@ export const paymentDocumentsController = {
     )
 
     const hasSelectedYear = !!(selectedYear && documentApiData[selectedYear])
+    const yearToChoose = hasSelectedYear ? [selectedYear] : [defaultYear]
 
     const allYears = Object.keys(documentApiData).filter((key) =>
       key.includes('to')
     )
 
-    const yearsToShow =
-      jsEnabled !== true
-        ? allYears
-        : hasSelectedYear
-          ? [selectedYear]
-          : [defaultYear]
+    const yearsToShow = !jsEnabled ? allYears : yearToChoose
 
     // Determine language to show based on URL param
     const langKey = currentLang.toUpperCase()
