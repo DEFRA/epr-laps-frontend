@@ -23,6 +23,10 @@ export const paymentDocuments = {
           path: '/session/js-enabled',
           handler: (request, h) => {
             request.yar.set('js_enabled', true)
+            console.log(
+              'Route value:',
+              request.yar.get('js_enabled')
+            )
             return h.response().code(204)
           }
         },
