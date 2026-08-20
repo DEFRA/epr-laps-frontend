@@ -26,6 +26,9 @@ ENV NODE_ENV=production
 
 RUN npm run build:frontend
 
+# Remove source map files from the build output
+RUN find ./.public -name "*.map" -type f -delete
+
 FROM defradigital/node:${PARENT_VERSION} AS production
 ARG PARENT_VERSION
 LABEL uk.gov.defra.ffc.parent-image=defradigital/node:${PARENT_VERSION}

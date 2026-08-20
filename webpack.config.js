@@ -31,7 +31,7 @@ export default {
     outputModule: true
   },
   mode: NODE_ENV === 'production' ? 'production' : 'development',
-  devtool: NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
+  devtool: NODE_ENV === 'production' ? false : 'inline-source-map',
   watchOptions: {
     aggregateTimeout: 200,
     poll: 1000
@@ -142,11 +142,6 @@ export default {
 
           // Allow Terser to remove @preserve comments
           format: { comments: false },
-
-          // Include sources content from dependency source maps
-          sourceMap: {
-            includeSources: true
-          },
 
           // Compatibility workarounds
           safari10: true
