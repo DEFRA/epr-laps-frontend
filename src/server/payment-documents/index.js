@@ -3,6 +3,8 @@ import {
   fileDownloadController
 } from './controller.js'
 
+import { statusCodes } from '../common/constants/status-codes.js'
+
 export const paymentDocuments = {
   plugin: {
     name: 'paymentDocuments',
@@ -17,6 +19,14 @@ export const paymentDocuments = {
           method: 'GET',
           path: '/document/{fileId}',
           ...fileDownloadController
+        },
+        {
+          method: 'GET',
+          path: '/session/js-enabled',
+          handler: (request, h) => {
+            request.yar.set('js_enabled', true)
+            return h.response().code(statusCodes.noContent)
+          }
         },
         {
           method: 'GET',
