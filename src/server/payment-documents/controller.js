@@ -116,9 +116,15 @@ export function buildFinancialYearOptions(
 }
 
 function buildTableRows(docsToShow, translations) {
-  const excludedDocuments = ['Grant letter Q2', 'Remittance letter Q4']
+  const excludedDocuments = new Set(['Grant letter Q2', 'Remittance letter Q2'])
   return docsToShow
-    .filter((doc) => !excludedDocuments.includes(doc.documentName?.trim()))
+    .filter(
+      (doc) =>
+        !(
+          excludedDocuments.has(doc.documentName?.trim()) &&
+          doc.financialYear === '2026/2027'
+        )
+    )
     .map((doc) => {
       // Only include filename in URL for download purposes
       // Metadata is stored securely in session, not exposed in URL
