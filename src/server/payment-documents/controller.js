@@ -116,46 +116,56 @@ export function buildFinancialYearOptions(
 }
 
 function buildTableRows(docsToShow, translations) {
-  return docsToShow.map((doc) => {
-    // Only include filename in URL for download purposes
-    // Metadata is stored securely in session, not exposed in URL
-    const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
-    const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
+  const excludedDocuments = new Set(['Grant letter Q2', 'Remittance letter Q2'])
+  return docsToShow
+    .filter(
+      (doc) =>
+        !(
+          excludedDocuments.has(doc.documentName?.trim()) &&
+          doc.financialYear === '2026/2027'
+        )
+    )
+    .map((doc) => {
+      // Only include filename in URL for download purposes
+      // Metadata is stored securely in session, not exposed in URL
+      const downloadLink = `/document/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
+      const viewLink = `/document/view/${encodeURIComponent(doc.id)}?docName=${encodeURIComponent(doc.fileName)}`
 
-    // Parse date in "DD Mon YYYY" format
-    const [day, month, year] = doc.creationDate.split(' ')
+      // Parse date in "DD Mon YYYY" format
+      const [day, month, year] = doc.creationDate.split(' ')
 
-    const documentStatus = doc.isLatest
-      ? `<span><strong class='govuk-tag recently-added-tag'>${translations['recently-added']}</strong></span>`
-      : ''
-    const translationKey = getTranslationKey(doc.documentName)
-    const docNameTranslated = translations[translationKey] || doc.documentName
-    const monthTranslated = translations[month] || month
-    const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
+      const documentStatus = doc.isLatest
+        ? `<span><strong class='govuk-tag recently-added-tag'>${translations['recently-added']}</strong></span>`
+        : ''
 
-    return [
-      {
-        text: formattedDateTranslated
-      },
-      {
-        html: `<div><span class='document-name'>${docNameTranslated}</span> ${documentStatus}</div>`
-      },
-      {
-        html: `<a href='${downloadLink}' download class='govuk-link'>
+      const translationKey = getTranslationKey(doc.documentName)
+      const docNameTranslated = translations[translationKey] || doc.documentName
+      const monthTranslated = translations[month] || month
+      const formattedDateTranslated = `${day} ${monthTranslated} ${year}`
+
+      return [
+        {
+          text: formattedDateTranslated
+        },
+        {
+          html: `<div><span class='document-name'>${docNameTranslated}</span> ${documentStatus}</div>`
+        },
+        {
+          html: `<a href='${downloadLink}' download class='govuk-link'>
                 ${translations.download}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
                 </span></a>`
-      },
-      {
-        html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
+        },
+        {
+          html: `<a href='${viewLink}' target='_blank' rel='noopener' class='govuk-link'>
                 ${translations['view-(opens-in-']}
                 <span class='govuk-visually-hidden'>
                   ${doc.creationDate} ${doc.documentName}
                 </span></a>`
-      }
-    ]
-  })
+        }
+      ]
+    })
 }
 
 export function findSelectedOption(isPost, request, documentApiData) {
