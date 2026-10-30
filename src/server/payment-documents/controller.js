@@ -116,7 +116,7 @@ export function buildFinancialYearOptions(
 }
 
 function buildTableRows(docsToShow, translations) {
-  const excludedDocuments = new Set(['Grant letter Q2', 'Remittance letter Q2'])
+  const excludedDocuments = new Set(['Remittance letter Q2'])
   return docsToShow
     .filter(
       (doc) =>
