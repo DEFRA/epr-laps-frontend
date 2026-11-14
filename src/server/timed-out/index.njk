@@ -10,6 +10,9 @@
   {{ translations['for-security-reas'] }}<br><br>
   {{ translations['sign-in-again'] | safe }}<br><br>
   </p>
+  <script>
+    sessionStorage.removeItem('js-detection-complete');
+  </script>
   {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {{ govukButton({
